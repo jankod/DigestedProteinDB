@@ -1,4 +1,4 @@
-package hr.createnr.cli;
+package hr.createnr.app;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -28,6 +28,7 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
+import hr.createnr.cli.IApp;
 import hr.createnr.util.BioUtil;
 
 public class CreateSmallMenyFilesDBapp implements IApp {

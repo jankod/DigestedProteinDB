@@ -18,14 +18,14 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import hr.createnr.app.CreateSmallMenyFilesDBapp;
+
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);
 
 	public static void main(String[] args) throws ParseException {
 
 		HashMap<String, IApp> apps = new HashMap<>();
-		apps.put("demo1", new Demo1App());
-		apps.put("demo2", new Demo2App());
 		apps.put("small", new CreateSmallMenyFilesDBapp());
 
 		// String[] demoArgs = { "-a", "small" };
