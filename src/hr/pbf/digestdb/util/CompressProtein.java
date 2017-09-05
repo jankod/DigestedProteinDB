@@ -14,7 +14,6 @@ public class CompressProtein {
 		String[] map = new String[Byte.MAX_VALUE];
 		//-128 do 127; == 254
 		
-		
 		System.out.println(Byte.MIN_VALUE);
 	}
 }

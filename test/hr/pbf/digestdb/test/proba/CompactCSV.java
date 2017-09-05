@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.compact;
+package hr.pbf.digestdb.test.proba;
 
 import java.io.DataOutputStream;
 import java.io.OutputStream;

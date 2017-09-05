@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.cli;
+package hr.pbf.digestdb;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -21,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
-import hr.pbf.digestdb.GlobalMainOld;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.FastaSeq;
 import hr.pbf.digestdb.util.MySQLdb;
