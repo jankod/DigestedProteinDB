@@ -24,6 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.DeflaterInputStream;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -115,19 +120,25 @@ public class BioUtil {
 		return w;
 	}
 
+	////////////////////////////////////////////////////////////
+	// COMPRESS
+	////////////////////////////////////////////////////////////
+
 	public static DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
 		DataOutputStream out = new DataOutputStream(
-
-				new BufferedOutputStream(new SnappyFramedOutputStream(new FileOutputStream(new File(path)))));
+				new BufferedOutputStream(new DeflaterOutputStream(new FileOutputStream(new File(path)))));
 		return out;
 	}
 
 	public static DataInputStream newDataInputStreamCompressed(String path) throws IOException {
+
 		DataInputStream out = new DataInputStream(
-				new BufferedInputStream(new SnappyFramedInputStream(new FileInputStream(new File(path)), false)));
+				new BufferedInputStream((new InflaterInputStream(new FileInputStream(new File(path))))));
 		return out;
 	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////// 77
 
 	public static DataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
 		DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(path))));

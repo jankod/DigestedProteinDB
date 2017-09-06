@@ -56,24 +56,28 @@ public class CompressSmall_APP implements IApp {
 
 	public static void main(String[] args) {
 		CompressSmall_APP app = new CompressSmall_APP();
-//		app.start(null);
-		
-		
-		
+		// compressApp.start(null);
+
 	}
 
-	public HashMap<String, List<Long>> uncompress(String fileIn) throws IOException {
+	public HashMap<String, List<Long>> decompress(String fileIn) throws IOException {
 		HashMap<String, List<Long>> result = new HashMap<>();
 		try (DataInputStream in = BioUtil.newDataInputStreamCompressed(fileIn)) {
 			while (in.available() > 0) {
 				String peptide = in.readUTF();
 				// in.read()
-
+				short howManyIds = in.readShort();
+				log.debug("How many "+ howManyIds);
+				List<Long> ids = new ArrayList<>(howManyIds);
+				for (int i = 0; i < howManyIds; i++) {
+					ids.add(in.readLong());
+				}
+				result.put(peptide, ids);
 			}
 
 		}
 
-		return null;
+		return result;
 
 	}
 
@@ -90,18 +94,20 @@ public class CompressSmall_APP implements IApp {
 			}
 		}
 
+		HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
+
+		for (PeptideMassIdRow row : rows) {
+			List<PeptideMassIdRow> listRows = map.get(row.peptide);
+			if (listRows == null) {
+				listRows = new ArrayList<>();
+				map.put(row.peptide, listRows);
+			}
+			listRows.add(row);
+		}
+
+		
 		try (DataOutputStream out = BioUtil.newDataOutputStreamCompresed(fileOut)) {
 
-			HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
-
-			for (PeptideMassIdRow row : rows) {
-				List<PeptideMassIdRow> listRows = map.get(row.peptide);
-				if (listRows == null) {
-					listRows = new ArrayList<>();
-					map.put(row.peptide, listRows);
-				}
-				listRows.add(row);
-			}
 
 			// Zapis: UTF:peptide, INT:kolko ID ima: LONG:ID-evi....
 			Set<Entry<String, List<PeptideMassIdRow>>> entrySet = map.entrySet();
@@ -121,6 +127,7 @@ public class CompressSmall_APP implements IApp {
 				// out.write(shuffle);
 			}
 		}
+		
 
 		return rows;
 

@@ -52,7 +52,7 @@ public class GlobalMainOld {
 			return;
 		}
 
-		System.out.println("Not find app...");
+		System.out.println("Not find compressApp...");
 
 	}
 }

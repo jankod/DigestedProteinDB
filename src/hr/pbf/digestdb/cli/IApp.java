@@ -6,7 +6,7 @@ import org.apache.commons.cli.Options;
 
 /**
  * Konstruktor je najbolje prazan ostaviti jer se poziva uvjek bez obzira da li
- * se app klasa koristi ili ne.
+ * se compressApp klasa koristi ili ne.
  * 
  * @author tag
  *

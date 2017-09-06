@@ -40,7 +40,7 @@ public class MainCli {
 		log.debug("Upisao " + Arrays.toString(demoArgs));
 
 		Options options = new Options();
-		options.addOption(Option.builder("a").longOpt("app").hasArg()
+		options.addOption(Option.builder("a").longOpt("compressApp").hasArg()
 				.desc("Start one of apps: " + apps.keySet().toString()).build());
 
 		options.addOption(Option.builder("sa").longOpt("showApps").hasArg(false).desc("Show existing apps").build());
@@ -65,13 +65,13 @@ public class MainCli {
 
 			if (cli.hasOption("a")) {
 				String appName = cli.getOptionValue("a");
-				log.debug("start app " + appName);
+				log.debug("start compressApp " + appName);
 				IApp app = apps.get(appName);
 				startApp(args, options, parser, app);
 				return;
 			}
 
-			printHelp(options, "Not find app name!");
+			printHelp(options, "Not find compressApp name!");
 
 		} catch (UnrecognizedOptionException e) {
 			System.out.println("Error " + e.getMessage());
