@@ -13,11 +13,25 @@ import java.util.TreeSet;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.IOUtils;
+import org.iq80.snappy.SnappyFramedOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xerial.snappy.BitShuffle;
+import org.xerial.snappy.BitShuffleNative;
 
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
 
+/**
+ * Kompresira file gdje je slozeno po masama sa
+ * {@link CreateSmallMenyFilesDBapp}.
+ * 
+ * @author tag
+ *
+ */
 public class CompressSmall_APP implements IApp {
+	private static final Logger log = LoggerFactory.getLogger(CompressSmall_APP.class);
 
 	@Override
 	public void populateOption(Options o) {
@@ -26,13 +40,13 @@ public class CompressSmall_APP implements IApp {
 
 	@Override
 	public void start(CommandLine appCli) {
-		String folderPath = "";
+		String folderPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store";
 
 		File f = new File(folderPath);
 		File[] listFiles = f.listFiles();
 		for (File file : listFiles) {
 			try {
-				compress(file);
+				compress(file.getAbsolutePath(), file.getAbsoluteFile() + ".compress");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -40,54 +54,93 @@ public class CompressSmall_APP implements IApp {
 		}
 	}
 
-	private void compress(File file) throws IOException {
-		TreeSet<Row> rows = new TreeSet<>();
+	public static void main(String[] args) {
+		CompressSmall_APP app = new CompressSmall_APP();
+//		app.start(null);
+		
+		
+		
+	}
 
-		DataInputStream in = BioUtil.newDataInputStream(file.getAbsolutePath());
-		while (in.available() > 0) {
-			double mass = in.readDouble();
-			long id = in.readLong();
-			String peptide = in.readUTF();
-			Row row = new Row(mass, id, peptide);
-			rows.add(row);
-		}
-		DataOutputStream out = BioUtil.newDataOutputStream(file.getAbsolutePath() + ".compress");
+	public HashMap<String, List<Long>> uncompress(String fileIn) throws IOException {
+		HashMap<String, List<Long>> result = new HashMap<>();
+		try (DataInputStream in = BioUtil.newDataInputStreamCompressed(fileIn)) {
+			while (in.available() > 0) {
+				String peptide = in.readUTF();
+				// in.read()
 
-		HashMap<String, List<Row>> map = new HashMap<>();
-
-		for (Row row : rows) {
-			List<Row> listRows = map.get(row.peptide);
-			if (listRows == null) {
-				listRows = new ArrayList<>();
-				map.put(row.peptide, listRows);
 			}
-			listRows.add(row);
+
 		}
 
-		Set<Entry<String, List<Row>>> entrySet = map.entrySet();
-		for (Entry<String, List<Row>> entry : entrySet) {
-			String peptide = entry.getKey();
-			
+		return null;
+
+	}
+
+	public TreeSet<PeptideMassIdRow> compress(String fileIn, String fileOut) throws IOException {
+		TreeSet<PeptideMassIdRow> rows = new TreeSet<>();
+
+		try (DataInputStream in = BioUtil.newDataInputStream(fileIn)) {
+			while (in.available() > 0) {
+				double mass = in.readDouble();
+				long id = in.readLong();
+				String peptide = in.readUTF();
+				PeptideMassIdRow row = new PeptideMassIdRow(mass, id, peptide);
+				rows.add(row);
+			}
+		}
+
+		try (DataOutputStream out = BioUtil.newDataOutputStreamCompresed(fileOut)) {
+
+			HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
+
+			for (PeptideMassIdRow row : rows) {
+				List<PeptideMassIdRow> listRows = map.get(row.peptide);
+				if (listRows == null) {
+					listRows = new ArrayList<>();
+					map.put(row.peptide, listRows);
+				}
+				listRows.add(row);
+			}
+
+			// Zapis: UTF:peptide, INT:kolko ID ima: LONG:ID-evi....
+			Set<Entry<String, List<PeptideMassIdRow>>> entrySet = map.entrySet();
+			for (Entry<String, List<PeptideMassIdRow>> entry : entrySet) {
+				String peptide = entry.getKey();
+				out.writeUTF(peptide);
+				List<PeptideMassIdRow> rowsByPeptide = entry.getValue();
+				// long[] arrayID = new long[rowsByPeptide.size()];
+
+				// int i = 0;
+				out.writeShort(rowsByPeptide.size());
+				for (PeptideMassIdRow row : rowsByPeptide) {
+					// arrayID[i] = row.id;
+					out.writeLong(row.id);
+				}
+				// byte[] shuffle = BitShuffle.shuffle(arrayID);
+				// out.write(shuffle);
+			}
+		}
+
+		return rows;
+
+	}
+
+	public static class PeptideMassIdRow implements Comparable<PeptideMassIdRow> {
+		String peptide;
+		double mass;
+		long id;
+
+		public PeptideMassIdRow(double mass, long id, String peptide) {
+			this.mass = mass;
+			this.id = id;
+			this.peptide = peptide;
+		}
+
+		@Override
+		public int compareTo(PeptideMassIdRow o) {
+			return this.peptide.compareTo(o.peptide);
 		}
 
 	}
-
-}
-
-class Row implements Comparable<Row> {
-	String peptide;
-	double mass;
-	long id;
-
-	public Row(double mass, long id, String peptide) {
-		this.mass = mass;
-		this.id = id;
-		this.peptide = peptide;
-	}
-
-	@Override
-	public int compareTo(Row o) {
-		return this.peptide.compareTo(o.peptide);
-	}
-
 }

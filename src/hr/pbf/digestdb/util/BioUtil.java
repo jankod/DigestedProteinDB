@@ -30,6 +30,8 @@ import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.iq80.snappy.SnappyFramedInputStream;
+import org.iq80.snappy.SnappyFramedOutputStream;
 
 public class BioUtil {
 
@@ -111,6 +113,20 @@ public class BioUtil {
 		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
 				BUFFER);
 		return w;
+	}
+
+	public static DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
+
+		DataOutputStream out = new DataOutputStream(
+
+				new BufferedOutputStream(new SnappyFramedOutputStream(new FileOutputStream(new File(path)))));
+		return out;
+	}
+
+	public static DataInputStream newDataInputStreamCompressed(String path) throws IOException {
+		DataInputStream out = new DataInputStream(
+				new BufferedInputStream(new SnappyFramedInputStream(new FileInputStream(new File(path)), false)));
+		return out;
 	}
 
 	public static DataOutputStream newDataOutputStream(String path) throws FileNotFoundException {

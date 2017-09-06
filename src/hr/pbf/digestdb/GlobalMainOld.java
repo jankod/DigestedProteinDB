@@ -19,7 +19,7 @@ public class GlobalMainOld {
 	public static final String DB_USER = "root";
 	public static final String DB_PASSWORD = "ja";
 
-	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+	public static void main2(String[] args) throws IOException, SQLException, InterruptedException {
 
 		if (args.length <= 1) {
 			System.out.println("Not call args!");

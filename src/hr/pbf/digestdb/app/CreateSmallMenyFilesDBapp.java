@@ -32,14 +32,14 @@ import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
 
 public class CreateSmallMenyFilesDBapp implements IApp {
-private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDBapp.class);
+	private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDBapp.class);
 
 	String pathCsv = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
 	String folderPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
 
 	private final double DELTA = 0.3;
-	final double fromMass = 1000;
-	final double toMass = 2000;
+	final double fromMass = 500;
+	final double toMass = 1000;
 
 	public CreateSmallMenyFilesDBapp() {
 		if (SystemUtils.IS_OS_WINDOWS) {
@@ -66,7 +66,7 @@ private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDB
 
 	@Override
 	public void populateOption(Options o) {
-		
+
 	}
 
 	static NumberFormat nf = NumberFormat.getInstance();
@@ -103,13 +103,16 @@ private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDB
 					System.out.println(
 							"Count " + nf.format(count) + " " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 				}
-
-				writeRow(mass, peptide, accessionID);
+				if (mass < fromMass || mass > toMass) {
+					continue;
+				}
+				DataOutputStream out = rangeMap.get(mass);
+				writeRow(mass, peptide, accessionID, out);
 
 			}
 
 			System.out.println("Count sequence ukupno " + count);
-			System.out.println("Duration: "+ DurationFormatUtils.formatDurationHMS(s.getTime()));
+			System.out.println("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -130,27 +133,34 @@ private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDB
 					.newDataOutputStream(folderPath + "/" + r.lowerEndpoint() + "-" + r.upperEndpoint() + ".db"));
 		}
 	}
+
 	private void closeAllStreams() {
-		
+
 		Collection<DataOutputStream> values = rangeMap.asMapOfRanges().values();
 		for (DataOutputStream dataOutputStream : values) {
 			IOUtils.closeQuietly(dataOutputStream);
 		}
 	}
 
-	private void writeRow(double mass, String peptide, long accessionID) throws IOException {
-		if(mass < fromMass || mass > toMass) {
-			return;
-		}
-		DataOutputStream out = rangeMap.get(mass);
-		if (out != null) {
-			out.writeDouble(mass);
-			out.writeLong(accessionID);
-			out.writeUTF(peptide);
-		}else {
-			log.warn("Not find stream for mass"+ mass);
-		}
-		// znaci nisam radio za te sada jos.
+	public Row readRow(DataInputStream in) throws IOException {
+		Row r = new Row();
+		r.mass = in.readDouble();
+		r.accessionID = in.readLong();
+		r.peptide = in.readUTF();
+		return r;
+	}
+
+	public static class Row {
+		public double mass;
+		public String peptide;
+		public long accessionID;
+	}
+
+	public void writeRow(double mass, String peptide, long accessionID, DataOutputStream out) throws IOException {
+
+		out.writeDouble(mass);
+		out.writeLong(accessionID);
+		out.writeUTF(peptide);
 	}
 
 }
