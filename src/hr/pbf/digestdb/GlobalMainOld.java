@@ -23,31 +23,31 @@ public class GlobalMainOld {
 
 		if (args.length <= 1) {
 			System.out.println("Not call args!");
-			PrepareAccessionTaxIdCSV_APP.printArgs();
-			PrepareNr_APP.printArgs();
-			Statistic_App.printArgs();
+			App_2_1_PrepareAccessionTaxIdCSV.printArgs();
+			App_1_PrepareNr.printArgs();
+			App_Statistic.printArgs();
 			return;
 		}
 
 		String argAppName = args[0];
-		if (argAppName.equalsIgnoreCase(PrepareAccessionTaxIdCSV_APP.ARG_APP_NAME)) {
+		if (argAppName.equalsIgnoreCase(App_2_1_PrepareAccessionTaxIdCSV.ARG_APP_NAME)) {
 
 			System.out.println("preprare accession taxid csv");
 
-			PrepareAccessionTaxIdCSV_APP.main(args);
+			App_2_1_PrepareAccessionTaxIdCSV.main(args);
 			System.out.println("Finish");
 			return;
 		}
-		if (argAppName.equalsIgnoreCase(PrepareNr_APP.ARG_APP_NAME)) {
+		if (argAppName.equalsIgnoreCase(App_1_PrepareNr.ARG_APP_NAME)) {
 			System.out.println("nr prepare");
-			PrepareNr_APP.main(args);
+			App_1_PrepareNr.main(args);
 			System.out.println("Finish");
 			return;
 		}
 
-		if (argAppName.equalsIgnoreCase(Statistic_App.ARG_APP_NAME)) {
+		if (argAppName.equalsIgnoreCase(App_Statistic.ARG_APP_NAME)) {
 			System.out.println("stat");
-			Statistic_App.main(args);
+			App_Statistic.main(args);
 			System.out.println("Finish");
 			return;
 		}

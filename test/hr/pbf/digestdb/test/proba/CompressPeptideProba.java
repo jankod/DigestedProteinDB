@@ -13,7 +13,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.CharSet;
 
-import hr.pbf.digestdb.test.Smaz;
 import hr.pbf.digestdb.util.BioUtil;
 
 public class CompressPeptideProba {

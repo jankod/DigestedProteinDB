@@ -12,6 +12,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -30,18 +35,26 @@ import com.google.common.collect.TreeRangeMap;
 
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
+import hr.pbf.digestdb.util.MassRangeMap;
 
-public class CreateSmallMenyFilesDBapp implements IApp {
-	private static final Logger log = LoggerFactory.getLogger(CreateSmallMenyFilesDBapp.class);
+/**
+ * Nakon sto se napravi veliki CSV sa podacima, masa=>peptid=>id ovaj kod
+ * razbija na manje filove po 0.3 Da.
+ * 
+ * @author tag
+ *
+ */
+public class App_3_CreateMenyFilesFromCSV implements IApp {
+	private static final Logger log = LoggerFactory.getLogger(App_3_CreateMenyFilesFromCSV.class);
 
 	String pathCsv = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
 	String folderPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
 
 	private final double DELTA = 0.3;
-	final double fromMass = 500;
-	final double toMass = 1000;
+	final int fromMass = 500;
+	final int toMass = 6000;
 
-	public CreateSmallMenyFilesDBapp() {
+	public App_3_CreateMenyFilesFromCSV() {
 		if (SystemUtils.IS_OS_WINDOWS) {
 			pathCsv = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
 			folderPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
@@ -53,15 +66,6 @@ public class CreateSmallMenyFilesDBapp implements IApp {
 	}
 
 	public static void main(String[] args) throws IOException {
-		CreateSmallMenyFilesDBapp app = new CreateSmallMenyFilesDBapp();
-		app.readAllFilea(app.folderPath + "\\5704.5-5704.8.db");
-	}
-
-	private void readAllFilea(String path) throws IOException {
-		DataInputStream in = BioUtil.newDataInputStream(path);
-		while (in.available() > 0) {
-			System.out.println(in.readDouble() + "," + in.readLong() + "," + in.readUTF());
-		}
 	}
 
 	@Override
@@ -74,7 +78,7 @@ public class CreateSmallMenyFilesDBapp implements IApp {
 	@Override
 	public void start(CommandLine appCli) {
 		log.debug("Params: Mass from: {}, to: {}", fromMass, toMass);
-		log.debug("Params: dest forlder: {}", folderPath);
+		log.debug("Params: result folder: {}", folderPath);
 		log.debug("Params: read csv from {}", pathCsv);
 		StopWatch s = new StopWatch();
 		s.start();
@@ -83,63 +87,98 @@ public class CreateSmallMenyFilesDBapp implements IApp {
 
 		BufferedReader in = null;
 		try {
-			populateRangeMap();
+			massMap = new MassRangeMap(DELTA, fromMass, toMass);
 
+			
+			int threads = 22;
+			ExecutorService ex = Executors.newFixedThreadPool(threads);
+			Semaphore semaphore = new Semaphore(threads);
+			
+			
 			in = BioUtil.newFileReader(pathCsv);
 			LineIterator it = IOUtils.lineIterator(in);
 			int count = 0;
 			while (it.hasNext()) {
 				count++;
-				String string = (String) it.next();
-				String[] split = StringUtils.split(string, '\t');
-				double mass = Double.parseDouble(split[0].trim());
-				// f.addValue(mass);
-				String peptide = split[1].trim();
-				// 3. accession_my_id
-				long accessionID = Long.parseLong(split[2].trim());
-
-				if (count % 10_000_000 == 0) {
+				if (count % 70_000_000 == 0) {
 					// break;
 					System.out.println(
 							"Count " + nf.format(count) + " " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 				}
-				if (mass < fromMass || mass > toMass) {
-					continue;
-				}
-				DataOutputStream out = rangeMap.get(mass);
-				writeRow(mass, peptide, accessionID, out);
-
+				String line = (String) it.next();
+				
+				semaphore.acquire();
+				ex.submit(new  Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							handleRow(line);
+							semaphore.release();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
 			}
+			ex.awaitTermination(5, TimeUnit.MINUTES);
 
 			System.out.println("Count sequence ukupno " + count);
 			System.out.println("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
 			IOUtils.closeQuietly(in);
 			closeAllStreams();
 		}
 	}
 
-	RangeMap<Double, DataOutputStream> rangeMap = TreeRangeMap.create();
+	private void handleRow(String line) throws IOException {
 
-	private void populateRangeMap() throws FileNotFoundException {
-		for (double i = fromMass; i < toMass; i = i + DELTA) {
-			double from = BioUtil.roundToDecimals(i, 1);
-			double to = BioUtil.roundToDecimals(i + DELTA, 1);
-			Range<Double> r = Range.closed(from, to);
-			rangeMap.put(r, BioUtil
-					.newDataOutputStream(folderPath + "/" + r.lowerEndpoint() + "-" + r.upperEndpoint() + ".db"));
+		String[] split = StringUtils.split(line, '\t');
+		// 1. mass
+		double mass = Double.parseDouble(split[0].trim());
+		// 2. peptide
+		String peptide = split[1].trim();
+		// 3. accession_my_id
+		long accessionID = Long.parseLong(split[2].trim());
+
+		if (mass < fromMass || mass > toMass) {
+			return;
 		}
+		// DataOutputStream out = rangeMap.get(mass);
+		DataOutputStream out = getDataOutputStream(mass);
+		writeRow(mass, peptide, accessionID, out);
+	}
+
+	private MassRangeMap massMap;
+
+	private HashMap<String, DataOutputStream> massStreamMapp = new HashMap<>();
+
+	private DataOutputStream getDataOutputStream(double mass) throws FileNotFoundException {
+		String fileName = massMap.getFileName(mass);
+		if (massStreamMapp.containsKey(fileName)) {
+			return massStreamMapp.get(fileName);
+		}
+
+		DataOutputStream out = BioUtil.newDataOutputStream(folderPath + "/" + fileName + ".db");
+		synchronized (massStreamMapp) {
+			massStreamMapp.put(fileName, out);
+		}
+		return out;
+
 	}
 
 	private void closeAllStreams() {
-
-		Collection<DataOutputStream> values = rangeMap.asMapOfRanges().values();
+		Collection<DataOutputStream> values = massStreamMapp.values();
 		for (DataOutputStream dataOutputStream : values) {
 			IOUtils.closeQuietly(dataOutputStream);
 		}
+
 	}
 
 	public Row readRow(DataInputStream in) throws IOException {
@@ -158,9 +197,11 @@ public class CreateSmallMenyFilesDBapp implements IApp {
 
 	public void writeRow(double mass, String peptide, long accessionID, DataOutputStream out) throws IOException {
 
-		out.writeDouble(mass);
-		out.writeLong(accessionID);
-		out.writeUTF(peptide);
+		synchronized (out) {
+			out.writeDouble(mass);
+			out.writeLong(accessionID);
+			out.writeUTF(peptide);
+		}
 	}
 
 }

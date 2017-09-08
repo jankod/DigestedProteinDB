@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -127,14 +129,24 @@ public class BioUtil {
 	public static DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
 		DataOutputStream out = new DataOutputStream(
-				new BufferedOutputStream(new DeflaterOutputStream(new FileOutputStream(new File(path)))));
+				new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
 		return out;
 	}
 
+	
+	/**
+	 * Neznam zasto mora ici preko bytearrayoutputstream-a.
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
 	public static DataInputStream newDataInputStreamCompressed(String path) throws IOException {
 
-		DataInputStream out = new DataInputStream(
-				new BufferedInputStream((new InflaterInputStream(new FileInputStream(new File(path))))));
+		GZIPInputStream in = new GZIPInputStream(new FileInputStream(new File(path)));
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		IOUtils.copy(in, bytes);
+		DataInputStream out = new DataInputStream(new ByteArrayInputStream(bytes.toByteArray()));
+
 		return out;
 	}
 

@@ -32,13 +32,13 @@ import org.eclipse.collections.impl.bag.mutable.HashBag;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.PermutationProteinTriplets;
 
-public class Statistic_App {
+public class App_Statistic {
 
 	public static final String ARG_APP_NAME = "stat";
 
 	public static void printArgs() {
 		System.out.println();
-		System.out.println(Statistic_App.class.getName());
+		System.out.println(App_Statistic.class.getName());
 		System.out.println("Stat");
 		System.out.println("Count unique mass inn CSV");
 		System.out.println();

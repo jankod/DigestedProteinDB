@@ -22,7 +22,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.app.CreateSmallMenyFilesDBapp;
+import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);
@@ -31,7 +32,8 @@ public class MainCli {
 	public static void main(String[] args) throws ParseException {
 
 		HashMap<String, IApp> apps = new HashMap<>();
-		apps.put("small", new CreateSmallMenyFilesDBapp());
+		apps.put("small", new App_3_CreateMenyFilesFromCSV());
+		apps.put("compress", new App_4_CompressManyFilesSmall());
 
 		// String[] demoArgs = { "-a", "small" };
 		String[] demoArgs = { "-a" };

@@ -14,37 +14,39 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import hr.pbf.digestdb.util.AccessionMemoryDB;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.FastaSeq;
 import hr.pbf.digestdb.util.MySQLdb;
 
-public class PrepareNrToSmall_APP {
+public class App_1_PrepareNr {
 
 	public static final String ARG_APP_NAME = "nr";
 
 	public static void printArgs() {
 		System.out.println();
-		System.out.println(PrepareNrToSmall_APP.class.getName());
+		System.out.println(App_1_PrepareNr.class.getName());
 		System.out.println("" + ARG_APP_NAME + " path");
 		System.out.println();
 	}
 
-	// static MySQLdb mysql;
+	static MySQLdb mysql;
 
 	private static BufferedWriter seqeunceWriter;
 	private static BufferedWriter proteinWriter;
 	private static int threads = 12;
-	private static long useSeqvences = Long.MAX_VALUE;
+	private static long useSeqvences =  Long.MAX_VALUE;
 	private static BufferedWriter massWriter;
 	final static Semaphore semaphore = new Semaphore(threads);
+	private static AccessionMemoryDB accessionDB;
 
+	static boolean useMemoryDB = false;
 	static long globalSeqID = 0; // Ima ih 127.050.501
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
@@ -54,12 +56,18 @@ public class PrepareNrToSmall_APP {
 
 		BioUtil.printMemoryUsage("Prije baze: ");
 
+		if (useMemoryDB) {
+			accessionDB = AccessionMemoryDB.tryDeserializeSelf();
+			if (accessionDB == null) {
+				accessionDB = new AccessionMemoryDB("./accesion_num_exported.csv");
+			}
+		}
 		BioUtil.printMemoryUsage("Poslje baze");
 		BioUtil.printTimeDurration(stopWatch);
 
-		// mysql = new MySQLdb();
-		// mysql.initDatabase(GlobalMainOld.DB_USER, GlobalMainOld.DB_PASSWORD,
-		// GlobalMainOld.DB_URL);
+		mysql = new MySQLdb();
+		if (!useMemoryDB)
+			mysql.initDatabase(GlobalMainOld.DB_USER, GlobalMainOld.DB_PASSWORD, GlobalMainOld.DB_URL);
 		String fastaPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\4000nr.txt";
 
 		ExecutorService th = Executors.newFixedThreadPool(threads);
@@ -114,7 +122,7 @@ public class PrepareNrToSmall_APP {
 		IOUtils.closeQuietly(proteinWriter);
 		IOUtils.closeQuietly(seqeunceWriter);
 		IOUtils.closeQuietly(massWriter);
-		// mysql.closeDatabaase();
+		mysql.closeDatabaase();
 		System.out.println("Finish all, seq ID: " + globalSeqID);
 		System.out.println("Trajanje: " + DurationFormatUtils.formatDurationHMS(stopWatch.getTime()));
 		System.out.println("SEQ num: " + globalSeqID);
@@ -141,6 +149,44 @@ public class PrepareNrToSmall_APP {
 		}
 	}
 
+	/*
+	 * MORA SE MAKNUTI VERSION iz accessiona jer inace ne radi. Vraca -1 ako ne
+	 * nadje.
+	 */
+	protected static long getAccesionNumDB(String accession) {
+		try {
+
+			accession = BioUtil.removeVersionFromAccession(accession);
+
+			if (useMemoryDB) {
+				Long res = accessionDB.getAccessionNum(accession);
+				if (res == null) {
+					return -1;
+				}
+				return res;
+
+			}
+
+			Connection conn = mysql.getConnection();
+
+			String sql = "SELECT accession_num FROM accession_taxid_gi WHERE accession = '"
+					+ StringUtils.trimToEmpty(accession) + "'";
+			Statement s = conn.createStatement();
+			ResultSet res = s.executeQuery(sql);
+			long accession_num = -1;
+			if (res.next()) {
+				accession_num = res.getLong("accession_num");
+			} else {
+				// System.err.println("Nisam nasao accession num: " + sql);
+			}
+			s.close();
+			conn.close();
+			return accession_num;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
 
 	protected static String extractProteinNameFromHeader(String header) {
 		try {
@@ -172,7 +218,6 @@ public class PrepareNrToSmall_APP {
 		}
 	}
 
-	private static AtomicLong accessionNumCounter = new AtomicLong(0);
 	private static void processOneSeq(StopWatch stopWatch, FastaSeq seq, final String[] headers, long seqID)
 			throws IOException {
 		if (seqID % 100000 == 0) {
@@ -183,7 +228,7 @@ public class PrepareNrToSmall_APP {
 		boolean usedHeader = false;
 		for (String header : headers) {
 			String accession = extractAccessionFromHeader(header);
-			long accessionNum = accessionNumCounter.incrementAndGet();
+			long accessionNum = getAccesionNumDB(accession);
 			if (accessionNum == -1) {
 				// Ako nema accessiona, znaci da ovaj je
 				// ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/README

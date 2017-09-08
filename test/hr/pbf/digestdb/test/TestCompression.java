@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
@@ -20,9 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import com.clearspring.analytics.stream.membership.DataInputBuffer;
 
-import hr.pbf.digestdb.app.CompressSmall_APP;
-import hr.pbf.digestdb.app.CreateSmallMenyFilesDBapp;
-import hr.pbf.digestdb.app.CreateSmallMenyFilesDBapp.Row;
+import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV.Row;
+import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.util.BioUtil;
 
 public class TestCompression {
@@ -36,8 +38,8 @@ public class TestCompression {
 	String peptide2 = "FERFGDSGFWEPEPTIDE";
 	long acc2 = 43333979732L;
 
-	CreateSmallMenyFilesDBapp smallFilesApp = new CreateSmallMenyFilesDBapp();
-	CompressSmall_APP compressApp = new CompressSmall_APP();
+	App_3_CreateMenyFilesFromCSV smallFilesApp = new App_3_CreateMenyFilesFromCSV();
+	App_4_CompressManyFilesSmall compressApp = new App_4_CompressManyFilesSmall();
 
 	@Test
 	public void test1() throws Exception {
@@ -71,22 +73,55 @@ public class TestCompression {
 	@Test
 	public void test2() throws IOException {
 		File tempDirectory = FileUtils.getTempDirectory();
-		String path = new File(tempDirectory + "/test1compress.txt").getAbsolutePath();
-		try (DataOutputStream out = BioUtil.newDataOutputStream(path)) {
+		File file = new File(tempDirectory + "/test1compress.txt");
 
+		assertTrue(file.exists());
+		assertTrue(file.isFile());
+
+		String path = file.getAbsolutePath();
+		try (DataOutputStream out = BioUtil.newDataOutputStream(path)) {
+			// one row
 			smallFilesApp.writeRow(mass, peptide, acc, out);
+			smallFilesApp.writeRow(mass2, peptide2, acc2, out);
 		}
 
 		String fileCompressed = path + "_compress";
-		compressApp.compress(path, fileCompressed);
+
+		TreeSet<PeptideMassIdRow> rows = new TreeSet<>();
+
+		// 1. READ
+		try (DataInputStream in = BioUtil.newDataInputStream(path)) {
+			while (in.available() > 0) {
+				double mass = in.readDouble();
+				long id = in.readLong();
+				String peptide = in.readUTF();
+				PeptideMassIdRow row = new PeptideMassIdRow(mass, id, peptide);
+				rows.add(row);
+			}
+		}
+
+		compressApp.compress(rows, fileCompressed);
+
+		long length = new File(fileCompressed).length();
+		assertTrue("Mora biti file veci od 1 length", length > 0);
+		log.debug("File je {} bytes", length);
 
 		HashMap<String, List<Long>> result = compressApp.decompress(fileCompressed);
-		assertEquals("Same ", 1, result.size());
+		log.debug("result {}", result);
+		assertEquals("Same ", 2, result.size());
 
-		List<Long> ids = result.get(peptide);
-		assertEquals("Same ", ids.size(), 1);
+		{
+			List<Long> ids = result.get(peptide);
+			assertEquals("Same ", 1, ids.size());
+			assertEquals("SAme ids:", ids.get(0).longValue(), acc);
+		}
 
-		assertEquals("SAme ids:", ids.get(0).longValue(), acc);
+		{
+			List<Long> ids = result.get(peptide2);
+			assertEquals("Same ", 1, ids.size());
+			assertEquals("SAme ids:", ids.get(0).longValue(), acc2);
+		}
+		
 
 	}
 

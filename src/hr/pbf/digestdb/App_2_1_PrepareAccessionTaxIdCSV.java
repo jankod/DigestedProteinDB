@@ -9,13 +9,13 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class PrepareAccessionTaxIdCSV_APP {
+public class App_2_1_PrepareAccessionTaxIdCSV {
 
 	public static final String ARG_APP_NAME = "acc";
 
 	public static void printArgs() {
 		System.out.println();
-		System.out.println(PrepareAccessionTaxIdCSV_APP.class.getName());
+		System.out.println(App_2_1_PrepareAccessionTaxIdCSV.class.getName());
 		System.out.println("" + ARG_APP_NAME + " path");
 		System.out.println();
 	}
