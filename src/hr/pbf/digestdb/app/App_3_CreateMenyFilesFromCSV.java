@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -22,6 +23,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -39,7 +41,7 @@ import hr.pbf.digestdb.util.MassRangeMap;
 
 /**
  * Nakon sto se napravi veliki CSV sa podacima, masa=>peptid=>id ovaj kod
- * razbija na manje filove po 0.3 Da.
+ * razbija na manje CSV filove po 0.3Da.
  * 
  * @author tag
  *
@@ -47,21 +49,22 @@ import hr.pbf.digestdb.util.MassRangeMap;
 public class App_3_CreateMenyFilesFromCSV implements IApp {
 	private static final Logger log = LoggerFactory.getLogger(App_3_CreateMenyFilesFromCSV.class);
 
-	String pathCsv = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
-	String folderPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
+	String inputCsvPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
+	String folderResultPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
 
-	private final double DELTA = 0.3;
-	final int fromMass = 500;
-	final int toMass = 6000;
+	private final static double DELTA = 0.3;
+	final static int fromMass = 500;
+	final static int toMass = 6000;
+	static final MassRangeMap massPartsMap = new MassRangeMap(DELTA, fromMass, toMass);
 
 	public App_3_CreateMenyFilesFromCSV() {
 		if (SystemUtils.IS_OS_WINDOWS) {
-			pathCsv = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
-			folderPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
+			inputCsvPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
+			folderResultPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
 		} else {
 			// LINUX
-			pathCsv = "/home/mysql_data/mysql/nr_mass.csv";
-			folderPath = "/home/tag/nr_db/mass_small_store";
+			inputCsvPath = "/home/mysql_data/mysql/nr_mass.csv";
+			folderResultPath = "/home/tag/nr_db/mass_small_store";
 		}
 	}
 
@@ -78,24 +81,21 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	@Override
 	public void start(CommandLine appCli) {
 		log.debug("Params: Mass from: {}, to: {}", fromMass, toMass);
-		log.debug("Params: result folder: {}", folderPath);
-		log.debug("Params: read csv from {}", pathCsv);
+		log.debug("Params: result folder: {}", folderResultPath);
+		log.debug("Params: read csv from {}", inputCsvPath);
 		StopWatch s = new StopWatch();
 		s.start();
 
-		new File(folderPath).mkdirs();
+		new File(folderResultPath).mkdirs();
 
 		BufferedReader in = null;
 		try {
-			massMap = new MassRangeMap(DELTA, fromMass, toMass);
 
-			
-			int threads = 22;
+			int threads = 42;
 			ExecutorService ex = Executors.newFixedThreadPool(threads);
 			Semaphore semaphore = new Semaphore(threads);
-			
-			
-			in = BioUtil.newFileReader(pathCsv);
+
+			in = BioUtil.newFileReader(inputCsvPath, null, 8192 * 34);
 			LineIterator it = IOUtils.lineIterator(in);
 			int count = 0;
 			while (it.hasNext()) {
@@ -106,10 +106,10 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 							"Count " + nf.format(count) + " " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 				}
 				String line = (String) it.next();
-				
+
 				semaphore.acquire();
-				ex.submit(new  Runnable() {
-					
+				ex.submit(new Runnable() {
+
 					@Override
 					public void run() {
 						try {
@@ -120,7 +120,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 						}
 					}
 				});
-				
+
 			}
 			ex.awaitTermination(5, TimeUnit.MINUTES);
 
@@ -134,6 +134,13 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		} finally {
 			IOUtils.closeQuietly(in);
 			closeAllStreams();
+		}
+		File fileMassParts = new File(folderResultPath + "/mass_parts.txt");
+		try (FileOutputStream outFF = new FileOutputStream(fileMassParts)) {
+			SerializationUtils.serialize(massPartsMap, outFF);
+			log.debug("file mass parts {}", fileMassParts);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -155,17 +162,15 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		writeRow(mass, peptide, accessionID, out);
 	}
 
-	private MassRangeMap massMap;
-
 	private HashMap<String, DataOutputStream> massStreamMapp = new HashMap<>();
 
 	private DataOutputStream getDataOutputStream(double mass) throws FileNotFoundException {
-		String fileName = massMap.getFileName(mass);
+		String fileName = massPartsMap.getFileName(mass);
 		if (massStreamMapp.containsKey(fileName)) {
 			return massStreamMapp.get(fileName);
 		}
 
-		DataOutputStream out = BioUtil.newDataOutputStream(folderPath + "/" + fileName + ".db");
+		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36);
 		synchronized (massStreamMapp) {
 			massStreamMapp.put(fileName, out);
 		}

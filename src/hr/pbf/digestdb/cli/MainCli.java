@@ -2,7 +2,6 @@ package hr.pbf.digestdb.cli;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -14,16 +13,14 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
-import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);

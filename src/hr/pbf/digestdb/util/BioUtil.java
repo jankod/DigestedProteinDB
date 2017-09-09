@@ -100,13 +100,30 @@ public class BioUtil {
 		return newFileReader(path, null);
 	}
 
-	public static BufferedReader newFileReader(String path, String charset)
+	/**
+	 * 
+	 * @param path
+	 * @param charset
+	 *            moze biti null, onda se uzima ASCII
+	 * @param bufSize
+	 *            default je 8192, pa moze vise od toga.
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws UnsupportedEncodingException
+	 */
+	public static BufferedReader newFileReader(String path, String charset, int bufSize)
 			throws UnsupportedEncodingException, FileNotFoundException {
 		if (charset == null) {
 			charset = "ASCII";
 		}
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset),
+				bufSize);
 		return reader;
+	}
+
+	public static BufferedReader newFileReader(String path, String charset)
+			throws UnsupportedEncodingException, FileNotFoundException {
+		return newFileReader(path, charset, 8192);
 	}
 
 	public static BufferedWriter newFileWiter(String path, String charset)
@@ -133,9 +150,9 @@ public class BioUtil {
 		return out;
 	}
 
-	
 	/**
 	 * Neznam zasto mora ici preko bytearrayoutputstream-a.
+	 * 
 	 * @param path
 	 * @return
 	 * @throws IOException
@@ -154,6 +171,19 @@ public class BioUtil {
 
 	public static DataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
 		DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(path))));
+		return out;
+	}
+
+	/**
+	 * 
+	 * @param path
+	 * @param bufSize default je 8192
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static DataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
+		DataOutputStream out = new DataOutputStream(
+				new BufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
 		return out;
 	}
 
