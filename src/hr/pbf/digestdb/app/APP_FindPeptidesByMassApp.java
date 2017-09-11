@@ -12,7 +12,7 @@ import org.apache.commons.lang3.time.StopWatch;
 import ch.qos.logback.core.pattern.ConverterUtil;
 import hr.pbf.digestdb.cli.IApp;
 
-public class FindPeptidesByMassApp implements IApp{
+public class APP_FindPeptidesByMassApp implements IApp{
 
 	
 	public static void main(String[] args) throws IOException {
@@ -29,20 +29,24 @@ public class FindPeptidesByMassApp implements IApp{
 	
 	@Override
 	public void populateOption(Options o) {
-		o.addOption("m", "mass", true, "Koju masu da trazi");
+		o.addOption("f", "mass", true, "Koju masu od da trazi");
+		o.addOption("t", "mass2", true, "Koju masu do da trazi");
 	}
 
 	@Override
 	public void start(CommandLine appCli) {
-		if(appCli.hasOption('m')) {
-			String massString = appCli.getOptionValue('m');
+		if(appCli.hasOption("f")) {
 			try {
-				double mass = Double.parseDouble(massString);
+				double mass1 = Double.parseDouble(appCli.getOptionValue("f"));
+				double mass2 = Double.parseDouble(appCli.getOptionValue("t"));
 				
 				String path = "/home/tag/nr_db/mass_small_store";
 				
+				
+				
+				
 			} catch (NumberFormatException e) {
-				System.out.println(massString + " is not mass");
+				System.out.println(appCli.getOptionValue("f") + " is not mass");
 				e.printStackTrace();
 			}
 		}

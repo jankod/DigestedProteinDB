@@ -12,6 +12,14 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.196</version>
+			<scope>test</scope>
+		</dependency>
+
+
 		<!-- najbrzi dekompresor -->
 		<dependency>
 			<groupId>net.jpountz.lz4</groupId>

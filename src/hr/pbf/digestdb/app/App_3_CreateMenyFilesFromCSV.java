@@ -97,7 +97,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 			in = BioUtil.newFileReader(inputCsvPath, null, 8192 * 34);
 			LineIterator it = IOUtils.lineIterator(in);
-			int count = 0;
+			long count = 0;
 			while (it.hasNext()) {
 				count++;
 				if (count % 70_000_000 == 0) {
@@ -170,7 +170,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 			return massStreamMapp.get(fileName);
 		}
 
-		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36);
+		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36); // 0.3 MB
 		synchronized (massStreamMapp) {
 			massStreamMapp.put(fileName, out);
 		}

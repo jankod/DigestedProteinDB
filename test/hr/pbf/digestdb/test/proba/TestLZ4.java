@@ -13,5 +13,7 @@ public class TestLZ4 {
 		System.out.println("prije  " + bytes.length);
 		System.out.println("Poslje " + result.length);
 
+		
+		
 	}
 }

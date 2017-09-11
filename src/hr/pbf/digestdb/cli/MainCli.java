@@ -21,16 +21,17 @@ import org.slf4j.LoggerFactory;
 
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.app.App_5_Statistic;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);
 
-	
 	public static void main(String[] args) throws ParseException {
 
 		HashMap<String, IApp> apps = new HashMap<>();
 		apps.put("small", new App_3_CreateMenyFilesFromCSV());
 		apps.put("compress", new App_4_CompressManyFilesSmall());
+		apps.put("stat", new App_5_Statistic());
 
 		// String[] demoArgs = { "-a", "small" };
 		String[] demoArgs = { "-a" };
@@ -85,7 +86,7 @@ public class MainCli {
 
 	private static void startApp(String[] args, Options options, CommandLineParser parser, IApp app)
 			throws ParseException {
-		List<String> argsList =  new ArrayList<>(Arrays.asList(args));
+		List<String> argsList = new ArrayList<>(Arrays.asList(args));
 		if (argsList.size() >= 1)
 			argsList.remove(0);
 		if (argsList.size() >= 1)

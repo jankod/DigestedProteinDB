@@ -1,9 +1,7 @@
 package hr.pbf.digestdb.app;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -14,21 +12,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Files;
 
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
@@ -55,6 +55,8 @@ public class App_4_CompressManyFilesSmall implements IApp {
 
 	@Override
 	public void start(CommandLine appCli) {
+		StopWatch s = new StopWatch();
+		s.start();
 		String folderPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store";
 		folderPath = "/home/tag/nr_db/mass_small_store";
 		File f = new File(folderPath);
@@ -63,6 +65,8 @@ public class App_4_CompressManyFilesSmall implements IApp {
 		int threads = 22;
 		ExecutorService threadPool = Executors.newFixedThreadPool(threads);
 		Semaphore semaphore = new Semaphore(threads);
+		AtomicLong counter = new AtomicLong(0);
+
 		for (File file : listFiles) {
 
 			try {
@@ -88,9 +92,14 @@ public class App_4_CompressManyFilesSmall implements IApp {
 							}
 						}
 
-						compress(rows, file.getAbsoluteFile() + ".c");
+						compress(rows, changeExtension(file, "c").getAbsolutePath());
 						semaphore.release();
-						file.delete();
+						// file.delete(); // NE SADA JOS
+						long c = counter.getAndIncrement();
+						if (c % 1000 == 0) {
+							log.debug("Obratio filova {} od {} time:"
+									+ DurationFormatUtils.formatDurationHMS(s.getTime()), c, listFiles.length);
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -104,20 +113,27 @@ public class App_4_CompressManyFilesSmall implements IApp {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Finish");
+		s.stop();
+		System.out.println("Finish " + DurationFormatUtils.formatDurationHMS(s.getTime()));
+	}
+
+	public static File changeExtension(File file, String extension) {
+		String path = Files.getNameWithoutExtension(file.getAbsolutePath());
+		return new File(file.getParentFile(), path + "." + extension);
 	}
 
 	public static void main(String[] args) {
-		App_4_CompressManyFilesSmall app = new App_4_CompressManyFilesSmall();
+		// App_4_CompressManyFilesSmall app = new App_4_CompressManyFilesSmall();
 		// compressApp.start(null);
-
+		File newFile = App_4_CompressManyFilesSmall.changeExtension(new File("/home/poss.db"), "c");
+		System.out.println(newFile);
 	}
 
-	public HashMap<String, List<Long>> decompress(String fileIn) throws IOException {
+	public static HashMap<String, List<Long>> decompress(String fileIn) throws IOException {
 		HashMap<String, List<Long>> result = new HashMap<>();
 		LZ4FastDecompressor fastDecompressor = LZ4Factory.fastestInstance().fastDecompressor();
 		File file = new File(fileIn);
-		log.debug("Citam file velicine {}  ", (file.length()));
+		// log.debug("Citam file velicine {} ", (file.length()));
 		FileInputStream fim = new FileInputStream(file);
 		// BufferedInputStream bfim = new BufferedInputStream(fim, 512);
 		LZ4BlockInputStream lz = new LZ4BlockInputStream(fim, fastDecompressor);
@@ -138,7 +154,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 
 	}
 
-	public void compress(TreeSet<PeptideMassIdRow> rows, String fileOut) throws IOException {
+	public static void compress(TreeSet<PeptideMassIdRow> rows, String fileOut) throws IOException {
 		//
 		HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
 
