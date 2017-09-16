@@ -90,7 +90,9 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 		BufferedReader in = null;
 		try {
-
+			
+			
+			
 			int threads = 42;
 			ExecutorService ex = Executors.newFixedThreadPool(threads);
 			Semaphore semaphore = new Semaphore(threads);
@@ -203,7 +205,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	public void writeRow(double mass, String peptide, long accessionID, DataOutputStream out) throws IOException {
 
 		synchronized (out) {
-			out.writeDouble(mass);
+			//out.writeDouble(mass);
 			out.writeLong(accessionID);
 			out.writeUTF(peptide);
 		}

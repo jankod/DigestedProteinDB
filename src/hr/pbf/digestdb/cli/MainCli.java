@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 import hr.pbf.digestdb.app.App_5_Statistic;
+import hr.pbf.digestdb.app.App_6_InsertToMassTable;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);
@@ -32,6 +33,7 @@ public class MainCli {
 		apps.put("small", new App_3_CreateMenyFilesFromCSV());
 		apps.put("compress", new App_4_CompressManyFilesSmall());
 		apps.put("stat", new App_5_Statistic());
+		apps.put("insert", new App_6_InsertToMassTable());
 
 		// String[] demoArgs = { "-a", "small" };
 		String[] demoArgs = { "-a" };

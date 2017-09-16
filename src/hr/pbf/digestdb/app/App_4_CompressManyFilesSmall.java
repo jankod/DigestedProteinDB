@@ -84,10 +84,10 @@ public class App_4_CompressManyFilesSmall implements IApp {
 						// 1. READ
 						try (DataInputStream in = BioUtil.newDataInputStream(file.getAbsolutePath())) {
 							while (in.available() > 0) {
-								double mass = in.readDouble();
+						//		double mass = in.readDouble();
 								long id = in.readLong();
 								String peptide = in.readUTF();
-								PeptideMassIdRow row = new PeptideMassIdRow(mass, id, peptide);
+								PeptideMassIdRow row = new PeptideMassIdRow(0L, id, peptide);
 								rows.add(row);
 							}
 						}

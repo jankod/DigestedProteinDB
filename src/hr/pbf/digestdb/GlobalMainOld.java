@@ -15,6 +15,10 @@ import hr.pbf.digestdb.cli.MainCli;
 public class GlobalMainOld {
 
 	// mozda jos dodati SET GLOBAL time_zone = '+3:00';
+	/**
+	 * @depreced, uzeti {@link AppConstants}
+	 * 
+	 */
 	public static final String DB_URL = "jdbc:mysql://localhost/createnr?useSSL=false&autoReconnect=true&serverTimezone=UTC";
 	public static final String DB_USER = "root";
 	public static final String DB_PASSWORD = "ja";
