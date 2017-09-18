@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.proba;
+package hr.pbf.digestdb.test.probe;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.proba;
+package hr.pbf.digestdb.test.probe;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;

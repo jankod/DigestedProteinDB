@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.proba;
+package hr.pbf.digestdb.test.probe;
 
 import net.jpountz.lz4.LZ4Factory;
 

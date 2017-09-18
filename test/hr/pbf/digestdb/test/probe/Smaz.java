@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.proba;
+package hr.pbf.digestdb.test.probe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

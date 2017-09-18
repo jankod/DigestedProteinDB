@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Properties;
 
@@ -92,7 +93,11 @@ public class MassRangeMap implements Externalizable {
 	}
 
 	private void createMap() {
-		NumberFormat nf = NumberFormat.getInstance();
+		DecimalFormat nf= new DecimalFormat("###.##");
+		DecimalFormatSymbols dec = new DecimalFormatSymbols();
+		dec.setDecimalSeparator('.');
+		dec.setGroupingSeparator(',');
+		nf.setDecimalFormatSymbols(dec);
 		nf.setGroupingUsed(false);
 		nf.setMaximumFractionDigits(decimalPlaces);
 		nf.setMinimumFractionDigits(decimalPlaces);

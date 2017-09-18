@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.proba;
+package hr.pbf.digestdb.test.probe;
 
 public class H2TestStore {
 

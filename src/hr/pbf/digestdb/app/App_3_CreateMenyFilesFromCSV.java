@@ -11,6 +11,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -59,8 +63,8 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	public App_3_CreateMenyFilesFromCSV() {
 		if (SystemUtils.IS_OS_WINDOWS) {
-			inputCsvPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
-			folderResultPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
+			inputCsvPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\850_000_nr_mass.csv";
+			folderResultPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store";
 		} else {
 			// LINUX
 			inputCsvPath = "/home/mysql_data/mysql/nr_mass.csv";
@@ -78,6 +82,9 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	static NumberFormat nf = NumberFormat.getInstance();
 
+	
+	public final static String MASS_PARTS_NAME  = "mass_parts.txt";
+	
 	@Override
 	public void start(CommandLine appCli) {
 		log.debug("Params: Mass from: {}, to: {}", fromMass, toMass);
@@ -90,9 +97,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 		BufferedReader in = null;
 		try {
-			
-			
-			
+
 			int threads = 42;
 			ExecutorService ex = Executors.newFixedThreadPool(threads);
 			Semaphore semaphore = new Semaphore(threads);
@@ -124,9 +129,10 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 				});
 
 			}
+			ex.shutdown();
 			ex.awaitTermination(5, TimeUnit.MINUTES);
 
-			System.out.println("Count sequence ukupno " + count);
+			System.out.println("Count sequence total " + NumberFormat.getInstance().format(count));
 			System.out.println("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
 
 		} catch (IOException e) {
@@ -137,7 +143,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 			IOUtils.closeQuietly(in);
 			closeAllStreams();
 		}
-		File fileMassParts = new File(folderResultPath + "/mass_parts.txt");
+		File fileMassParts = new File(folderResultPath + "/"+ MASS_PARTS_NAME);
 		try (FileOutputStream outFF = new FileOutputStream(fileMassParts)) {
 			SerializationUtils.serialize(massPartsMap, outFF);
 			log.debug("file mass parts {}", fileMassParts);
@@ -168,11 +174,14 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	private DataOutputStream getDataOutputStream(double mass) throws FileNotFoundException {
 		String fileName = massPartsMap.getFileName(mass);
-		if (massStreamMapp.containsKey(fileName)) {
-			return massStreamMapp.get(fileName);
+		synchronized (massStreamMapp) {
+			if (massStreamMapp.containsKey(fileName)) {
+				return massStreamMapp.get(fileName);
+			}
 		}
 
-		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36); // 0.3 MB
+		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36); // 0.3
+																													// MB
 		synchronized (massStreamMapp) {
 			massStreamMapp.put(fileName, out);
 		}
@@ -205,9 +214,21 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	public void writeRow(double mass, String peptide, long accessionID, DataOutputStream out) throws IOException {
 
 		synchronized (out) {
-			//out.writeDouble(mass);
+			// out.writeDouble(mass); NE VISE
 			out.writeLong(accessionID);
 			out.writeUTF(peptide);
+		}
+	}
+
+	public void deleteAllZeroFiles() {
+		// NE RADI, DataOutputStream uvjek zapise par bytova...
+		File[] dirs = new File(folderResultPath).listFiles();
+		for (File file : dirs) {
+			if (file.length() == 0) {
+				System.out.println("Brisem : " + file.getName());
+			}else {
+				System.out.println("NE brisem "+ file.getName());
+			}
 		}
 	}
 
