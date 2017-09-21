@@ -98,7 +98,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		BufferedReader in = null;
 		try {
 
-			int threads = 42;
+			int threads = 52;
 			ExecutorService ex = Executors.newFixedThreadPool(threads);
 			Semaphore semaphore = new Semaphore(threads);
 
