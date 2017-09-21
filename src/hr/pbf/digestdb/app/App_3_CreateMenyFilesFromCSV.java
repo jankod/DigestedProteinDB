@@ -68,6 +68,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		} else {
 			// LINUX
 			inputCsvPath = "/home/mysql_data/mysql/nr_mass.csv";
+			//inputCsvPath = "/home/tag/nr_db/ncbi/nr_mass_test.csv"; // TEST
 			folderResultPath = "/home/tag/nr_db/mass_small_store";
 		}
 	}
@@ -82,9 +83,8 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	static NumberFormat nf = NumberFormat.getInstance();
 
-	
-	public final static String MASS_PARTS_NAME  = "mass_parts.txt";
-	
+	public final static String MASS_PARTS_NAME = "mass_parts.txt";
+
 	@Override
 	public void start(CommandLine appCli) {
 		log.debug("Params: Mass from: {}, to: {}", fromMass, toMass);
@@ -130,7 +130,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 			}
 			ex.shutdown();
-			ex.awaitTermination(5, TimeUnit.MINUTES);
+			ex.awaitTermination(7, TimeUnit.MINUTES);
 
 			System.out.println("Count sequence total " + NumberFormat.getInstance().format(count));
 			System.out.println("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
@@ -143,7 +143,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 			IOUtils.closeQuietly(in);
 			closeAllStreams();
 		}
-		File fileMassParts = new File(folderResultPath + "/"+ MASS_PARTS_NAME);
+		File fileMassParts = new File(folderResultPath + "/" + MASS_PARTS_NAME);
 		try (FileOutputStream outFF = new FileOutputStream(fileMassParts)) {
 			SerializationUtils.serialize(massPartsMap, outFF);
 			log.debug("file mass parts {}", fileMassParts);
@@ -192,6 +192,11 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	private void closeAllStreams() {
 		Collection<DataOutputStream> values = massStreamMapp.values();
 		for (DataOutputStream dataOutputStream : values) {
+			try {
+				dataOutputStream.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			IOUtils.closeQuietly(dataOutputStream);
 		}
 
@@ -226,8 +231,8 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		for (File file : dirs) {
 			if (file.length() == 0) {
 				System.out.println("Brisem : " + file.getName());
-			}else {
-				System.out.println("NE brisem "+ file.getName());
+			} else {
+				System.out.println("NE brisem " + file.getName());
 			}
 		}
 	}

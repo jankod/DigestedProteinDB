@@ -21,6 +21,7 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
@@ -44,15 +45,41 @@ public class App_6_InsertToMassTable implements IApp {
 
 	}
 
+	public static void main(String[] args) throws IOException {
+		App_6_InsertToMassTable t = new App_6_InsertToMassTable();
+		String simpleFile = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store\\1325.3.c";
+		simpleFile = "/home/tag/nr_db/mass_small_store/1325.3.c";
+		HashMap<String, List<Long>> result = App_4_CompressManyFilesSmall.decompress(simpleFile);
+		System.out.println(result);
+		System.out.println("Size: " + result.size());
+	}
+
 	@Override
 	public void start(CommandLine appCli) {
+//		if (true) {
+//			try {
+//				App_6_InsertToMassTable.main(null);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//			return;
+//		}
+
 		String folderPath = "/home/tag/nr_db/mass_small_store";
+		if (SystemUtils.IS_OS_WINDOWS) {
+			folderPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store";
+		}
 		File f = new File(folderPath);
 		File[] listFiles = f.listFiles();
 
 		MySQLdb db = new MySQLdb();
 		try {
+			// if (SystemUtils.IS_OS_WINDOWS) {
+			// db.initDatabase("root", "ja", AppConstants.DB_URL);
+			// } else {
+
 			db.initDatabase(AppConstants.DB_USER, AppConstants.DB_PASSWORD, AppConstants.DB_URL);
+			// }
 			Connection conn = db.getConnection();
 			int count = 0;
 			StopWatch s = new StopWatch();
@@ -68,10 +95,14 @@ public class App_6_InsertToMassTable implements IApp {
 							.decompress(file.getAbsolutePath());
 
 					Set<String> peptidesSet = peptides.keySet();
+					
 					for (String peptide : peptidesSet) {
 						List<Long> accessionNums = peptides.get(peptide);
-						if (accessionNums.size() > 1)
-							log.debug("accessions ima ih {}", accessionNums.size());
+						
+						
+						if(true ) {
+							continue;
+						}
 						double mass = BioUtil.calculateMassWidthH2O(peptide);
 						st.setDouble(1, mass);
 						st.setString(2, peptide);

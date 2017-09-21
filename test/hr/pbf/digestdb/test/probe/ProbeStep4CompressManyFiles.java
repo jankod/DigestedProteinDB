@@ -17,10 +17,10 @@ import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 
 public class ProbeStep4CompressManyFiles {
 
-	public static void main22(String[] args) throws FileNotFoundException, IOException {
+	public static void main222(String[] args) throws FileNotFoundException, IOException {
 		// NE RADI
 		String file = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\4904.3.db";
-		file = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\small_store\\674.3.db";
+		file = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\500.3.db";
 		TreeSet<PeptideMassIdRow> result = App_4_CompressManyFilesSmall.readSmallDataFile(new File(file));
 		for (PeptideMassIdRow p : result) {
 			System.out.println(p.mass + " " + p.id + " " + p.peptide);

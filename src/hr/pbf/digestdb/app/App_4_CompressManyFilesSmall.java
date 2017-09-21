@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,9 +22,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
+import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -70,7 +73,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 		File f = new File(folderPath);
 		File[] listFiles = f.listFiles();
 
-		int threads = 22;
+		int threads = 32;
 		ExecutorService threadPool = Executors.newFixedThreadPool(threads);
 		Semaphore semaphore = new Semaphore(threads);
 		AtomicLong counter = new AtomicLong(0);
@@ -150,8 +153,28 @@ public class App_4_CompressManyFilesSmall implements IApp {
 	public static void main(String[] args) {
 		// App_4_CompressManyFilesSmall app = new App_4_CompressManyFilesSmall();
 		// compressApp.start(null);
-		File newFile = App_4_CompressManyFilesSmall.changeExtension(new File("/home/poss.db"), "c");
-		System.out.println(newFile);
+		// File newFile = App_4_CompressManyFilesSmall.changeExtension(new
+		// File("/home/poss.db"), "c");
+		// System.out.println(newFile);
+
+		TreeSet<PeptideMassIdRow> rows = new TreeSet<>();
+		rows.add(new PeptideMassIdRow(2, 33, "PERO"));
+		rows.add(new PeptideMassIdRow(23, 133, "PERO"));
+		rows.add(new PeptideMassIdRow(232, 333, "PERO"));
+
+		HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
+
+		// 2. CONVERT
+		for (PeptideMassIdRow row : rows) {
+			List<PeptideMassIdRow> listRows = map.get(row.peptide);
+			if (listRows == null) {
+				listRows = new ArrayList<>();
+				map.put(row.peptide, listRows);
+			}
+			listRows.add(row);
+		}
+
+		System.out.println(map);
 	}
 
 	public static HashMap<String, List<Long>> decompress(String fileIn) throws IOException {
@@ -226,9 +249,28 @@ public class App_4_CompressManyFilesSmall implements IApp {
 			this.peptide = peptide;
 		}
 
+		public String getPeptide() {
+			return peptide;
+		}
+
+		public long getId() {
+			return id;
+		}
+
+		
+		/**
+		 * Bug je bio, nije komparirao dobro, ne moze samo po masi.
+		 */
 		@Override
 		public int compareTo(PeptideMassIdRow o) {
-			return this.peptide.compareTo(o.peptide);
+			return Comparator.comparing(PeptideMassIdRow::getPeptide).thenComparingLong(PeptideMassIdRow::getId)
+					.compare(this, o);
+
+		}
+
+		@Override
+		public String toString() {
+			return "[" + peptide + " " + mass + " " + id + "]";
 		}
 
 	}
