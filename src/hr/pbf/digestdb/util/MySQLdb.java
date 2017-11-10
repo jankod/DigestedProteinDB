@@ -15,12 +15,13 @@ public class MySQLdb {
 
 		ds = new BasicDataSource();
 		// ds.setPoolPreparedStatements(true);
-		// ds.setMaxActive(maxConnection);
-		ds.setMaxWait(4000L);
-		ds.setMaxActive(10);
+		ds.setMaxWait(7000L);
+		ds.setMaxActive(180);
 		ds.addConnectionProperty("useUnicode", "false");
 		ds.addConnectionProperty("characterEncoding", "ASCII");
 		// ds.setMaxIdle(5);
+		ds.setMaxOpenPreparedStatements(20000);
+		
 		ds.setTestOnBorrow(true);
 		ds.setTestWhileIdle(true);
 		// ds.setTimeBetweenEvictionRunsMillis(10000L);

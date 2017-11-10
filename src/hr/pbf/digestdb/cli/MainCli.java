@@ -30,10 +30,10 @@ public class MainCli {
 	public static void main(String[] args) throws ParseException {
 
 		HashMap<String, IApp> apps = new HashMap<>();
-		apps.put("small", new App_3_CreateMenyFilesFromCSV());
-		apps.put("compress", new App_4_CompressManyFilesSmall());
-		apps.put("stat", new App_5_Statistic());
-		apps.put("insert", new App_6_InsertToMassTable());
+		apps.put("3.small", new App_3_CreateMenyFilesFromCSV());
+		apps.put("4.compress", new App_4_CompressManyFilesSmall());
+		apps.put("5.stat", new App_5_Statistic());
+		apps.put("6.insert", new App_6_InsertToMassTable());
 
 		// String[] demoArgs = { "-a", "small" };
 		String[] demoArgs = { "-a" };

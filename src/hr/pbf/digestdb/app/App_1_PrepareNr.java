@@ -1,4 +1,4 @@
-package hr.pbf.digestdb;
+package hr.pbf.digestdb.app;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import hr.pbf.digestdb.AppConstants;
 import hr.pbf.digestdb.util.AccessionMemoryDB;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.FastaSeq;
@@ -41,13 +42,20 @@ public class App_1_PrepareNr {
 	private static BufferedWriter seqeunceWriter;
 	private static BufferedWriter proteinWriter;
 	private static int threads = 12;
-	private static long useSeqvences =  Long.MAX_VALUE;
+	private static long useSeqvences = Long.MAX_VALUE;
 	private static BufferedWriter massWriter;
 	final static Semaphore semaphore = new Semaphore(threads);
-	private static AccessionMemoryDB accessionDB;
+	// private static AccessionMemoryDB accessionDB;
 
 	static boolean useMemoryDB = false;
 	static long globalSeqID = 0; // Ima ih 127.050.501
+	// static String fastaNrPath =
+	// "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\4000nr.txt";
+	
+	static String fastaNrPath = "/home/tag/nr_db/ncbi";
+	static String outSequenceCsvPath = fastaNrPath + "_sequence.csv";
+	static String outProteinCsvPath = fastaNrPath + "_protein.csv";
+	static String outMassCsvPath = fastaNrPath + "_mass.csv";
 
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 
@@ -56,33 +64,23 @@ public class App_1_PrepareNr {
 
 		BioUtil.printMemoryUsage("Prije baze: ");
 
-		if (useMemoryDB) {
-			accessionDB = AccessionMemoryDB.tryDeserializeSelf();
-			if (accessionDB == null) {
-				accessionDB = new AccessionMemoryDB("./accesion_num_exported.csv");
-			}
-		}
-		BioUtil.printMemoryUsage("Poslje baze");
-		BioUtil.printTimeDurration(stopWatch);
-
 		mysql = new MySQLdb();
-		if (!useMemoryDB)
-			mysql.initDatabase(GlobalMainOld.DB_USER, GlobalMainOld.DB_PASSWORD, GlobalMainOld.DB_URL);
-		String fastaPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\4000nr.txt";
+		mysql.initDatabase(AppConstants.DB_USER, AppConstants.DB_PASSWORD, AppConstants.DB_URL);
 
 		ExecutorService th = Executors.newFixedThreadPool(threads);
 
 		if (args.length > 1) {
-			fastaPath = args[1];
-			System.out.println("Read: " + fastaPath);
+			fastaNrPath = args[1];
+			System.out.println("Read: " + fastaNrPath);
 		}
 
-		String pathSequence = fastaPath + "_sequence.csv";
-		System.out.println("Write to " + pathSequence);
-		seqeunceWriter = BioUtil.newFileWiter(pathSequence, null);
-		proteinWriter = BioUtil.newFileWiter(fastaPath + "_protein.csv", null);
-		massWriter = BioUtil.newFileWiter(fastaPath + "_mass.csv", null);
-		BioUtil.readLargeFasta(fastaPath, new BioUtil.Callback() {
+		System.out.println("Write to " + outSequenceCsvPath);
+		seqeunceWriter = BioUtil.newFileWiter(outSequenceCsvPath, null);
+
+		proteinWriter = BioUtil.newFileWiter(outProteinCsvPath, null);
+
+		massWriter = BioUtil.newFileWiter(outMassCsvPath, null);
+		BioUtil.readLargeFasta(fastaNrPath, new BioUtil.Callback() {
 
 			@Override
 			public void evoTiFasta(FastaSeq seq) throws IOException {
@@ -123,13 +121,16 @@ public class App_1_PrepareNr {
 		IOUtils.closeQuietly(seqeunceWriter);
 		IOUtils.closeQuietly(massWriter);
 		mysql.closeDatabaase();
+
+		BioUtil.printMemoryUsage("Poslje baze");
+
 		System.out.println("Finish all, seq ID: " + globalSeqID);
-		System.out.println("Trajanje: " + DurationFormatUtils.formatDurationHMS(stopWatch.getTime()));
+		BioUtil.printTimeDurration(stopWatch);
 		System.out.println("SEQ num: " + globalSeqID);
 	}
 
-	protected static void insertDBprotein(long accessionNum, String protName, long seqID) throws IOException {
-		String str = accessionNum + "\t" + seqID + "\t" + protName + "\n";
+	protected static void insertDBprotein(String accession, String protName, long seqID) throws IOException {
+		String str = accession + "\t" + seqID + "\t" + protName + "\n";
 		proteinWriter.write(str);
 	}
 
@@ -158,15 +159,6 @@ public class App_1_PrepareNr {
 
 			accession = BioUtil.removeVersionFromAccession(accession);
 
-			if (useMemoryDB) {
-				Long res = accessionDB.getAccessionNum(accession);
-				if (res == null) {
-					return -1;
-				}
-				return res;
-
-			}
-
 			Connection conn = mysql.getConnection();
 
 			String sql = "SELECT accession_num FROM accession_taxid_gi WHERE accession = '"
@@ -176,8 +168,7 @@ public class App_1_PrepareNr {
 			long accession_num = -1;
 			if (res.next()) {
 				accession_num = res.getLong("accession_num");
-			} else {
-				// System.err.println("Nisam nasao accession num: " + sql);
+				System.err.println("Nisam nasao accession num: " + sql);
 			}
 			s.close();
 			conn.close();
@@ -193,7 +184,6 @@ public class App_1_PrepareNr {
 			int spacePos = header.indexOf(' ');
 			int parentheasPos = header.indexOf('[');
 			if (parentheasPos < 0) {
-				// System.err.println("Nema "+ header);
 				parentheasPos = header.length();
 			}
 
@@ -228,27 +218,11 @@ public class App_1_PrepareNr {
 		boolean usedHeader = false;
 		for (String header : headers) {
 			String accession = extractAccessionFromHeader(header);
-			long accessionNum = getAccesionNumDB(accession);
-			if (accessionNum == -1) {
-				// Ako nema accessiona, znaci da ovaj je
-				// ftp://ftp.ncbi.nih.gov/pub/taxonomy/accession2taxid/README
-
-				// prot.accession2taxid.gz
-				// TaxID mapping for live protein sequence records.
-				// The second set of files contains accession to taxid mappings for dead
-				// (suppressed or withdrawn) sequence records:
-				continue;
-				// System.out.println("Not find accession in DB. " + header);
-			}
-
-			usedHeader = true;
 			String protName = extractProteinNameFromHeader(header);
 
-			// System.out.println(accession + "\n" + protName + "\n" + header);
+			insertDBprotein(accession, protName, seqID);
 
-			insertDBprotein(accessionNum, protName, seqID);
-
-			insertDBmasses(seq, accessionNum);
+			insertDBmasses(seq, accession);
 		}
 		if (!usedHeader) {
 			System.err.println("Necu unjeti: " + StringUtils.abbreviate(seq.header, 18));
@@ -257,14 +231,12 @@ public class App_1_PrepareNr {
 		}
 	}
 
-	// private static DecimalFormat df = new DecimalFormat("#.######");
-
-	final private static void insertDBmasses(FastaSeq seq, long accessionNum) throws IOException {
+	final private static void insertDBmasses(FastaSeq seq, String accession) throws IOException {
 		final Map<String, Double> massesDigest = BioUtil.getMassesDigest(seq.seq);
 		Set<String> keySet = massesDigest.keySet();
 		for (String peptide : keySet) {
 			Double mass = massesDigest.get(peptide);
-			String str = BioUtil.roundToDecimals(mass, 7) + "\t" + peptide + "\t" + accessionNum + "\n";
+			String str = BioUtil.roundToDecimals(mass, 7) + "\t" + peptide + "\t" + accession + "\n";
 			massWriter.write(str);
 		}
 	}

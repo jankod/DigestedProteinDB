@@ -3,6 +3,7 @@ package hr.pbf.digestdb;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import hr.pbf.digestdb.app.App_1_PrepareNr;
 import hr.pbf.digestdb.cli.MainCli;
 
 /**
@@ -19,9 +20,9 @@ public class GlobalMainOld {
 	 * @depreced, uzeti {@link AppConstants}
 	 * 
 	 */
-	public static final String DB_URL = "jdbc:mysql://localhost/createnr?useSSL=false&autoReconnect=true&serverTimezone=UTC";
-	public static final String DB_USER = "root";
-	public static final String DB_PASSWORD = "ja";
+	//public static final String DB_URL = "jdbc:mysql://localhost/createnr?useSSL=false&autoReconnect=true&serverTimezone=UTC";
+	//public static final String DB_USER = "root";
+	//public static final String DB_PASSWORD = "ja";
 
 	public static void main2(String[] args) throws IOException, SQLException, InterruptedException {
 

@@ -115,7 +115,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 
 		try {
 			threadPool.shutdown();
-			threadPool.awaitTermination(5, TimeUnit.MINUTES);
+			threadPool.awaitTermination(8, TimeUnit.MINUTES);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -189,7 +189,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 		try (DataInputStream in = new DataInputStream(new ByteArrayInputStream(IOUtils.toByteArray(lz)))) {
 			while (in.available() > 0) {
 				String peptide = in.readUTF();
-				short howManyIds = in.readShort();
+				int howManyIds = in.readInt();
 				List<Long> ids = new ArrayList<>(howManyIds);
 				for (int i = 0; i < howManyIds; i++) {
 					ids.add(in.readLong());
@@ -204,17 +204,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 
 	public static void compress(TreeSet<PeptideMassIdRow> rows, String fileOut) throws IOException {
 		//
-		HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
-
-		// 2. CONVERT
-		for (PeptideMassIdRow row : rows) {
-			List<PeptideMassIdRow> listRows = map.get(row.peptide);
-			if (listRows == null) {
-				listRows = new ArrayList<>();
-				map.put(row.peptide, listRows);
-			}
-			listRows.add(row);
-		}
+		HashMap<String, List<PeptideMassIdRow>> map = mapByPeptide(rows);
 
 		// 3. COMPRESS
 		LZ4Compressor compressor = LZ4Factory.nativeInstance().highCompressor();
@@ -227,7 +217,7 @@ public class App_4_CompressManyFilesSmall implements IApp {
 			String peptide = entry.getKey();
 			out.writeUTF(peptide);
 			List<PeptideMassIdRow> rowsByPeptide = entry.getValue();
-			out.writeShort(rowsByPeptide.size());
+			out.writeInt(rowsByPeptide.size());
 
 			for (PeptideMassIdRow row : rowsByPeptide) {
 				out.writeLong(row.id);
@@ -236,6 +226,21 @@ public class App_4_CompressManyFilesSmall implements IApp {
 		buf.flush();
 		IOUtils.closeQuietly(buf);
 
+	}
+
+	public static HashMap<String, List<PeptideMassIdRow>> mapByPeptide(TreeSet<PeptideMassIdRow> rows) {
+		HashMap<String, List<PeptideMassIdRow>> map = new HashMap<>();
+
+		// 2. CONVERT
+		for (PeptideMassIdRow row : rows) {
+			List<PeptideMassIdRow> listRows = map.get(row.peptide);
+			if (listRows == null) {
+				listRows = new ArrayList<>();
+				map.put(row.peptide, listRows);
+			}
+			listRows.add(row);
+		}
+		return map;
 	}
 
 	public static class PeptideMassIdRow implements Comparable<PeptideMassIdRow> {
