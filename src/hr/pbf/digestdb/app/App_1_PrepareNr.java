@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,8 +42,8 @@ public class App_1_PrepareNr {
 
 	private static BufferedWriter seqeunceWriter;
 	private static BufferedWriter proteinWriter;
-	private static int threads = 12;
-	private static long useSeqvences = Long.MAX_VALUE;
+	private static int threads = 22;
+	private static long useSeqvences =  Long.MAX_VALUE;
 	private static BufferedWriter massWriter;
 	final static Semaphore semaphore = new Semaphore(threads);
 	// private static AccessionMemoryDB accessionDB;
@@ -51,12 +52,16 @@ public class App_1_PrepareNr {
 	static long globalSeqID = 0; // Ima ih 127.050.501
 	// static String fastaNrPath =
 	// "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\4000nr.txt";
-	
-	static String fastaNrPath = "/home/tag/nr_db/ncbi";
+
+	static String fastaNrPath = "C:\\nr_db\\ncbi\\nr"; // "/home/tag/nr_db/ncbi";
+
 	static String outSequenceCsvPath = fastaNrPath + "_sequence.csv";
 	static String outProteinCsvPath = fastaNrPath + "_protein.csv";
 	static String outMassCsvPath = fastaNrPath + "_mass.csv";
 
+	static AtomicInteger maxAccessionLength = new AtomicInteger(0);
+
+	// static String maxAccession = "";
 	public static void main(String[] args) throws IOException, SQLException, InterruptedException {
 
 		StopWatch stopWatch = new StopWatch();
@@ -64,8 +69,9 @@ public class App_1_PrepareNr {
 
 		BioUtil.printMemoryUsage("Prije baze: ");
 
-		mysql = new MySQLdb();
-		mysql.initDatabase(AppConstants.DB_USER, AppConstants.DB_PASSWORD, AppConstants.DB_URL);
+		// mysql = new MySQLdb();
+		// mysql.initDatabase(AppConstants.DB_USER, AppConstants.DB_PASSWORD,
+		// AppConstants.DB_URL);
 
 		ExecutorService th = Executors.newFixedThreadPool(threads);
 
@@ -120,21 +126,24 @@ public class App_1_PrepareNr {
 		IOUtils.closeQuietly(proteinWriter);
 		IOUtils.closeQuietly(seqeunceWriter);
 		IOUtils.closeQuietly(massWriter);
-		mysql.closeDatabaase();
+
+		if (mysql != null)
+			mysql.closeDatabaase();
 
 		BioUtil.printMemoryUsage("Poslje baze");
 
 		System.out.println("Finish all, seq ID: " + globalSeqID);
 		BioUtil.printTimeDurration(stopWatch);
 		System.out.println("SEQ num: " + globalSeqID);
+		System.out.println("Max accession length " + maxAccessionLength );
 	}
 
-	protected static void insertDBprotein(String accession, String protName, long seqID) throws IOException {
+	protected static void putToproteinCSV(String accession, String protName, long seqID) throws IOException {
 		String str = accession + "\t" + seqID + "\t" + protName + "\n";
 		proteinWriter.write(str);
 	}
 
-	protected static void insertDBSeq(String seq, long seqID) {
+	protected static void putToSeqCSV(String seq, long seqID) {
 		try {
 			StringBuilder seqCache = new StringBuilder(seq.length() + 26);
 			seqCache.setLength(0);
@@ -199,7 +208,11 @@ public class App_1_PrepareNr {
 	protected static String extractAccessionFromHeader(String header) {
 		try {
 			int spacePos = header.indexOf(' ');
-			return header.substring(0, spacePos);
+			// TODO: makni verziju
+			String accession = header.substring(0, spacePos);
+			
+			
+			return accession;
 		} catch (StringIndexOutOfBoundsException e) {
 			System.err.println("Error line: " + header);
 			e.printStackTrace();
@@ -215,23 +228,28 @@ public class App_1_PrepareNr {
 			BioUtil.printTimeDurration(stopWatch);
 		}
 
-		boolean usedHeader = false;
 		for (String header : headers) {
 			String accession = extractAccessionFromHeader(header);
+
+			setUpMaxAccession(accession);
 			String protName = extractProteinNameFromHeader(header);
 
-			insertDBprotein(accession, protName, seqID);
+			putToproteinCSV(accession, protName, seqID);
 
-			insertDBmasses(seq, accession);
+			putToMassesCSV(seq, accession);
 		}
-		if (!usedHeader) {
-			System.err.println("Necu unjeti: " + StringUtils.abbreviate(seq.header, 18));
-		} else {
-			insertDBSeq(seq.seq, seqID);
+		putToSeqCSV(seq.seq, seqID);
+	}
+
+	private static void setUpMaxAccession(String accession) {
+		int currentMax = maxAccessionLength.get();
+		int max = Math.max(accession.length(), currentMax);
+		if (max > currentMax) {
+			maxAccessionLength.set(max);
 		}
 	}
 
-	final private static void insertDBmasses(FastaSeq seq, String accession) throws IOException {
+	final private static void putToMassesCSV(FastaSeq seq, String accession) throws IOException {
 		final Map<String, Double> massesDigest = BioUtil.getMassesDigest(seq.seq);
 		Set<String> keySet = massesDigest.keySet();
 		for (String peptide : keySet) {
