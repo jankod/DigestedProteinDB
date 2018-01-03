@@ -23,6 +23,8 @@ import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 import hr.pbf.digestdb.app.App_5_Statistic;
 import hr.pbf.digestdb.app.App_6_InsertToMassTable;
+import hr.pbf.digestdb.app.App_7_StatisticOnSortedFileCSV;
+import hr.pbf.digestdb.app.App_8_StatisticProtAccessionFile;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);
@@ -34,6 +36,9 @@ public class MainCli {
 		apps.put("4.compress", new App_4_CompressManyFilesSmall());
 		apps.put("5.stat", new App_5_Statistic());
 		apps.put("6.insert", new App_6_InsertToMassTable());
+		apps.put("7.statistic", new App_7_StatisticOnSortedFileCSV());
+		apps.put("8.statistic", new App_8_StatisticProtAccessionFile());
+		
 
 		// String[] demoArgs = { "-a", "small" };
 		String[] demoArgs = { "-a" };

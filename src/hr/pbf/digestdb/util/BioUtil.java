@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DeflaterInputStream;
@@ -523,6 +524,63 @@ public class BioUtil {
 
 	public static void printTimeDurration(StopWatch stopWatch) {
 		System.out.println("Time duration: " + DurationFormatUtils.formatDurationHMS(stopWatch.getTime()));
+	}
+	
+	
+	public final static String[] fastSplit(String string, char delimiter) {
+	    /*
+	     *  fastpath of String.split()
+	     *  
+	     *  [NOTE]
+	     *  it will remove empty token in the end
+	     *  it will not remove in-between empty tokens
+	     *  the same behavior as String.split(String regex)
+	     *  
+	     *  [EXAMPLE]
+	     *  string = "boo\tboo\tboo\t\t\tboo\t\t\t\t\t";
+	     *  strings = fastSplit(string, '\t') -> [boo, boo, boo, , , boo]
+	     */
+	    int off = 0;
+	    int next = 0;
+	    ArrayList<String> list = new ArrayList<>();
+	    while ((next = string.indexOf(delimiter, off)) != -1) {
+	        list.add(string.substring(off, next));
+	        off = next + 1;
+	    }
+	    // If no match was found, return this
+	    if (off == 0)
+	        return new String[] { string };
+
+	    // Add remaining segment
+	    list.add(string.substring(off, string.length()));
+
+	    // Construct result
+	    int resultSize = list.size();
+	    while (resultSize > 0 && list.get(resultSize - 1).length() == 0)
+	        resultSize--;
+	    String[] result = new String[resultSize];
+	    return list.subList(0, resultSize).toArray(result);
+	}
+
+
+	
+	public static String extractAccessionPrefix(String accessionNumber) {
+		int length = accessionNumber.length();
+		for (int i = 0; i < length; i++) {
+
+			char c = accessionNumber.charAt(i);
+
+			if (c == '_' || c == '|') {
+				return accessionNumber.substring(0, i);
+			}
+
+			if (Character.isDigit(c)) {
+				return accessionNumber.substring(0, i);
+			}
+
+		}
+
+		return null;
 	}
 
 }

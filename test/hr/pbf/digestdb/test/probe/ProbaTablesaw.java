@@ -19,10 +19,18 @@ import tech.tablesaw.store.StorageManager;
 
 public class ProbaTablesaw {
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	static String storeFolderPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\saw_store";
 
-		BufferedReader in = BioUtil
-				.newFileReader("C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv");
+	public static void main(String[] args) throws IOException {
+		Table t = StorageManager.readTable("C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\saw_store\\mass.saw");
+		System.out.println(t.first(3));
+
+	}
+
+	public static void main1(String[] args) throws FileNotFoundException, IOException {
+
+		BufferedReader in = BioUtil.newFileReader(
+				"C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\850_000_nr_mass.csv");
 
 		ColumnType[] columns = { ColumnType.DOUBLE, ColumnType.CATEGORY, ColumnType.LONG_INT };
 		CsvReadOptionsBuilder build = CsvReadOptions.builder(in, "mass").columnTypes(columns).separator('\t')
@@ -34,9 +42,7 @@ public class ProbaTablesaw {
 
 		Column c = table.column(1);
 		c.sortAscending();
-		
-		
-		String storeFolderPath = "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\saw_store";
+
 		StorageManager.saveTable(storeFolderPath, table);
 
 		System.out.println(table.structure().print());

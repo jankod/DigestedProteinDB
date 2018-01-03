@@ -42,8 +42,8 @@ public class ProbeStep4CompressManyFiles {
 		App_3_CreateMenyFilesFromCSV c = new App_3_CreateMenyFilesFromCSV();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DataOutputStream dout = new DataOutputStream(out);
-		c.writeRow(1230D, "PEPTIDE", 3423534234L, dout);
-		c.writeRow(1230D, "PEPTIDESFDSDFSDFREWRWEFCSEFWS", 2312312312234L, dout);
+		c.writeRow(1230D, "PEPTIDE", "WP_000184067.1", dout);
+		c.writeRow(1230D, "PEPTIDESFDSDFSDFREWRWEFCSEFWS", "XP_642131.1", dout);
 		dout.flush();
 
 		File tempFile = new File(FileUtils.getTempDirectory(), "proba.txt");

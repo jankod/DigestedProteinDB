@@ -160,7 +160,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		// 2. peptide
 		String peptide = split[1].trim();
 		// 3. accession_my_id
-		long accessionID = Long.parseLong(split[2].trim());
+		String accessionID = split[2].trim();
 
 		if (mass < fromMass || mass > toMass) {
 			return;
@@ -204,23 +204,23 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	public Row readRow(DataInputStream in) throws IOException {
 		Row r = new Row();
-		r.mass = in.readDouble();
-		r.accessionID = in.readLong();
+		//r.mass = in.readDouble();
+		r.accessionID = in.readUTF();
 		r.peptide = in.readUTF();
 		return r;
 	}
 
 	public static class Row {
-		public double mass;
+		//public double mass;
 		public String peptide;
-		public long accessionID;
+		public String accessionID;
 	}
 
-	public void writeRow(double mass, String peptide, long accessionID, DataOutputStream out) throws IOException {
+	public void writeRow(double mass, String peptide, String accessionID, DataOutputStream out) throws IOException {
 
 		synchronized (out) {
 			// out.writeDouble(mass); NE VISE
-			out.writeLong(accessionID);
+			out.writeUTF(accessionID);
 			out.writeUTF(peptide);
 		}
 	}
