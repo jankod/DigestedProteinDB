@@ -37,10 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.mysql.cj.mysqla.MysqlaUtils;
 
 import hr.pbf.digestdb.AppConstants;
-import hr.pbf.digestdb.GlobalMainOld;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;

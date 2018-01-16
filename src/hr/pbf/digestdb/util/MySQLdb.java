@@ -26,8 +26,8 @@ public class MySQLdb {
 		ds.setTestWhileIdle(true);
 		// ds.setTimeBetweenEvictionRunsMillis(10000L);
 		// ds.setMinEvictableIdleTimeMillis(60000L);
-		//ds.setDriverClassName("com.mysql.jdbc.Driver");
-		ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		ds.setDriverClassName("com.mysql.jdbc.Driver");
+	//	ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		ds.setUsername(username);
 		ds.setPassword(password);
 		// ds.setRemoveAbandoned(true);
