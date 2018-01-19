@@ -4,7 +4,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<Pattern>
-				%C.%M\(%file:%line\) %msg%n
+				%C.%M\(%file:%line\) %msg [%date{HH:mm:ss}]%n
 			</Pattern>
 		</encoder>
 	</appender>

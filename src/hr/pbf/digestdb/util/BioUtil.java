@@ -41,6 +41,8 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.iq80.snappy.SnappyFramedInputStream;
 import org.iq80.snappy.SnappyFramedOutputStream;
 
+import net.jpountz.util.UnsafeUtils;
+
 public class BioUtil {
 
 	public static final double PROTON_MASS = 1.007825;

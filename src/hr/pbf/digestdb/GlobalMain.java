@@ -11,6 +11,8 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import hr.pbf.digestdb.app.App_10_AddTaxIdToCSV;
 import hr.pbf.digestdb.app.App_11_MakeLevelDbStore;
+import hr.pbf.digestdb.app.App_11_MakeLevelDbStore_TEST;
+import hr.pbf.digestdb.app.App_12_CreateTaxIDAccessionDB;
 
 public class GlobalMain {
 
@@ -20,7 +22,9 @@ public class GlobalMain {
 		s.start();
 		try {
 			//App_10_AddTaxIdToCSV.main(args);
-			App_11_MakeLevelDbStore.main(args);
+			//App_11_MakeLevelDbStore.main(args);
+		//	App_12_CreateTaxIDAccessionDB.main(args);
+			App_11_MakeLevelDbStore_TEST.main(args);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}

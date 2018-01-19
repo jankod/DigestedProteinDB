@@ -46,6 +46,7 @@ public class GenerateTriplets {
 		}
 		Map<Byte, String> map = Maps.newHashMap();
 		map.put((byte) 0, "AAA");
+		lines.close();
 
 	}
 }
