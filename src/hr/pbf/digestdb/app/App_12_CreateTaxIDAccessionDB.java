@@ -38,33 +38,42 @@ public class App_12_CreateTaxIDAccessionDB {
 
 	public static void main(String[] args) throws IOException {
 
+		// leveldb();
+		mvstore();
+
+	}
+
+	private static void mvstore() {
+
+	}
+
+	private static void leveldb() throws IOException {
 		Options options = new Options();
 		options.createIfMissing(true);
-		
+
 		options.cacheSize(100 * 1048576 * 10); // 100MB cache
 		options.compressionType(CompressionType.SNAPPY);
 		options.verifyChecksums(false);
 		options.paranoidChecks(false);
-		
+
 		String newDbPath = "/home/users/tag/nr_db/leveldb_accession2taxid_dead";
 		System.out.println("db: " + newDbPath);
 		DB db = factory.open(new File(newDbPath), options);
-		
+
 		TimeScheduler.runEvery10Minutes(new Runnable() {
 
 			@Override
 			public void run() {
 				log.debug("Došao do " + NumberFormat.getIntegerInstance().format(count));
-				log.debug("Status "+  db.getProperty("leveldb.stats"));
+				log.debug("Status " + db.getProperty("leveldb.stats"));
 			}
 		});
 
-
-
 		MutableString line = new MutableString();
-		try (FastBufferedReader reader = new FastBufferedReader(new FileReader("/home/users/tag/nr_db/dead_prot.accession2taxid"))) {
+		try (FastBufferedReader reader = new FastBufferedReader(
+				new FileReader("/home/users/tag/nr_db/dead_prot.accession2taxid"))) {
 			WriteBatch batch = db.createWriteBatch();
-			
+
 			boolean batchWriten = false;
 			reader.readLine(line); // header
 			while ((reader.readLine(line)) != null) {
@@ -80,17 +89,17 @@ public class App_12_CreateTaxIDAccessionDB {
 					batch.close();
 					batch = db.createWriteBatch();
 					batchWriten = true;
-				}else {
+				} else {
 					batchWriten = false;
 				}
 
 				count++;
 			}
-			if(!batchWriten) {
+			if (!batchWriten) {
 				db.write(batch);
 				batch.close();
 			}
-			
+
 			batch.close();
 		} catch (Throwable e) {
 			e.printStackTrace();

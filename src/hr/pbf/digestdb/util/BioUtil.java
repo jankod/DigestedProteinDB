@@ -35,6 +35,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -610,7 +611,7 @@ public class BioUtil {
 
 	public static final String intToAccession(int accession, ArrayList<String> prefixList) {
 
-		return null;
+		throw new NotImplementedException("");
 
 	}
 

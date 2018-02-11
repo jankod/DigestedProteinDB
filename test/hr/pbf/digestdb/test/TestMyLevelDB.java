@@ -32,7 +32,7 @@ class TestMyLevelDB {
 	@Test
 	void test1() {
 
-		int taxId = db.getInt("WP_070124593");
+		int taxId = db.getInt("WP_070124588");
 		assertEquals(1656094, taxId);
 
 		DBIterator it = db.getIterator();

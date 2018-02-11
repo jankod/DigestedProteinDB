@@ -1,5 +1,7 @@
 package hr.pbf.digestdb.util;
 
+import java.nio.ByteBuffer;
+
 import com.google.common.base.Charsets;
 
 public class BiteUtil {
@@ -22,5 +24,13 @@ public class BiteUtil {
 
 	public static byte[] toByte(String s) {
 		return s.getBytes(Charsets.US_ASCII);
+	}
+
+	public static byte[] floatToByteArray(float f) {
+		return ByteBuffer.allocate(4).putFloat(f).array();
+	}
+
+	public static float byteArrayToFloat(byte[] t) {
+		return ByteBuffer.allocate(4).put(t).getFloat();
 	}
 }

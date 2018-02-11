@@ -16,7 +16,7 @@ public class P1 {
 				"C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\nr_mass_sorted_200_000.csv");
 		csv.startIterate(new CallbackMass() {
 			@Override
-			public void row(Double mass, String accVersion, String peptide) {
+			public void row(double mass, String accVersion, String peptide) {
 				// System.out.println(mass + " "+ accVersion + " "+ peptide);
 				c++;
 			}

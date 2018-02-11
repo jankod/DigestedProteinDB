@@ -18,11 +18,17 @@ public class MassCSV {
 		this.path = path;
 	}
 
+	
+	private boolean stop = false;
 	public void startIterate(CallbackMass callbackMass) throws FileNotFoundException, IOException {
 
 		MutableString line = new MutableString(220);
 		try (FastBufferedReader reader = new FastBufferedReader(new FileReader(path))) {
 			while ((reader.readLine(line)) != null) {
+				if(stop) {
+					break;
+				}
+				
 				String[] split = StringUtils.split(line.toString(), '\t');
 
 				double mass = Double.parseDouble(split[0]);
@@ -33,6 +39,10 @@ public class MassCSV {
 			}
 		}
 		callbackMass.finish();
+	}
+
+	public void stop() {
+		stop = true;
 	}
 
 }

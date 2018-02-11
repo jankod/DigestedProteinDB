@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import com.esotericsoftware.kryo.io.UnsafeInput;
@@ -115,18 +117,25 @@ public class LoadAllAccessionTax {
 		System.out.println(DurationFormatUtils.formatDurationHMS(stop.getTime()));
 	}
 
-	public static void main(String[] args) {
-		System.out.println("start");
-		storeFileDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\mvstore.db";
+	public static void main(String[] args) throws FileNotFoundException {
+		storeFileDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\mvstore_accession_taxid.db";
 		if (SystemUtils.IS_OS_LINUX) {
 			storeFileDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\mvstore.db";
 		}
 		
+		if(!Paths.get(storeFileDb).toFile().exists()) {
+			throw new FileNotFoundException(storeFileDb);
+		}
+		
 		MVStore s = new MVStore.Builder().cacheSize(512).fileName(storeFileDb).compress().open();
 		MVMap<Object, Object> map = s.openMap("acc_taxid");
-		System.out.println("Size: "+ map.size());
-		System.out.println("Accession: "+ map.get("AAF27197.1").getClass());
 		
+		
+		
+		System.out.println("Size: "+ map.size());
+		System.out.println("Accession APZ74649.1 : "+ map.get("APZ74649.1"));
+		Object firstKey = map.firstKey();
+		System.out.println(firstKey);
 		s.close();
 	}
 }

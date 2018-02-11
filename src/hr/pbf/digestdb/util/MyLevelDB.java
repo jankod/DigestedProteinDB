@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.util;
 
+import static hr.pbf.digestdb.util.BiteUtil.toStringFromByte;
 import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 
 import java.io.File;
@@ -38,10 +39,10 @@ public class MyLevelDB {
 			db.close();
 		}
 	}
-	
-	
+
 	/**
 	 * Mora ga zatvoriti onda!
+	 * 
 	 * @return
 	 */
 	public DBIterator getIterator() {
@@ -60,7 +61,8 @@ public class MyLevelDB {
 		i.seek(bk);
 		if (i.hasNext()) {
 			Entry<byte[], byte[]> res = i.next();
-			
+			System.out.println(toStringFromByte(res.getKey()) + " " + BiteUtil.toInt(res.getValue()));
+
 			if (res.getKey().equals(bk)) {
 				return BiteUtil.toInt(res.getValue());
 			}
