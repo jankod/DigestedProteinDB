@@ -187,6 +187,7 @@ public class BioUtil {
 	 * @throws FileNotFoundException
 	 */
 	public static DataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
+		new File(path).getParentFile().mkdirs();
 		DataOutputStream out = new DataOutputStream(
 				new BufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
 		return out;
@@ -228,6 +229,8 @@ public class BioUtil {
 		}
 		return cepaniceMasa;
 	}
+
+	
 
 	/**
 	 * Postavlja sve seq u velika slova.

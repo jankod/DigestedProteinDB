@@ -61,7 +61,7 @@ public class Smaz {
 			"\002la\211", "\001<\341", "\003, a\224" };
 
 	/* Reverse compression CODEBOOK, used for decompression */
-	private static final String REVERSE_CODEBOOK[] = { "A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K",
+	private static final String REVERSE_CODEBOOK[] = { "A", "R", "N", "D", "C", "EntrySax", "Q", "G", "H", "I", "L", "K",
 			"M", "F", "P", "S", "T", "W", "Y", "V", "RAG", "LLTAD", "AD", "s ", "d", " a", "an", "er", "c", " o",
 			"d ", "on", " of", "re", "of ", "t ", ", ", "is", "u", "at", "   ", "n ", "or", "which", "f", "m", "as",
 			"it", "that", "\n", "was", "en", "  ", " w", "es", " an", " i", "\r", "f ", "g", "p", "nd", " s", "nd ",

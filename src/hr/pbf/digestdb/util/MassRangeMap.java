@@ -15,6 +15,9 @@ import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Range;
 import com.google.common.collect.TreeRangeMap;
 
@@ -78,7 +81,7 @@ public class MassRangeMap implements Externalizable {
 	 * @param min
 	 *            min Da od kojeg se rade filovi
 	 * @param max
-	 *            max Da od kojeg se rrade filovi.
+	 *            max Da od kojeg se rade filovi.
 	 */
 	public MassRangeMap(double delta, int min, int max) {
 		this.delta = delta;
@@ -125,6 +128,7 @@ public class MassRangeMap implements Externalizable {
 	public TreeRangeMap<Double, String> getMap() {
 		return map;
 	}
+private static final Logger log = LoggerFactory.getLogger(MassRangeMap.class);
 
 	/**
 	 * 
@@ -133,6 +137,9 @@ public class MassRangeMap implements Externalizable {
 	 */
 	public String getFileName(double mass) {
 		String name = map.get(mass);
+		if(name == null) {
+			throw new NullPointerException("Not find mass: "+ mass);
+		}
 		return name;
 	}
 

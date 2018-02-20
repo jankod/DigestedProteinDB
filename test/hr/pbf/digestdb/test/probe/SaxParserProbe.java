@@ -2,6 +2,7 @@ package hr.pbf.digestdb.test.probe;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -18,53 +19,66 @@ import lombok.Data;
 public class SaxParserProbe {
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+		parse("F:\\Downloads\\uniprot_sprot.xml\\uniprot_sprot.xml");
+	}
+
+	public static void parse(String sprotXmlPath) throws ParserConfigurationException, SAXException, IOException {
 		SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 		SAXParser saxParser = saxParserFactory.newSAXParser();
 		MyHandler handler = new MyHandler();
-		saxParser.parse(new File("F:\\Downloads\\uniprot_sprot.xml\\uniprot_sprot.xml"), handler);
-
+		saxParser.parse(new File(sprotXmlPath), handler);
 	}
 }
 
-//@Data
-class Row {
+// @Data
+class EntrySax {
 
-	private static final Logger log = LoggerFactory.getLogger(Row.class);
-	
+	private static final Logger log = LoggerFactory.getLogger(EntrySax.class);
+
 	int numRow = -1;
 	private String seq;
 	private String accession;
-	private int taxid;
+	//private int taxid;
+	private ArrayList<Integer> taxids = new ArrayList<>(); 
 	private String proteinName;
+
+
 	
-	
-	public void setTaxid(int taxid) {
-		
-		this.taxid = taxid;
-	}
-	
-	public int getTaxid() {
-		return taxid;
-	}
 	public String getAccession() {
 		return accession;
 	}
+
 	public void setAccession(String accession) {
-		if(this.accession != null) {
-			log.debug("accession exist "+ accession);
+		if (this.accession != null) {
+			log.debug("accession exist " + accession);
 		}
 		this.accession = accession;
 	}
-	
+
 	public String getSeq() {
 		return seq;
 	}
+
 	public void setSeq(String seq) {
-		if(this.seq != null) {
-			log.debug("seq exisst "+ accession);
+		if (this.seq != null) {
+			log.debug("seq exisst " + accession);
 		}
 		this.seq = seq;
 	}
+
+	public ArrayList<Integer> getTaxids() {
+		return taxids;
+	}
+
+	public void setTaxids(ArrayList<Integer> taxids) {
+		this.taxids = taxids;
+	}
+
+	public void addTaxid(int taxId) {
+		this.taxids.add(taxId);
+	}
+	
+	
 }
 
 class MyHandler extends DefaultHandler {
@@ -73,10 +87,16 @@ class MyHandler extends DefaultHandler {
 	boolean sequence = false;
 	boolean accession = false;
 	boolean organism = false;
+	
+	// ncbi  <dbReference id="654924" type="NCBI Taxonomy"/> moze
+	// biti u unutar <organismHost> a to je virus kao
+	boolean organismHost=false;
+
+	boolean dbReference = false;
 
 	int countRow = 0;
 
-	Row row = new Row();
+	EntrySax row = new EntrySax();
 
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
@@ -86,7 +106,8 @@ class MyHandler extends DefaultHandler {
 			row.setSeq(new String(ch, start, length));
 		} else if (accession) {
 			row.setAccession(new String(ch, start, length));
-
+//		}else if (organism) {
+//			row.set
 		}
 	}
 
@@ -97,16 +118,19 @@ class MyHandler extends DefaultHandler {
 		processRow(row);
 	}
 
-	private void processRow(Row r) {
-		
+	private void processRow(EntrySax r) {
+		log.debug(r.toString());
 	}
 
 	@Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		if (qName.equals("entry")) {
 			countRow++;
-			row = new Row();
+			row = new EntrySax();
 			// TODO: pukni row negdje
+			if(countRow > 10) {
+				throw new RuntimeException("Finish dosta");
+			}
 
 			// String dataset = attributes.getValue("dataset");
 			// System.out.println("dataset " + dataset);
@@ -117,10 +141,7 @@ class MyHandler extends DefaultHandler {
 		} else if (organism && qName.equals("dbReference")) {
 			if (attributes.getValue("type").equals("NCBI Taxonomy")) {
 				int taxId = Integer.parseInt(attributes.getValue("id"));
-				if (row.getTaxid() != 0) {
-					log.debug("Sadrzi vec taxid " + row);
-				}
-				row.setTaxid(taxId);
+				row.addTaxid(taxId);
 			}
 		} else if (qName.equals("organism")) {
 			organism = true;
@@ -133,6 +154,15 @@ class MyHandler extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if (qName.equals("organism")) {
 			organism = false;
+		}
+		if (qName.equals("dbReference")) {
+			dbReference = false;
+		}
+		if (qName.equals("accession")) {
+			dbReference = false;
+		}
+		if("sequence".equals(qName)) {
+			sequence = false;
 		}
 	}
 }

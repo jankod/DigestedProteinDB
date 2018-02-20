@@ -10,6 +10,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import hr.pbf.digestdb.app.App_15_AddTaxIdToCSV;
+import hr.pbf.digestdb.test.probe.uniprot.UniprotTextParser;
 import hr.pbf.digestdb.util.TimeScheduler;
 import hr.pbf.digestdb.app.App_11_MakeLevelDbStore;
 import hr.pbf.digestdb.app.App_11_MakeLevelDbStore_TEST;
@@ -24,10 +25,11 @@ public class GlobalMain {
 		s.start();
 		try {
 			// App_11_MakeLevelDbStore.main(args);
-			// App_12_CreateTaxIDAccessionDB.main(args);
+			//App_12_CreateTaxIDAccessionDB.main(args);
 			// App_11_MakeLevelDbStore_TEST.main(args);
 			// App_14_MaveMVstoreAccessionTaxid.main(args);
-			App_15_AddTaxIdToCSV.main(args);
+			//App_15_AddTaxIdToCSV.main(args);
+			UniprotTextParser.main(args);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {

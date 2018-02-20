@@ -181,7 +181,7 @@ public class App_15_AddTaxIdToCSV {
 						cNotFind++;
 						outAccNotFound.write((acc + "\n").getBytes(Charsets.US_ASCII));
 					}
-//					Row r = new Row();
+//					EntrySax r = new EntrySax();
 //					r.setAcc(acc);
 //					r.setMass((float) mass);
 //					r.setPeptide(peptide);

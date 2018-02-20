@@ -38,8 +38,8 @@ public class App_12_CreateTaxIDAccessionDB {
 
 	public static void main(String[] args) throws IOException {
 
-		// leveldb();
-		mvstore();
+		 leveldb();
+		//mvstore();
 
 	}
 
@@ -53,10 +53,11 @@ public class App_12_CreateTaxIDAccessionDB {
 
 		options.cacheSize(100 * 1048576 * 10); // 100MB cache
 		options.compressionType(CompressionType.SNAPPY);
-		options.verifyChecksums(false);
-		options.paranoidChecks(false);
+		//options.verifyChecksums(false);
+		//options.paranoidChecks(true);
 
 		String newDbPath = "/home/users/tag/nr_db/leveldb_accession2taxid_dead";
+		String accessionTaxIdPath = "/home/users/tag/nr_db/dead_prot.accession2taxid";
 		System.out.println("db: " + newDbPath);
 		DB db = factory.open(new File(newDbPath), options);
 
@@ -71,7 +72,7 @@ public class App_12_CreateTaxIDAccessionDB {
 
 		MutableString line = new MutableString();
 		try (FastBufferedReader reader = new FastBufferedReader(
-				new FileReader("/home/users/tag/nr_db/dead_prot.accession2taxid"))) {
+				new FileReader(accessionTaxIdPath))) {
 			WriteBatch batch = db.createWriteBatch();
 
 			boolean batchWriten = false;

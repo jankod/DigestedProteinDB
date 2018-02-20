@@ -4,8 +4,39 @@
 	<groupId>DigestedProteinDB</groupId>
 	<artifactId>DigestedProteinDB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<lmdbjni.v>0.4.7</lmdbjni.v>
+	</properties>
 	<dependencies>
 
+		<!-- https://github.com/deephacks/lmdbjni -->
+		<dependency>
+			<groupId>org.deephacks.lmdbjni</groupId>
+			<artifactId>lmdbjni</artifactId>
+			<version>${lmdbjni.v}</version>
+		</dependency>
+
+		<!-- prebuilt liblmdb platform packages -->
+
+		<dependency>
+			<groupId>org.deephacks.lmdbjni</groupId>
+			<artifactId>lmdbjni-linux64</artifactId>
+			<version>${lmdbjni.v}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.deephacks.lmdbjni</groupId>
+			<artifactId>lmdbjni-win64</artifactId>
+			<version>0.4.6</version>
+		</dependency>
+
+
+		<!-- https://mvnrepository.com/artifact/org.mapdb/mapdb -->
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
+			<version>3.0.5</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.fusesource.leveldbjni</groupId>
