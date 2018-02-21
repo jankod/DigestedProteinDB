@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.probe.uniprot;
+package hr.pbf.digestdb.uniprot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils;
 
 import hr.pbf.digestdb.util.BioUtil;
 
-public class UniprotXmlClean {
+public class UniprotXmlCleanProbe {
 
 	public static void main(String[] args) throws IOException {
 		BufferedReader in = BioUtil.newFileReader("F:\\Downloads\\uniprot\\uniprot_sprot.xml", "US-ASCII");

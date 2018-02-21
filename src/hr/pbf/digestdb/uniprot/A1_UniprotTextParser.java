@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test.probe.uniprot;
+package hr.pbf.digestdb.uniprot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,7 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.FastOutput;
+import com.google.common.collect.TreeRangeMap;
 
+import hr.pbf.digestdb.uniprot.UniprotModel.CallbackUniprotReader;
+import hr.pbf.digestdb.uniprot.UniprotModel.EntryUniprot;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.MassRangeMap;
 import hr.pbf.digestdb.util.TimeScheduler;
@@ -33,8 +36,8 @@ import hr.pbf.digestdb.util.TimeScheduler;
  * Doc text formata: https://web.expasy.org/docs/userman.html
  *
  */
-public class UniprotTextParser {
-	private static final Logger log = LoggerFactory.getLogger(UniprotTextParser.class);
+public class A1_UniprotTextParser {
+	private static final Logger log = LoggerFactory.getLogger(A1_UniprotTextParser.class);
 
 	private static long c = 0;
 
@@ -42,54 +45,64 @@ public class UniprotTextParser {
 	static String deltaDbPath;
 	// private static String taxidLevelDBpath = mainfolder + "\\taxid_level.db";
 	// private static String accLevelDBpath = mainfolder + "\\acc_level.db";
+	static BufferedWriter outProt;
 
 	public static void main(String[] args) throws IOException {
-
+		long maxRows = 1000;
 		if (SystemUtils.IS_OS_LINUX) {
 			mainfolder = "/home/users/tag/uniprot";
+			maxRows = Long.MAX_VALUE;
 		}
 		deltaDbPath = mainfolder + File.separator + "delta-db";
 
 		File d = new File(deltaDbPath);
 		FileUtils.deleteDirectory(d);
 		d.mkdirs();
-		TimeScheduler.runEvery1Minutes(new Runnable() {
+		TimeScheduler.runEvery10Minutes(new Runnable() {
 
 			@Override
 			public void run() {
 				log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(c));
 			}
 		});
-		BufferedWriter outMass = BioUtil.newFileWiter(mainfolder + File.separator + "result.csv", "ASCII");
+		String outProtPath = mainfolder + File.separator + "result_prot_names.csv";
+		// log.debug(outProtPath);
+		outProt = BioUtil.newFileWiter(outProtPath, "ASCII");
 
-		readUniprotTextLarge(mainfolder + File.separator + "uniprot.dat.txt", e -> {
+		String db = "uniprot_trembl.dat";
+		// db = "uniprot_sprot.dat";
+		log.debug("db " + db);
+		readUniprotTextLarge(mainfolder + File.separator + db, e -> {
 
 			try {
-				// mass, peptide, acc, taxid
-				// mass->(0.3Da) -> marge (peptide, acc1, acc2, acc3, taxid)
 
 				writeMass(e);
-
-				// taxid, tax_desc -> CSV
-
-				writeTax(e);
-				// acc, prot_desc -> CSV
-
+				writeProteNames(e);
+				c++;
 			} catch (Throwable e1) {
 				e1.printStackTrace();
 			}
 
-		}, 100);
+		}, maxRows);
 
-		IOUtils.closeQuietly(outMass);
+		IOUtils.closeQuietly(outProt);
 		for (DataOutputStream out : massStreamMap.values()) {
 			IOUtils.closeQuietly(out);
 		}
 		TimeScheduler.stopAll();
 	}
 
-	private static void writeTax(EntryUniprot e) {
+	private static void writeProteNames(EntryUniprot e) throws IOException {
+		outProt.write(e.getAccession() + "\t" + e.getProtName() + "\n");
+	}
 
+	/**
+	 * taxid, tax_desc -> CSV
+	 * 
+	 * @param e
+	 */
+	private static void writeTax_Desc(EntryUniprot e) {
+		// outProt.write(e.getTax() +"\t"+e.);
 	}
 
 	private final static double DELTA = 0.3;
@@ -110,17 +123,15 @@ public class UniprotTextParser {
 			if (massStreamMap.containsKey(fileName)) {
 				out = massStreamMap.get(fileName);
 			} else {
-				out = BioUtil.newDataOutputStream(deltaDbPath + File.separator+ fileName + ".db", 8192);
+				out = BioUtil.newDataOutputStream(deltaDbPath + File.separator + fileName + ".db", 8192);
 				massStreamMap.put(fileName, out);
 			}
 
 			// out.writeDouble(mass);
-			out.writeUTF(peptideMass.getKey()); // peptide
+			String peptide = peptideMass.getKey();
+			out.writeUTF(peptide); 
 			out.writeInt(e.getTax());
-			out.writeInt(e.getAccessions().size());
-			for (String acc : e.getAccessions()) {
-				out.writeUTF(acc);
-			}
+			out.writeUTF(e.getAccession());
 
 		}
 
@@ -201,7 +212,7 @@ public class UniprotTextParser {
 		if (line.startsWith(prefixRecName)) {
 			entry.setProtName(line.substring(prefixRecName.length(), line.length() - 1));
 		} else if (line.startsWith(prefixSubName) && entry.getProtName() == null) {
-			// mozda nema RedName nego SubName, trebl ima SubName uglavnom...
+			// maybe note have RecName nego SubName, trebl ima SubName uglavnom...
 			entry.setProtName(line.substring(prefixSubName.length(), line.length() - 1));
 		}
 	}
@@ -212,27 +223,19 @@ public class UniprotTextParser {
 	 * 
 	 */
 	private static void addSequence(String line, EntryUniprot e) {
+
 		String seq = StringUtils.remove(line, " ");
 		e.getSeq().append(seq);
 	}
 
 	/**
-	 * Parsira nesto ovako: OX NCBI_TaxID=30343; Trembl ima ovo: NCBI_TaxID=418404
-	 * {ECO:0000313|EMBL:AHZ18584.1}; Moze biti i ovako: "NCBI_TaxID=3617
-	 * {ECO:0000305};"
+	 * 
 	 */
 	public static void addTaxonomy(String line, EntryUniprot e) {
-		try {
-			line = line.substring(16).trim();
-			int pos = line.indexOf(';');
-			if (line.contains("{")) {
-				pos = line.indexOf(" ");
-			}
 
-			String striTaxID = line.substring(0, pos);
-			// String desc = line.substring(pos + 1);
-			// desc = StringUtils.removeEnd(desc, ".");
-			e.setTax(Integer.parseInt(striTaxID));
+		try {
+			int taxIt = UniprotParseUtil.parseTaxLine(line);
+			e.setTax(taxIt);
 		} catch (Throwable t) {
 			log.error("Error on line: " + line, t);
 		}
@@ -242,19 +245,12 @@ public class UniprotTextParser {
 	/**
 	 * <code>
 	 * AC Q16653; O00713; O00714; O00715; Q13054; Q13055; Q14855; Q92891;
-	 * </code> ili <code>AC   P00321;</code>
+	 * </code> ili <code>AC   P00321;</code> Only first use.
 	 * 
 	 */
 	public static void addAccessions(String line, EntryUniprot e) {
-		line = line.substring(5);
-		String[] split = StringUtils.split(line, ";");
-		for (String ac : split) {
-			ac = ac.trim();
-			if (StringUtils.isBlank(ac)) {
-				continue;
-			}
-			e.getAccessions().add(ac);
-		}
+		e.setAccession(UniprotParseUtil.parseFirstAccession(line));
+
 	}
 
 }
