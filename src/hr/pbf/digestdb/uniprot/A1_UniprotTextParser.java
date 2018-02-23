@@ -39,22 +39,43 @@ import hr.pbf.digestdb.util.TimeScheduler;
 public class A1_UniprotTextParser {
 	private static final Logger log = LoggerFactory.getLogger(A1_UniprotTextParser.class);
 
+	private final static float DELTA = 0.3f;
+	final static int fromMass = 500;
+	final static int toMass = 6000;
+	static final MassRangeMap massRangeMap = new MassRangeMap(DELTA, fromMass, toMass);
+	private static HashMap<String, DataOutputStream> massStreamMap = new HashMap<>();
+	
+	
+	/**
+	 * Round float mass before and after save peptide mass
+	 */
+	public static final int ROUND_FLOAT_MASS = 2;
+
 	private static long c = 0;
 
 	private static String mainfolder = "F:\\Downloads\\uniprot";
-	static String deltaDbPath;
-	// private static String taxidLevelDBpath = mainfolder + "\\taxid_level.db";
-	// private static String accLevelDBpath = mainfolder + "\\acc_level.db";
-	static BufferedWriter outProt;
+	public static String deltaDbPath;
+	private static BufferedWriter outProt;
 
 	public static void main(String[] args) throws IOException {
-		long maxRows = 1000;
+		long maxEntry = 100_000;
+		String db = "uniprot_sprot.dat";
+		// uniprot_sprot.dat
+
 		if (SystemUtils.IS_OS_LINUX) {
 			mainfolder = "/home/users/tag/uniprot";
-			maxRows = Long.MAX_VALUE;
+			maxEntry = Long.MAX_VALUE;
+			db = "uniprot_trembl.dat";
+		//	db = "uniprot_sprot.dat";
 		}
-		deltaDbPath = mainfolder + File.separator + "delta-db";
+		
+		//LZMACompressorInputStream
+		
+		deltaDbPath = mainfolder + File.separator + db +"_delta-db1";
 
+		if(SystemUtils.IS_OS_WINDOWS) {
+			deltaDbPath += "_"+maxEntry;
+		}
 		File d = new File(deltaDbPath);
 		FileUtils.deleteDirectory(d);
 		d.mkdirs();
@@ -65,13 +86,12 @@ public class A1_UniprotTextParser {
 				log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(c));
 			}
 		});
-		String outProtPath = mainfolder + File.separator + "result_prot_names.csv";
+		String outProtPath = mainfolder + File.separator + db+"_prot_names1.csv";
 		// log.debug(outProtPath);
 		outProt = BioUtil.newFileWiter(outProtPath, "ASCII");
 
-		String db = "uniprot_trembl.dat";
-		// db = "uniprot_sprot.dat";
 		log.debug("db " + db);
+
 		readUniprotTextLarge(mainfolder + File.separator + db, e -> {
 
 			try {
@@ -83,7 +103,7 @@ public class A1_UniprotTextParser {
 				e1.printStackTrace();
 			}
 
-		}, maxRows);
+		}, maxEntry);
 
 		IOUtils.closeQuietly(outProt);
 		for (DataOutputStream out : massStreamMap.values()) {
@@ -96,29 +116,19 @@ public class A1_UniprotTextParser {
 		outProt.write(e.getAccession() + "\t" + e.getProtName() + "\n");
 	}
 
-	/**
-	 * taxid, tax_desc -> CSV
-	 * 
-	 * @param e
-	 */
-	private static void writeTax_Desc(EntryUniprot e) {
-		// outProt.write(e.getTax() +"\t"+e.);
-	}
-
-	private final static double DELTA = 0.3;
-	final static int fromMass = 500;
-	final static int toMass = 6000;
-	static final MassRangeMap massPartsMap = new MassRangeMap(DELTA, fromMass, toMass);
-	private static HashMap<String, DataOutputStream> massStreamMap = new HashMap<>();
-
 	private static void writeMass(EntryUniprot e) throws IOException {
 		Map<String, Double> massesMapp = BioUtil.getMassesDigest(e.getSeq().toString());
 		reduceMasses(massesMapp, fromMass, toMass);
 
 		Set<Entry<String, Double>> entrySet = massesMapp.entrySet();
 		for (Entry<String, Double> peptideMass : entrySet) {
-			Double mass = peptideMass.getValue();
-			String fileName = massPartsMap.getFileName(mass);
+			float mass = peptideMass.getValue().floatValue();
+			mass = BioUtil.roundToDecimals(mass, ROUND_FLOAT_MASS); // da ih previse ne napravi
+//			if (mass > 1011.4 && mass < 1011.6 ) {
+//				log.debug(""+ mass + " "+ massRangeMap.getFileName(mass));
+//			}
+
+			String fileName = massRangeMap.getFileName(mass);
 			DataOutputStream out;
 			if (massStreamMap.containsKey(fileName)) {
 				out = massStreamMap.get(fileName);
@@ -129,7 +139,7 @@ public class A1_UniprotTextParser {
 
 			// out.writeDouble(mass);
 			String peptide = peptideMass.getKey();
-			out.writeUTF(peptide); 
+			out.writeUTF(peptide);
 			out.writeInt(e.getTax());
 			out.writeUTF(e.getAccession());
 

@@ -6,7 +6,9 @@ import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.CallbackMass;
 import hr.pbf.digestdb.util.MassCSV;
 
-import static org.fusesource.leveldbjni.JniDBFactory.*;
+//import static org.fusesource.leveldbjni.JniDBFactory.*;
+import static org.iq80.leveldb.impl.Iq80DBFactory.*;
+
 import java.io.*;
 
 public class LevelDBnativeProbe {

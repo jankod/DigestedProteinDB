@@ -1,18 +1,16 @@
 package hr.pbf.digestdb.uniprot;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -43,12 +41,14 @@ public class UniprotModel {
 	}
 
 	public static class KryoFloatHolder implements KryoSerializable {
+		private static final Logger log = LoggerFactory.getLogger(UniprotModel.KryoFloatHolder.class);
 
 		private List<PeptideAccTax> data = new ArrayList<>();
 
 		public KryoFloatHolder() {
-			
+
 		}
+
 		public KryoFloatHolder(List<PeptideAccTax> data) {
 			this.data = data;
 		}
@@ -56,7 +56,10 @@ public class UniprotModel {
 		@Override
 		public void write(Kryo kryo, Output o) {
 			o.writeInt(data.size());
+			// TODO: sort by mass before
+
 			for (PeptideAccTax p : data) {
+
 				o.writeAscii(p.getPeptide());
 			}
 			for (PeptideAccTax p : data) {
@@ -72,6 +75,7 @@ public class UniprotModel {
 			int howMany = i.readInt();
 			data = new ArrayList<>(howMany);
 			for (int j = 0; j < howMany; j++) {
+//				log.debug("reqad");
 				PeptideAccTax p = new PeptideAccTax();
 				data.add(j, p);
 				p.setPeptide(i.readString());

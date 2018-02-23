@@ -1,6 +1,8 @@
 package hr.pbf.digestdb.test.probe;
 
 import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
+//import static org.fusesource.leveldbjni.JniDBFactory.*;
+
 
 import java.io.File;
 import java.io.IOException;

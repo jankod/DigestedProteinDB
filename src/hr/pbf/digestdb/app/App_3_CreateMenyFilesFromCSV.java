@@ -56,7 +56,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	String inputCsvPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\850_000_nr_mass.csv";
 	String folderResultPath = null; // "C:\\Eclipse\\OxygenWorkspace\\CreateNR\\misc\\sample_data\\small_store";
 
-	private final static double DELTA = 0.3;
+	private final static float DELTA = 0.3f;
 	final static int fromMass = 500;
 	final static int toMass = 6000;
 	static final MassRangeMap massPartsMap = new MassRangeMap(DELTA, fromMass, toMass);
@@ -156,7 +156,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 		String[] split = StringUtils.split(line, '\t');
 		// 1. mass
-		double mass = Double.parseDouble(split[0].trim());
+		float mass = (float) Double.parseDouble(split[0].trim());
 		// 2. peptide
 		String peptide = split[1].trim();
 		// 3. accession_my_id
@@ -172,7 +172,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 
 	private HashMap<String, DataOutputStream> massStreamMapp = new HashMap<>();
 
-	private DataOutputStream getDataOutputStream(double mass) throws FileNotFoundException {
+	private DataOutputStream getDataOutputStream(float mass) throws FileNotFoundException {
 		String fileName = massPartsMap.getFileName(mass);
 		synchronized (massStreamMapp) {
 			if (massStreamMapp.containsKey(fileName)) {

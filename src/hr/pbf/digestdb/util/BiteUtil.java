@@ -30,7 +30,8 @@ public class BiteUtil {
 		return ByteBuffer.allocate(4).putFloat(f).array();
 	}
 
-	public static float byteArrayToFloat(byte[] t) {
-		return ByteBuffer.allocate(4).put(t).getFloat();
+	public static float byteArrayToFloat(byte[] bytes) {
+		 return bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
+		//return ByteBuffer.allocate(4).put(t).getFloat();
 	}
 }

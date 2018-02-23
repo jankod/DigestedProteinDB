@@ -4,15 +4,10 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -30,13 +25,14 @@ import com.google.common.collect.TreeRangeMap;
  *
  */
 public class MassRangeMap implements Externalizable {
-
+	private static final Logger log = LoggerFactory.getLogger(MassRangeMap.class);
+	
 	private static final long serialVersionUID = 1L;
 
-	private double delta;
+	private float delta;
 	private int min;
 	private int max;
-	private transient TreeRangeMap<Double, String> map;
+	private transient TreeRangeMap<Float, String> map;
 	private int decimalPlaces;
 
 	@Override
@@ -45,7 +41,7 @@ public class MassRangeMap implements Externalizable {
 		int result = 1;
 		result = prime * result + decimalPlaces;
 		long temp;
-		temp = Double.doubleToLongBits(delta);
+		temp = Float.floatToIntBits(delta);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + max;
 		result = prime * result + min;
@@ -63,7 +59,7 @@ public class MassRangeMap implements Externalizable {
 		MassRangeMap other = (MassRangeMap) obj;
 		if (decimalPlaces != other.decimalPlaces)
 			return false;
-		if (Double.doubleToLongBits(delta) != Double.doubleToLongBits(other.delta))
+		if (Float.floatToIntBits(delta) != Float.floatToIntBits(other.delta))
 			return false;
 		if (max != other.max)
 			return false;
@@ -83,7 +79,7 @@ public class MassRangeMap implements Externalizable {
 	 * @param max
 	 *            max Da od kojeg se rade filovi.
 	 */
-	public MassRangeMap(double delta, int min, int max) {
+	public MassRangeMap(float delta, int min, int max) {
 		this.delta = delta;
 		this.min = min;
 		this.max = max;
@@ -96,7 +92,7 @@ public class MassRangeMap implements Externalizable {
 	}
 
 	private void createMap() {
-		DecimalFormat nf= new DecimalFormat("###.##");
+		DecimalFormat nf = new DecimalFormat("###.##");
 		DecimalFormatSymbols dec = new DecimalFormatSymbols();
 		dec.setDecimalSeparator('.');
 		dec.setGroupingSeparator(',');
@@ -108,37 +104,36 @@ public class MassRangeMap implements Externalizable {
 
 		map = TreeRangeMap.create();
 
-		for (double i = min; i < max + delta; i = i + delta) {
+		for (float i = min; i < max + delta; i = i + delta) {
 
-			double from = BioUtil.roundToDecimals(i, decimalPlaces);
-			double to = BioUtil.roundToDecimals(i + delta, decimalPlaces);
-			Range<Double> r = Range.closed(from, to);
+			float from = BioUtil.roundToDecimals(i, decimalPlaces);
+			float to = BioUtil.roundToDecimals(i + delta, decimalPlaces);
+			Range<Float> r = Range.closed(from, to);
 			// map.put(r, BioUtil.roundToDecimals(r.lowerEndpoint(), decimalPlaces) + "");
 			map.put(r, nf.format(r.lowerEndpoint()));
 		}
 	}
 
-	private int getDecimalPlaces(double d) {
-		String text = Double.toString(Math.abs(d));
+	private int getDecimalPlaces(float d) {
+		String text = Float.toString(Math.abs(d));
 		int integerPlaces = text.indexOf('.');
 		int decimalPlaces = text.length() - integerPlaces - 1;
 		return decimalPlaces;
 	}
 
-	public TreeRangeMap<Double, String> getMap() {
+	public TreeRangeMap<Float, String> getMap() {
 		return map;
 	}
-private static final Logger log = LoggerFactory.getLogger(MassRangeMap.class);
 
 	/**
 	 * 
 	 * @param mass
 	 * @return null ako nista ne nadje, inace file name za tu masu.
 	 */
-	public String getFileName(double mass) {
+	public String getFileName(float mass) {
 		String name = map.get(mass);
-		if(name == null) {
-			throw new NullPointerException("Not find mass: "+ mass);
+		if (name == null) {
+			throw new NullPointerException("Not find for mass: " + mass);
 		}
 		return name;
 	}
@@ -162,7 +157,7 @@ private static final Logger log = LoggerFactory.getLogger(MassRangeMap.class);
 		String utf = in.readUTF();
 		Properties p = new Properties();
 		p.load(new StringReader(utf));
-		delta = Double.parseDouble(p.getProperty("delta"));
+		delta = Float.parseFloat(p.getProperty("delta"));
 		max = Integer.parseInt(p.getProperty("max"));
 		min = Integer.parseInt(p.getProperty("min"));
 		decimalPlaces = Integer.parseInt(p.getProperty("decimalPlaces"));

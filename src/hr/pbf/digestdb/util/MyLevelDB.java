@@ -2,6 +2,7 @@ package hr.pbf.digestdb.util;
 
 import static hr.pbf.digestdb.util.BiteUtil.toStringFromByte;
 import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
+//import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 import java.io.File;
 import java.io.IOException;
