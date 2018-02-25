@@ -25,6 +25,7 @@ import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV.Row;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
+import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 import hr.pbf.digestdb.util.BioUtil;
 
 public class TestCompression {
@@ -44,7 +45,7 @@ public class TestCompression {
 	@Test
 	public void test1() throws Exception {
 		ByteArrayOutputStream data = new ByteArrayOutputStream();
-		DataOutputStream out = new DataOutputStream(data);
+		MyDataOutputStream out = new MyDataOutputStream(data);
 
 		smallFilesApp.writeRow(mass, peptide, acc, out);
 		smallFilesApp.writeRow(mass2, peptide2, acc2, out);
@@ -79,7 +80,7 @@ public class TestCompression {
 		assertTrue(file.isFile());
 
 		String path = file.getAbsolutePath();
-		try (DataOutputStream out = BioUtil.newDataOutputStream(path)) {
+		try (MyDataOutputStream out = BioUtil.newDataOutputStream(path)) {
 			// one row
 			smallFilesApp.writeRow(mass, peptide, acc, out);
 			smallFilesApp.writeRow(mass2, peptide2, acc2, out);

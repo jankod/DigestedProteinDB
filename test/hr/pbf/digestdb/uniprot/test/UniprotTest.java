@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.test;
+package hr.pbf.digestdb.uniprot.test;
 
 import static hr.pbf.digestdb.uniprot.UniprotParseUtil.parseFirstAccession;
 import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.minlog.Log;
 
-import hr.pbf.digestdb.uniprot.A2_UniprotDeltaMassReader;
+import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
 import hr.pbf.digestdb.uniprot.UniprotModel;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotParseUtil;
@@ -66,11 +66,11 @@ class UniprotTest {
 		String dir = "c:/tmp/test_kryio";
 		new File(dir).mkdirs();
 		s.start();
-		File resultFile = A2_UniprotDeltaMassReader.toKryo(mass, list1, dir);
+		File resultFile = A_X2_UniprotCompressSmallFilesLevelDb.toKryo(mass, list1, dir);
 		log.debug("save " + s.getTime());
 		s = new StopWatch();
 		s.start();
-		List<PeptideAccTax> listReaded = A2_UniprotDeltaMassReader.fromKryo(resultFile);
+		List<PeptideAccTax> listReaded = A_X2_UniprotCompressSmallFilesLevelDb.fromKryo(resultFile);
 		log.debug("read " + s.getTime());
 
 		assertIterableEquals(list1, listReaded);

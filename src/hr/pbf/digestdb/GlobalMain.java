@@ -10,8 +10,8 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import hr.pbf.digestdb.app.App_15_AddTaxIdToCSV;
-import hr.pbf.digestdb.uniprot.A1_UniprotTextParser;
-import hr.pbf.digestdb.uniprot.A2_UniprotDeltaMassReader;
+import hr.pbf.digestdb.uniprot.A1_UniprotToManyFormat1;
+import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
 import hr.pbf.digestdb.util.TimeScheduler;
 import hr.pbf.digestdb.app.App_11_MakeLevelDbStore;
 import hr.pbf.digestdb.app.App_11_MakeLevelDbStore_TEST;
@@ -30,8 +30,8 @@ public class GlobalMain {
 			// App_11_MakeLevelDbStore_TEST.main(args);
 			// App_14_MaveMVstoreAccessionTaxid.main(args);
 			//App_15_AddTaxIdToCSV.main(args);
-			//A1_UniprotTextParser.main(args);
-			A2_UniprotDeltaMassReader.main(args);
+			//A1_UniprotToManyFormat1.main(args);
+			A_X2_UniprotCompressSmallFilesLevelDb.main(args);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {

@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
 import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
+import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 
 public class ProbeStep4CompressManyFiles {
 
@@ -41,7 +42,7 @@ public class ProbeStep4CompressManyFiles {
 		// RADI
 		App_3_CreateMenyFilesFromCSV c = new App_3_CreateMenyFilesFromCSV();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		DataOutputStream dout = new DataOutputStream(out);
+		MyDataOutputStream dout = new MyDataOutputStream(out);
 		c.writeRow(1230D, "PEPTIDE", "WP_000184067.1", dout);
 		c.writeRow(1230D, "PEPTIDESFDSDFSDFREWRWEFCSEFWS", "XP_642131.1", dout);
 		dout.flush();

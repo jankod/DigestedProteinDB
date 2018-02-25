@@ -40,6 +40,7 @@ import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
 import hr.pbf.digestdb.cli.IApp;
+import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.MassRangeMap;
 
@@ -166,13 +167,13 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 			return;
 		}
 		// DataOutputStream out = rangeMap.get(mass);
-		DataOutputStream out = getDataOutputStream(mass);
+		MyDataOutputStream out = getDataOutputStream(mass);
 		writeRow(mass, peptide, accessionID, out);
 	}
 
-	private HashMap<String, DataOutputStream> massStreamMapp = new HashMap<>();
+	private HashMap<String, MyDataOutputStream> massStreamMapp = new HashMap<>();
 
-	private DataOutputStream getDataOutputStream(float mass) throws FileNotFoundException {
+	private MyDataOutputStream getDataOutputStream(float mass) throws FileNotFoundException {
 		String fileName = massPartsMap.getFileName(mass);
 		synchronized (massStreamMapp) {
 			if (massStreamMapp.containsKey(fileName)) {
@@ -180,7 +181,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 			}
 		}
 
-		DataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36); // 0.3
+		MyDataOutputStream out = BioUtil.newDataOutputStream(folderResultPath + "/" + fileName + ".db", 8192 * 36); // 0.3
 																													// MB
 		synchronized (massStreamMapp) {
 			massStreamMapp.put(fileName, out);
@@ -190,8 +191,8 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 	}
 
 	private void closeAllStreams() {
-		Collection<DataOutputStream> values = massStreamMapp.values();
-		for (DataOutputStream dataOutputStream : values) {
+		Collection<MyDataOutputStream> values = massStreamMapp.values();
+		for (MyDataOutputStream dataOutputStream : values) {
 			try {
 				dataOutputStream.flush();
 			} catch (IOException e) {
@@ -216,7 +217,7 @@ public class App_3_CreateMenyFilesFromCSV implements IApp {
 		public String accessionID;
 	}
 
-	public void writeRow(double mass, String peptide, String accessionID, DataOutputStream out) throws IOException {
+	public void writeRow(double mass, String peptide, String accessionID, MyDataOutputStream out) throws IOException {
 
 		synchronized (out) {
 			// out.writeDouble(mass); NE VISE

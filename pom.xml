@@ -9,7 +9,20 @@
 	</properties>
 	<dependencies>
 
+		<dependency>
+			<groupId>edu.ucar</groupId>
+			<artifactId>netcdfAll</artifactId>
+			<version>ESGF-5.0.1</version>
+		</dependency>
+
+
 		<!-- COMPRESS -->
+		<dependency>
+			<groupId>org.xerial.snappy</groupId>
+			<artifactId>snappy-java</artifactId>
+			<version>1.1.7.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
@@ -22,7 +35,7 @@
 			<version>1.8</version>
 		</dependency>
 		<!-- END COMPRESS -->
-		
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -233,6 +246,13 @@
 		</dependency>
 
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>boundlessgo</id>
+			<name>boundlessgo</name>
+			<url>http://repo.boundlessgeo.com/main/</url>
+		</repository>
+	</repositories>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>

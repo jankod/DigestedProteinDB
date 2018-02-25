@@ -42,7 +42,13 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.iq80.snappy.SnappyFramedInputStream;
 import org.iq80.snappy.SnappyFramedOutputStream;
 
+import com.esotericsoftware.kryo.io.FastOutput;
+
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
+import hr.pbf.digestdb.uniprot.MyDataOutputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import net.jpountz.util.UnsafeUtils;
+import ucar.nc2.util.UnsynchronizedBufferedWriter;
 
 public class BioUtil {
 
@@ -136,8 +142,11 @@ public class BioUtil {
 		if (charset == null) {
 			charset = "ASCII";
 		}
-		int BUFFER = 1024 * 1024 * 12 * 8; // 12 * 8 MB
+		int BUFFER = 1024 * 1024 * 12 * 4; // 12 * 4 MB
 
+		
+		//FastBufferedOutputStream f = new FastBufferedOutputStream(new FastOutput(new FileOutputStream(new File(path)), charset));
+		
 		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
 				BUFFER);
 		return w;
@@ -173,8 +182,9 @@ public class BioUtil {
 
 	/////////////////////////////////////////////////////////////////////////////////////////// 77
 
-	public static DataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
-		DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(new File(path))));
+	public static MyDataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
+		
+		MyDataOutputStream out = new MyDataOutputStream(new FastBufferedOutputStream(new FileOutputStream(new File(path))));
 		return out;
 	}
 
@@ -186,10 +196,12 @@ public class BioUtil {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static DataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
+	public static MyDataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
 		new File(path).getParentFile().mkdirs();
-		DataOutputStream out = new DataOutputStream(
-				new BufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
+		
+		
+		MyDataOutputStream out = new MyDataOutputStream(
+				new FastBufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
 		return out;
 	}
 

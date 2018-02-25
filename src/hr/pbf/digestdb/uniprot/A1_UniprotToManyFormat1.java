@@ -2,17 +2,14 @@ package hr.pbf.digestdb.uniprot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -22,10 +19,6 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.FastOutput;
-import com.google.common.collect.TreeRangeMap;
-
 import hr.pbf.digestdb.uniprot.UniprotModel.CallbackUniprotReader;
 import hr.pbf.digestdb.uniprot.UniprotModel.EntryUniprot;
 import hr.pbf.digestdb.util.BioUtil;
@@ -33,72 +26,80 @@ import hr.pbf.digestdb.util.MassRangeMap;
 import hr.pbf.digestdb.util.TimeScheduler;
 
 /**
- * Doc text formata: https://web.expasy.org/docs/userman.html
+ * Parse uniprot dat files and create folder of many "format1" files. Format1 is
+ * format which store peptide-acc-tax. sorted by mass. Doc text formata:
+ * https://web.expasy.org/docs/userman.html Make .db files
  *
  */
-public class A1_UniprotTextParser {
-	private static final Logger log = LoggerFactory.getLogger(A1_UniprotTextParser.class);
+public class A1_UniprotToManyFormat1 {
+	private static final Logger log = LoggerFactory.getLogger(A1_UniprotToManyFormat1.class);
 
-	private final static float DELTA = 0.3f;
-	final static int fromMass = 500;
-	final static int toMass = 6000;
-	static final MassRangeMap massRangeMap = new MassRangeMap(DELTA, fromMass, toMass);
-	private static HashMap<String, DataOutputStream> massStreamMap = new HashMap<>();
-	
-	
+	// private final static float DELTA = 0.3f;
+	// final static int fromMass = 500;
+	// final static int toMass = 6000;
+	// static final MassRangeMap massRangeMap = new MassRangeMap(DELTA, fromMass,
+	// toMass);
+	// private static HashMap<String, DataOutput> massStreamMap = new HashMap<>();
+
 	/**
 	 * Round float mass before and after save peptide mass
 	 */
 	public static final int ROUND_FLOAT_MASS = 2;
 
-	private static long c = 0;
+	private static long counter = 0;
 
-	private static String mainfolder = "F:\\Downloads\\uniprot";
-	public static String deltaDbPath;
+	private static String pathDirMain;
+	public static String pathDirFormat1;
 	private static BufferedWriter outProt;
 
+	private static MassRangeFiles massRangeFiles;
+
 	public static void main(String[] args) throws IOException {
-		long maxEntry = 100_000;
+		long maxEntry = 100_000; // Long.MAX_VALUE
+
 		String db = "uniprot_sprot.dat";
-		// uniprot_sprot.dat
+
+		pathDirMain = "F:\\Downloads\\uniprot";
 
 		if (SystemUtils.IS_OS_LINUX) {
-			mainfolder = "/home/users/tag/uniprot";
+			pathDirMain = "/home/users/tag/uniprot";
 			maxEntry = Long.MAX_VALUE;
 			db = "uniprot_trembl.dat";
-		//	db = "uniprot_sprot.dat";
+			// db = "uniprot_sprot.dat";
 		}
-		
-		//LZMACompressorInputStream
-		
-		deltaDbPath = mainfolder + File.separator + db +"_delta-db1";
 
-		if(SystemUtils.IS_OS_WINDOWS) {
-			deltaDbPath += "_"+maxEntry;
+		pathDirFormat1 = pathDirMain + File.separator + db + "_format1";
+
+		if (SystemUtils.IS_OS_WINDOWS) {
+			pathDirFormat1 += "_" + maxEntry;
 		}
-		File d = new File(deltaDbPath);
+		String outProtPath = pathDirMain + File.separator + db + "_prot_names.csv";
+
+		massRangeFiles = new MassRangeFiles(500, 6000, 0.3f, "format1", pathDirFormat1);
+
+		File d = new File(pathDirFormat1);
 		FileUtils.deleteDirectory(d);
 		d.mkdirs();
 		TimeScheduler.runEvery10Minutes(new Runnable() {
 
 			@Override
 			public void run() {
-				log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(c));
+				log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(counter));
 			}
 		});
-		String outProtPath = mainfolder + File.separator + db+"_prot_names1.csv";
+
 		// log.debug(outProtPath);
 		outProt = BioUtil.newFileWiter(outProtPath, "ASCII");
 
 		log.debug("db " + db);
 
-		readUniprotTextLarge(mainfolder + File.separator + db, e -> {
+		readUniprotTextLarge(pathDirMain + File.separator + db, e -> {
 
 			try {
 
 				writeMass(e);
 				writeProteNames(e);
-				c++;
+				counter++;
 			} catch (Throwable e1) {
 				e1.printStackTrace();
 			}
@@ -106,9 +107,9 @@ public class A1_UniprotTextParser {
 		}, maxEntry);
 
 		IOUtils.closeQuietly(outProt);
-		for (DataOutputStream out : massStreamMap.values()) {
-			IOUtils.closeQuietly(out);
-		}
+
+		massRangeFiles.closeAll();
+
 		TimeScheduler.stopAll();
 	}
 
@@ -118,41 +119,17 @@ public class A1_UniprotTextParser {
 
 	private static void writeMass(EntryUniprot e) throws IOException {
 		Map<String, Double> massesMapp = BioUtil.getMassesDigest(e.getSeq().toString());
-		reduceMasses(massesMapp, fromMass, toMass);
+		UniprotUtil.reduceMasses(massesMapp, massRangeFiles.getFromMass(), massRangeFiles.getToMass());
 
 		Set<Entry<String, Double>> entrySet = massesMapp.entrySet();
 		for (Entry<String, Double> peptideMass : entrySet) {
 			float mass = peptideMass.getValue().floatValue();
-			mass = BioUtil.roundToDecimals(mass, ROUND_FLOAT_MASS); // da ih previse ne napravi
-//			if (mass > 1011.4 && mass < 1011.6 ) {
-//				log.debug(""+ mass + " "+ massRangeMap.getFileName(mass));
-//			}
+			mass = BioUtil.roundToDecimals(mass, ROUND_FLOAT_MASS);
 
-			String fileName = massRangeMap.getFileName(mass);
-			DataOutputStream out;
-			if (massStreamMap.containsKey(fileName)) {
-				out = massStreamMap.get(fileName);
-			} else {
-				out = BioUtil.newDataOutputStream(deltaDbPath + File.separator + fileName + ".db", 8192);
-				massStreamMap.put(fileName, out);
-			}
+			DataOutput out = massRangeFiles.getOuput(mass);
 
-			// out.writeDouble(mass);
 			String peptide = peptideMass.getKey();
-			out.writeUTF(peptide);
-			out.writeInt(e.getTax());
-			out.writeUTF(e.getAccession());
-
-		}
-
-	}
-
-	private static void reduceMasses(Map<String, Double> masses, int fromMass, int toMass) {
-		Iterator<String> it = masses.keySet().iterator();
-		while (it.hasNext()) {
-			Double m = masses.get(it.next());
-			if (fromMass >= m || m >= toMass)
-				it.remove();
+			UniprotUtil.writeOneFormat1(out, peptide, e.getTax(), e.getAccession());
 
 		}
 

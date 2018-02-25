@@ -15,6 +15,8 @@ import com.esotericsoftware.kryo.io.Output;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.util.BiteUtil;
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
+import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.iq80.leveldb.*;
@@ -106,7 +108,7 @@ public class LevelDbUniprot {
 //			List<PeptideAccTax> o = k.readObject(new Input(b), ArrayList.class);
 //			return o;
 //		}
-		DataInputStream in = new DataInputStream(new ByteArrayInputStream(b));
+		DataInputStream in = new DataInputStream(new FastByteArrayInputStream(b));
 		int how = in.readInt();
 		ArrayList<PeptideAccTax> result = new ArrayList<>(how);
 		for (int i = 0; i < how; i++) {
@@ -135,8 +137,9 @@ public class LevelDbUniprot {
 //			return outb.toByteArray();
 //		}
 		
-		ByteArrayOutputStream out = new ByteArrayOutputStream(peptides.size() * 22);
-		DataOutputStream d = new DataOutputStream(out);
+		FastByteArrayOutputStream out = new FastByteArrayOutputStream(peptides.size() * 22);
+		
+		MyDataOutputStream d = new MyDataOutputStream(out);
 
 		d.writeInt(peptides.size());
 		for (PeptideAccTax pep : peptides) {
@@ -152,7 +155,7 @@ public class LevelDbUniprot {
 			// b.write(pep.getTax());
 			d.writeInt(pep.getTax());
 		}
-		return out.toByteArray();
+		return out.array;
 	}
 
 	public void printStatus() {
