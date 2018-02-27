@@ -8,12 +8,14 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.List;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 
 /**
@@ -26,7 +28,7 @@ import com.google.common.collect.TreeRangeMap;
  */
 public class MassRangeMap implements Externalizable {
 	private static final Logger log = LoggerFactory.getLogger(MassRangeMap.class);
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private float delta;
@@ -123,6 +125,10 @@ public class MassRangeMap implements Externalizable {
 
 	public TreeRangeMap<Float, String> getMap() {
 		return map;
+	}
+
+	public RangeMap<Float, String> getFileNames(float from, float to) {
+		return map.subRangeMap(Range.openClosed(from, to));
 	}
 
 	/**

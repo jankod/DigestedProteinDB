@@ -1,6 +1,6 @@
 package hr.pbf.digestdb.uniprot;
 
-import static hr.pbf.digestdb.uniprot.A1_UniprotToManyFormat1.ROUND_FLOAT_MASS;
+import static hr.pbf.digestdb.uniprot.A1_UniprotToFormat1.ROUND_FLOAT_MASS;
 import static hr.pbf.digestdb.util.BioUtil.calculateMassWidthH2O;
 import static hr.pbf.digestdb.util.BioUtil.roundToDecimals;
 
@@ -119,7 +119,7 @@ public class UniprotReader {
 		for (File file : listFiles) {
 			List<PeptideAccTax> res = A_X2_UniprotCompressSmallFilesLevelDb.fromKryo(file);
 			String floatName = FilenameUtils.getBaseName(file.getName());
-			float mass = BioUtil.roundToDecimals(Float.parseFloat(floatName), A1_UniprotToManyFormat1.ROUND_FLOAT_MASS);
+			float mass = BioUtil.roundToDecimals(Float.parseFloat(floatName), A1_UniprotToFormat1.ROUND_FLOAT_MASS);
 
 			// System.out.println("My mas: " + mass);
 			for (PeptideAccTax p : res) {

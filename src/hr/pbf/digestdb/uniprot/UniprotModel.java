@@ -98,12 +98,24 @@ public class UniprotModel {
 		}
 
 	}
-
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public final static class PeptideAccTaxMass {
+		private String peptide;
+		private String acc;
+		private int tax;
+		private float mass;
+	}
+	
+	
+	
 	// @Accessors
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class PeptideAccTax implements KryoSerializable {
+	public final static class PeptideAccTax implements KryoSerializable {
 		private String peptide;
 		private String acc;
 		private int tax;

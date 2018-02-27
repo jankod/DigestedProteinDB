@@ -15,18 +15,34 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xerial.snappy.Snappy;
+
+import com.esotericsoftware.kryo.io.FastInput;
+import com.esotericsoftware.kryo.io.FastOutput;
+import com.esotericsoftware.minlog.Log;
+
 import java.util.Map.Entry;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
+import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
+import hr.pbf.digestdb.util.BioUtil;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 public class UniprotUtil {
+	private static final Logger log = LoggerFactory.getLogger(UniprotUtil.class);
 
 	/**
 	 * Remove entry with mass less on fromMass or more than toMass.
@@ -71,20 +87,21 @@ public class UniprotUtil {
 		return grouped;
 	}
 
-	public final static byte[] peptideToFormat2(Map<String, List<PeptideAccTax>> grouped) throws IOException {
+	public final static byte[] toFormat2(Map<String, List<PeptideAccTax>> grouped) throws IOException {
 		FastByteArrayOutputStream byteOut = new FastByteArrayOutputStream(grouped.size() * 18);
-
-		MyDataOutputStream out = new MyDataOutputStream(byteOut);
+		// MyDataOutputStream out = new MyDataOutputStream(byteOut);
+		FastOutput out = new FastOutput(byteOut);
 
 		Set<Entry<String, List<PeptideAccTax>>> entrySet = grouped.entrySet();
 		out.writeInt(entrySet.size());
 		for (Entry<String, List<PeptideAccTax>> entry : entrySet) {
 			String peptide = entry.getKey();
 			List<PeptideAccTax> p = entry.getValue();
-			out.writeUTF(peptide);
-			out.writeInt(p.size());
+			out.writeAscii(peptide);
+
+			out.writeShort(p.size());
 			for (PeptideAccTax pAccTax : p) {
-				out.writeUTF(pAccTax.getAcc());
+				out.writeAscii(pAccTax.getAcc());
 				out.writeInt(pAccTax.getTax());
 			}
 		}
@@ -92,17 +109,56 @@ public class UniprotUtil {
 		return byteOut.array;
 	}
 
-	public final static Map<String, List<PeptideAccTax>> format2ToPeptides(byte[] format2) throws IOException {
-		DataInputStream in = new DataInputStream(new FastByteArrayInputStream(format2));
+	public final static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass)
+			throws IOException {
+		return fromFormat2(format2, sortByMass, 0, 1000000);
+	}
+
+	public final static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass,
+			float fromMass, float toMass) throws IOException {
+
+		FastInput in = new FastInput(new FastByteArrayInputStream(format2));
+
 		final int how = in.readInt();
-		Map<String, List<PeptideAccTax>> result = new HashMap<String, List<PeptideAccTax>>(how);
+		Map<String, List<PeptideAccTaxMass>> result;
+		if (!sortByMass) {
+			result = new HashMap<String, List<PeptideAccTaxMass>>(how);
+		} else {
+			result = new TreeMap<String, List<PeptideAccTaxMass>>(new Comparator<String>() {
+
+				@Override
+				public int compare(String p1, String p2) {
+					double m1 = BioUtil.calculateMassWidthH2O(p1);
+					double m2 = BioUtil.calculateMassWidthH2O(p2);
+					return Double.compare(m1, m2);
+				}
+			});
+		}
 		for (int i = 0; i < how; i++) {
-			String peptide = in.readUTF();
-			int howInList = in.readInt();
-			ArrayList<PeptideAccTax> pepList = new ArrayList<PeptideAccTax>(howInList);
-			result.put(peptide, pepList);
+			String peptide = in.readString();
+			// log.debug(peptide);
+			float mass = (float) BioUtil.calculateMassWidthH2O(peptide);
+			boolean skipPeptide = false;
+			// if (!(fromMass <= mass && mass <= toMass)) {
+			if (mass < fromMass || toMass < mass) {
+				//log.debug("peptide " + peptide + " mass " + mass);
+				skipPeptide = true;
+			}
+
+			// must call in.readYXZ for data
+
+			int howInList = in.readShort();
+			ArrayList<PeptideAccTaxMass> pepList = null;
+
+			if (!skipPeptide) {
+				pepList = new ArrayList<PeptideAccTaxMass>(howInList);
+				result.put(peptide, pepList);
+			}
 			for (int j = 0; j < howInList; j++) {
-				pepList.add(j, new PeptideAccTax(peptide, in.readUTF(), in.readInt()));
+				String acc = in.readString();
+				int tax = in.readInt();
+				if (!skipPeptide)
+					pepList.add(j, new PeptideAccTaxMass(peptide, acc, tax, mass));
 			}
 		}
 		in.close();
@@ -129,15 +185,45 @@ public class UniprotUtil {
 		return res;
 	}
 
-	
+	public static String getDirectorySize(String pathDir) {
+		return FileUtils.byteCountToDisplaySize(FileUtils.sizeOfDirectory(new File(pathDir)));
+	}
+
+	public static byte[] toByteArrayFast(String path) throws IOException {
+		return toByteArrayFast(new File(path));
+	}
+
 	public static byte[] toByteArrayFast(File f) throws IOException {
-		RandomAccessFile memoryFile = new RandomAccessFile(f.getPath(), "r");
-		long length = f.length();
-		MappedByteBuffer mappedByteBuffer = memoryFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, length);
-		// mappedByteBuffer.array();
-		byte[] all = new byte[(int) length];
-		mappedByteBuffer.get(all);
-		memoryFile.close();
-		return all;
+		try (RandomAccessFile memoryFile = new RandomAccessFile(f.getPath(), "r")) {
+			long length = f.length();
+			if (length > Integer.MAX_VALUE) {
+				throw new IOException("File length is more then integer: " + length);
+			}
+			MappedByteBuffer mappedByteBuffer = memoryFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, length);
+			// mappedByteBuffer.array();
+			byte[] all = new byte[(int) length];
+			mappedByteBuffer.get(all);
+			return all;
+		}
+	}
+
+	public static ArrayList<PeptideAccTax> fromFormat1(byte[] bytes) throws IOException {
+		MyDataInputStream in = new MyDataInputStream(new FastByteArrayInputStream(bytes));
+
+		ArrayList<PeptideAccTax> pepList = new ArrayList<>();
+		while (in.available() != 0) {
+			PeptideAccTax pep = UniprotUtil.readOneFormat1(in);
+			pepList.add(pep);
+		}
+		in.close();
+		return pepList;
+	}
+
+	public static byte[] uncompress(byte[] b) throws IOException {
+		return Snappy.uncompress(b);
+	}
+
+	public static byte[] compress(byte[] b) throws IOException {
+		return Snappy.compress(b);
 	}
 }

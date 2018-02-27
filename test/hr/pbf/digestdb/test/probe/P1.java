@@ -8,9 +8,24 @@ import hr.pbf.digestdb.util.MassCSV;
 
 public class P1 {
 
+	public static void main(String[] args) {
+		float fromMass = 1300f;
+		float toMass = 1300.1f;
+		
+		float mass = 1300.3457f;
+		
+		if (mass < fromMass || toMass < mass) {
+			System.out.println("skip");
+		} else {
+			System.out.println("not skip");
+		}
+	}
+	
 	static int c = 0;
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	
+	
+	public static void main2(String[] args) throws FileNotFoundException, IOException {
 
 		MassCSV csv = new MassCSV(
 				"C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\nr_mass_sorted_200_000.csv");

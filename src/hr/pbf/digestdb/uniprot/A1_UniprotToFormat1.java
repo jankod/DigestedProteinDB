@@ -5,7 +5,9 @@ import java.io.BufferedWriter;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,15 +33,8 @@ import hr.pbf.digestdb.util.TimeScheduler;
  * https://web.expasy.org/docs/userman.html Make .db files
  *
  */
-public class A1_UniprotToManyFormat1 {
-	private static final Logger log = LoggerFactory.getLogger(A1_UniprotToManyFormat1.class);
-
-	// private final static float DELTA = 0.3f;
-	// final static int fromMass = 500;
-	// final static int toMass = 6000;
-	// static final MassRangeMap massRangeMap = new MassRangeMap(DELTA, fromMass,
-	// toMass);
-	// private static HashMap<String, DataOutput> massStreamMap = new HashMap<>();
+public class A1_UniprotToFormat1 {
+	private static final Logger log = LoggerFactory.getLogger(A1_UniprotToFormat1.class);
 
 	/**
 	 * Round float mass before and after save peptide mass
@@ -55,7 +50,7 @@ public class A1_UniprotToManyFormat1 {
 	private static MassRangeFiles massRangeFiles;
 
 	public static void main(String[] args) throws IOException {
-		long maxEntry = 100_000; // Long.MAX_VALUE
+		long maxEntry = 1000_000; // Long.MAX_VALUE
 
 		String db = "uniprot_sprot.dat";
 
@@ -70,9 +65,9 @@ public class A1_UniprotToManyFormat1 {
 
 		pathDirFormat1 = pathDirMain + File.separator + db + "_format1";
 
-		if (SystemUtils.IS_OS_WINDOWS) {
-			pathDirFormat1 += "_" + maxEntry;
-		}
+//		if (SystemUtils.IS_OS_WINDOWS) {
+//			pathDirFormat1 += "_" + maxEntry;
+//		}
 		String outProtPath = pathDirMain + File.separator + db + "_prot_names.csv";
 
 		massRangeFiles = new MassRangeFiles(500, 6000, 0.3f, "format1", pathDirFormat1);
@@ -111,6 +106,7 @@ public class A1_UniprotToManyFormat1 {
 		massRangeFiles.closeAll();
 
 		TimeScheduler.stopAll();
+		log.debug(pathDirFormat1 + " size: "+ UniprotUtil.getDirectorySize(pathDirFormat1));
 	}
 
 	private static void writeProteNames(EntryUniprot e) throws IOException {
@@ -135,11 +131,11 @@ public class A1_UniprotToManyFormat1 {
 
 	}
 
-	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback) {
+	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback) throws IOException {
 		readUniprotTextLarge(path, callback, Long.MAX_VALUE);
 	}
 
-	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback, long howMany) {
+	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback, long howMany) throws IOException {
 		BufferedReader reader = null;
 		try {
 
@@ -151,7 +147,6 @@ public class A1_UniprotToManyFormat1 {
 			while ((line = reader.readLine()) != null) {
 
 				if (count == howMany) {
-
 					log.info("Finish now on " + NumberFormat.getInstance().format(howMany) + " entries !!!");
 					return;
 				}
@@ -184,9 +179,7 @@ public class A1_UniprotToManyFormat1 {
 
 			}
 
-			System.out.println("Finish all, readed: " + count);
-		} catch (IOException e) {
-			e.printStackTrace();
+			log.debug("Finish all, readed: " + count);
 		} finally {
 			IOUtils.closeQuietly(reader);
 		}
@@ -210,7 +203,6 @@ public class A1_UniprotToManyFormat1 {
 	 * 
 	 */
 	private static void addSequence(String line, EntryUniprot e) {
-
 		String seq = StringUtils.remove(line, " ");
 		e.getSeq().append(seq);
 	}

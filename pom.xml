@@ -10,11 +10,13 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>edu.ucar</groupId>
-			<artifactId>netcdfAll</artifactId>
-			<version>ESGF-5.0.1</version>
+			<groupId>com.ning</groupId>
+			<artifactId>compress-lzf</artifactId>
+			<version>1.0.4</version>
 		</dependency>
 
+		<!-- <dependency> <groupId>edu.ucar</groupId> <artifactId>netcdfAll</artifactId> 
+			<version>ESGF-5.0.1</version> </dependency> -->
 
 		<!-- COMPRESS -->
 		<dependency>

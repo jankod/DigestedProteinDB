@@ -116,7 +116,7 @@ public class A_X2_UniprotCompressSmallFilesLevelDb {
 			ArrayList<PeptideAccTax> data = parseDataFile(f);
 			Map<Float, List<PeptideAccTax>> res = data.stream().collect(groupingBy(o -> {
 				float num = (float) BioUtil.calculateMassWidthH2O(o.getPeptide());
-				num = BioUtil.roundToDecimals(num, A1_UniprotToManyFormat1.ROUND_FLOAT_MASS); // round 2 same as tjhe
+				num = BioUtil.roundToDecimals(num, A1_UniprotToFormat1.ROUND_FLOAT_MASS); // round 2 same as tjhe
 				return num;
 			}));
 
@@ -196,7 +196,7 @@ public class A_X2_UniprotCompressSmallFilesLevelDb {
 	}
 
 	public static List<PeptideAccTax> fromKryo(File f) throws IOException {
-		// mass = BioUtil.roundToDecimals(mass, A1_UniprotToManyFormat1.ROUND_FLOAT_MASS);
+		// mass = BioUtil.roundToDecimals(mass, A1_UniprotToFormat1.ROUND_FLOAT_MASS);
 		// File f = new File(dir, mass + ".db");
 		InputStream in = new InflaterInputStream(new FileInputStream(f), new Inflater(), 512 * 16);
 		// Input input = new Input(in);

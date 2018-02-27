@@ -27,6 +27,8 @@ public class MassRangeFiles {
 	 */
 	public static final int ROUND_FLOAT_MASS = 2;
 
+	
+	
 	/**
 	 * 
 	 * @param from
@@ -79,7 +81,7 @@ public class MassRangeFiles {
 			out = BioUtil.newDataOutputStream(dir + File.separator + fileName + "." + this.fileExtension, 8192);
 			massStreamMap.put(fileName, out);
 		}
-		return null;
+		return out;
 	}
 
 }

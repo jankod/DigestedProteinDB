@@ -43,12 +43,12 @@ import org.iq80.snappy.SnappyFramedInputStream;
 import org.iq80.snappy.SnappyFramedOutputStream;
 
 import com.esotericsoftware.kryo.io.FastOutput;
+import com.esotericsoftware.minlog.Log;
 
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
 import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import net.jpountz.util.UnsafeUtils;
-import ucar.nc2.util.UnsynchronizedBufferedWriter;
 
 public class BioUtil {
 
@@ -144,9 +144,9 @@ public class BioUtil {
 		}
 		int BUFFER = 1024 * 1024 * 12 * 4; // 12 * 4 MB
 
-		
-		//FastBufferedOutputStream f = new FastBufferedOutputStream(new FastOutput(new FileOutputStream(new File(path)), charset));
-		
+		// FastBufferedOutputStream f = new FastBufferedOutputStream(new FastOutput(new
+		// FileOutputStream(new File(path)), charset));
+
 		BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
 				BUFFER);
 		return w;
@@ -183,8 +183,9 @@ public class BioUtil {
 	/////////////////////////////////////////////////////////////////////////////////////////// 77
 
 	public static MyDataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
-		
-		MyDataOutputStream out = new MyDataOutputStream(new FastBufferedOutputStream(new FileOutputStream(new File(path))));
+
+		MyDataOutputStream out = new MyDataOutputStream(
+				new FastBufferedOutputStream(new FileOutputStream(new File(path))));
 		return out;
 	}
 
@@ -198,8 +199,7 @@ public class BioUtil {
 	 */
 	public static MyDataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
 		new File(path).getParentFile().mkdirs();
-		
-		
+
 		MyDataOutputStream out = new MyDataOutputStream(
 				new FastBufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
 		return out;
@@ -241,8 +241,6 @@ public class BioUtil {
 		}
 		return cepaniceMasa;
 	}
-
-	
 
 	/**
 	 * Postavlja sve seq u velika slova.
@@ -472,8 +470,12 @@ public class BioUtil {
 	 */
 	public static final double calculateMassWidthH2O(final String peptide) {
 		float h = 0;
-		for (int i = 0; i < peptide.length(); i++) {
-			h += getMassFromAAfast(peptide.charAt(i));
+		try {
+			for (int i = 0; i < peptide.length(); i++) {
+				h += getMassFromAAfast(peptide.charAt(i));
+			}
+		} catch (RuntimeException e) {
+			throw new RuntimeException(e.getMessage() + " peptide: " + peptide, e);
 		}
 		return h + H2O;
 	}
@@ -529,7 +531,7 @@ public class BioUtil {
 			return 113.08406398D;
 		default:
 			// log.error("Koji je ovo aa: '{}'", aa);
-			throw new RuntimeException("Wrong AA " + aa);
+			throw new RuntimeException("Wrong AA '" + aa + "' ");
 			// return '?';
 		}
 	}
