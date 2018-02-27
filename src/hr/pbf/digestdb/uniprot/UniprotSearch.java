@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -96,8 +97,19 @@ public class UniprotSearch {
 	public static void searchLinux(String[] args) throws IOException {
 		String dir = "/home/users/tag/uniprot/trembl_format2s";
 
+		{ // TESTING
+			dir = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne radi\\format2";
+			String[] myArgs = { "1728:1728.1", "debug" };
+			args = myArgs;
+		}
+
 		if (!new File(dir).isDirectory()) {
 			throw new FileNotFoundException("Not a dir: " + dir);
+		}
+		boolean debug = false;
+		if (args.length > 1 && args[1].equals("debug")) {
+			debug = true;
+			log.debug("DEBUG MODE");
 		}
 
 		String param = args[0];
@@ -110,15 +122,16 @@ public class UniprotSearch {
 			s.start();
 			MassRangeMap map = new MassRangeMap(0.3f, 500, 6000);
 
-			RangeMap<Float, String> names = map.getFileNames(from, to);
-			Collection<String> values = names.asMapOfRanges().values();
+			RangeMap<Float, String> massFileNames = map.getFileNames(from, to);
+			Collection<String> fileNames = massFileNames.asMapOfRanges().values();
 			int countTotalPeptides = 0;
 			int countFiles = 0;
-			for (String fileName : values) {
+			for (String fileName : fileNames) {
 
 				File f = new File(dir, fileName + ".f2s");
 				if (!f.exists()) {
-//					log.debug("Not find: " + f.getAbsolutePath());
+					if (debug)
+						log.debug("Not find: " + f.getAbsolutePath());
 					continue;
 				}
 
@@ -127,15 +140,17 @@ public class UniprotSearch {
 				byte[] bytes = UniprotUtil.toByteArrayFast(f);
 				bytes = Snappy.uncompress(bytes);
 				Map<String, List<PeptideAccTaxMass>> data = UniprotUtil.fromFormat2(bytes, true, from, to);
+
+				// findAccession("A0A1J4YX49", data);
 				Set<Entry<String, List<PeptideAccTaxMass>>> entrySet = data.entrySet();
 				s.suspend();
 
 				for (Entry<String, List<PeptideAccTaxMass>> entry : entrySet) {
-					List<PeptideAccTaxMass> value = entry.getValue();
 					String peptide = entry.getKey();
-
+					List<PeptideAccTaxMass> value = entry.getValue();
 					String accessions = getAllAccessions(value);
 					String taxs = getAllTax(value);
+
 					System.out.println(value.get(0).getMass() + "\t" + peptide + "\t" + accessions + "\t" + taxs);
 				}
 				s.resume();
@@ -149,13 +164,32 @@ public class UniprotSearch {
 
 	}
 
-	private final static String getAllAccessions(final List<PeptideAccTaxMass> value) {
-		final StringBuilder b = new StringBuilder(value.size() * 10);
-		b.append("[");
-		for (PeptideAccTaxMass p : value) {
-			b.append(p.getAcc()).append(",");
+	private static void findAccession(String acc, Map<String, List<PeptideAccTaxMass>> data) {
+		Set<Entry<String, List<PeptideAccTaxMass>>> entrySet = data.entrySet();
+		for (Entry<String, List<PeptideAccTaxMass>> entry : entrySet) {
+			List<PeptideAccTaxMass> value = entry.getValue();
+			for (PeptideAccTaxMass p : value) {
+				if (p.getAcc().equals(acc)) {
+					throw new RuntimeException("NASO " + p);
+				}
+
+			}
 		}
-		b.deleteCharAt(b.length() - 1);
+
+	}
+
+	private final static String getAllAccessions(final List<PeptideAccTaxMass> value) {
+		final StringBuilder b = new StringBuilder(value.size() * 7);
+		b.append("[");
+		boolean first = true;
+		for (PeptideAccTaxMass p : value) {
+			if (!first) {
+				b.append(',');
+			}
+			b.append(p.getAcc());
+			first = false;
+
+		}
 		b.append("]");
 		return b.toString();
 	}
@@ -163,10 +197,15 @@ public class UniprotSearch {
 	private final static String getAllTax(final List<PeptideAccTaxMass> value) {
 		final StringBuilder b = new StringBuilder(value.size() * 7);
 		b.append("[");
+		boolean first = true;
 		for (PeptideAccTaxMass p : value) {
-			b.append(p.getTax()).append(",");
+			if (!first) {
+				b.append(',');
+			}
+			b.append(p.getTax());
+			first = false;
 		}
-		b.deleteCharAt(b.length() - 1);
+
 		b.append("]");
 		return b.toString();
 	}

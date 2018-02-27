@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.uniprot.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,31 +50,43 @@ class UniprotUtilTest {
 		PeptideAccTax p = new PeptideAccTax("PEPTIDE", "ACC222", 23232);
 		UniprotUtil.writeOneFormat1(out, p.getPeptide(), p.getTax(), p.getAcc());
 		PeptideAccTax res = UniprotUtil.readOneFormat1(new DataInputStream(new FastByteArrayInputStream(bout.array)));
-		
+
 		assertEquals(p, res);
-		
+
 	}
 
 	@Test
 	void testPeptideToDataAndBackStream() throws IOException {
 		ArrayList<PeptideAccTax> pepList = new ArrayList<>();
-		pepList.add(new PeptideAccTax("PEPTIDE1", "ACC11", 1111));
-		pepList.add(new PeptideAccTax("PEPTIDE1", "ACC12", 1111));
-		pepList.add(new PeptideAccTax("PEPTIDE1", "ACC13", 1113));
-		pepList.add(new PeptideAccTax("PEPTIDE2", "ACC24", 1113));
-		pepList.add(new PeptideAccTax("PEPTIDE2", "ACC25", 1112));
+		pepList.add(new PeptideAccTax("PEPTIDER", "ACC11", 1111));
+		pepList.add(new PeptideAccTax("PEPTIDER", "ACC12", 1111));
+		pepList.add(new PeptideAccTax("PEPTIDER", "ACC13", 1113));
+		pepList.add(new PeptideAccTax("PEPTIDEK", "ACC24", 1113));
+		pepList.add(new PeptideAccTax("PEPTIDEK", "ACC25", 1112));
 
 		Map<String, List<PeptideAccTax>> group = UniprotUtil.groupByPeptide(pepList);
 		assertEquals(2, group.size());
-		assertEquals(3, group.get("PEPTIDE1").size());
-		assertEquals(2, group.get("PEPTIDE2").size());
+		assertEquals(3, group.get("PEPTIDER").size());
+		assertEquals(2, group.get("PEPTIDEK").size());
 
 		byte[] result = UniprotUtil.toFormat2(group);
 
 		Map<String, List<PeptideAccTaxMass>> groupNew = UniprotUtil.fromFormat2(result, false);
-		
+
 		// TODO: check assert
-		//assertEquals(group, groupNew);
+		assertEquals(group.size(), groupNew.size());
+		Set<String> keySet = group.keySet();
+		for (String peptide : keySet) {
+			List<PeptideAccTax> a1 = group.get(peptide);
+			List<PeptideAccTaxMass> a2 = groupNew.get(peptide);
+			assertEquals(a1.size(), a2.size());
+			for (int i = 0; i < a1.size(); i++) {
+				assertEquals(a1.get(i).getAcc(), a2.get(i).getAcc());
+				assertEquals(a1.get(i).getPeptide(), a2.get(i).getPeptide());
+				assertEquals(a1.get(i).getTax(), a2.get(i).getTax());
+			}
+
+		}
 
 	}
 

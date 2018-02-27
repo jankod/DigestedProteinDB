@@ -136,26 +136,28 @@ public class UniprotUtil {
 		}
 		for (int i = 0; i < how; i++) {
 			String peptide = in.readString();
-			// log.debug(peptide);
 			float mass = (float) BioUtil.calculateMassWidthH2O(peptide);
 			boolean skipPeptide = false;
-			// if (!(fromMass <= mass && mass <= toMass)) {
 			if (mass < fromMass || toMass < mass) {
-				//log.debug("peptide " + peptide + " mass " + mass);
 				skipPeptide = true;
 			}
-
-			// must call in.readYXZ for data
 
 			int howInList = in.readShort();
 			ArrayList<PeptideAccTaxMass> pepList = null;
 
 			if (!skipPeptide) {
 				pepList = new ArrayList<PeptideAccTaxMass>(howInList);
-				result.put(peptide, pepList);
+				if (result.containsKey(peptide)) {
+					result.get(peptide).addAll(pepList);
+				} else {
+					result.put(peptide, pepList);
+				}
 			}
 			for (int j = 0; j < howInList; j++) {
 				String acc = in.readString();
+//				if ("A0A1J4YX49".equals(acc)) {
+//					log.debug("nasao peptide: " + peptide + " skip: " + skipPeptide);
+//				}
 				int tax = in.readInt();
 				if (!skipPeptide)
 					pepList.add(j, new PeptideAccTaxMass(peptide, acc, tax, mass));

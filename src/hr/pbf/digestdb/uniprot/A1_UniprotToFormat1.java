@@ -56,6 +56,11 @@ public class A1_UniprotToFormat1 {
 
 		pathDirMain = "F:\\Downloads\\uniprot";
 
+		
+		// DEMO
+		pathDirMain = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne radi";
+		db = "Entry nema NAKIIFVRPLLGLFK A0A1J4YX49.txt";
+		
 		if (SystemUtils.IS_OS_LINUX) {
 			pathDirMain = "/home/users/tag/uniprot";
 			maxEntry = Long.MAX_VALUE;
@@ -117,8 +122,8 @@ public class A1_UniprotToFormat1 {
 		Map<String, Double> massesMapp = BioUtil.getMassesDigest(e.getSeq().toString());
 		UniprotUtil.reduceMasses(massesMapp, massRangeFiles.getFromMass(), massRangeFiles.getToMass());
 
-		Set<Entry<String, Double>> entrySet = massesMapp.entrySet();
-		for (Entry<String, Double> peptideMass : entrySet) {
+		Set<Entry<String, Double>> peptideMassSet = massesMapp.entrySet();
+		for (Entry<String, Double> peptideMass : peptideMassSet) {
 			float mass = peptideMass.getValue().floatValue();
 			mass = BioUtil.roundToDecimals(mass, ROUND_FLOAT_MASS);
 
