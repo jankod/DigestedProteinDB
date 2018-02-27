@@ -46,7 +46,7 @@ public class UniprotSearch {
 
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(UniprotSearch.class);
+//	private static final Logger log = LoggerFactory.getLogger(UniprotSearch.class);
 
 	public static void main111(String[] args) throws IOException {
 		String p = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl\\1831.8.f1";
@@ -62,7 +62,7 @@ public class UniprotSearch {
 		Path path = Paths.get(p + ".new");
 
 		Files.write(path, f2);
-		log.debug("saveo novi");
+//		log.debug("saveo novi");
 
 	}
 
@@ -91,16 +91,16 @@ public class UniprotSearch {
 			}
 			countTotalPeptides = value.size();
 		}
-		log.debug("Founded peptides " + countTotalPeptides);
+//		log.debug("Founded peptides " + countTotalPeptides);
 	}
 
 	public static void searchLinux(String[] args) throws IOException {
 		String dir = "/home/users/tag/uniprot/trembl_format2s";
 
 		{ // TESTING
-			dir = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne radi\\format2";
-			String[] myArgs = { "1728:1728.1", "debug" };
-			args = myArgs;
+			 dir = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne radi\\format2";
+			 String[] myArgs = { "1728:1728.1", "debug" };
+			 args = myArgs;
 		}
 
 		if (!new File(dir).isDirectory()) {
@@ -109,7 +109,7 @@ public class UniprotSearch {
 		boolean debug = false;
 		if (args.length > 1 && args[1].equals("debug")) {
 			debug = true;
-			log.debug("DEBUG MODE");
+			System.out.println("DEBUG MODE");
 		}
 
 		String param = args[0];
@@ -117,7 +117,7 @@ public class UniprotSearch {
 			String[] split = param.split(":");
 			float from = Float.parseFloat(split[0]);
 			float to = Float.parseFloat(split[1]);
-			log.debug("from:to {}:{}", from, to);
+			System.out.println("from:to "+ from + ":"+ to);
 			StopWatch s = new StopWatch();
 			s.start();
 			MassRangeMap map = new MassRangeMap(0.3f, 500, 6000);
@@ -131,7 +131,7 @@ public class UniprotSearch {
 				File f = new File(dir, fileName + ".f2s");
 				if (!f.exists()) {
 					if (debug)
-						log.debug("Not find: " + f.getAbsolutePath());
+						System.out.println("Not find: " + f.getAbsolutePath());
 					continue;
 				}
 
@@ -148,20 +148,37 @@ public class UniprotSearch {
 				for (Entry<String, List<PeptideAccTaxMass>> entry : entrySet) {
 					String peptide = entry.getKey();
 					List<PeptideAccTaxMass> value = entry.getValue();
+					String accTax = getAllAccessionsAndTax(value);
 					String accessions = getAllAccessions(value);
 					String taxs = getAllTax(value);
 
-					System.out.println(value.get(0).getMass() + "\t" + peptide + "\t" + accessions + "\t" + taxs);
+					System.out.println(value.get(0).getMass() + "\t" + peptide + "\t" + accTax);
 				}
 				s.resume();
 
 			}
-			log.debug("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
-			log.debug("Found peptides: " + countTotalPeptides);
-			log.debug("Count files: " + countFiles);
+			System.out.println("Duration: " + DurationFormatUtils.formatDurationHMS(s.getTime()));
+			System.out.println("Found peptides: " + countTotalPeptides);
+			System.out.println("Count files: " + countFiles);
 
 		}
 
+	}
+
+	private static String getAllAccessionsAndTax(List<PeptideAccTaxMass> value) {
+		StringBuilder b = new StringBuilder(value.size() * 15);
+
+		b.append("[");
+		boolean first = true;
+		for (PeptideAccTaxMass p : value) {
+			if (!first) {
+				b.append(",");
+			}
+			b.append(p.getAcc() + ":" + p.getTax());
+			first = false;
+		}
+		b.append("]");
+		return b.toString();
 	}
 
 	private static void findAccession(String acc, Map<String, List<PeptideAccTaxMass>> data) {
@@ -274,7 +291,7 @@ public class UniprotSearch {
 		}
 		s.stop();
 		String time = DurationFormatUtils.formatDurationHMS(s.getTime());
-		log.debug("Type: {}  {}", type, time);
-		log.debug("c {}", c);
+		System.out.println("Type: {}  {}"+ type + " "+ time);
+		System.out.println("c "+ c);
 	}
 }

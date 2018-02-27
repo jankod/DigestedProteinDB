@@ -121,16 +121,32 @@ public class UniprotUtil {
 
 		final int how = in.readInt();
 		Map<String, List<PeptideAccTaxMass>> result;
+
 		if (!sortByMass) {
 			result = new HashMap<String, List<PeptideAccTaxMass>>(how);
 		} else {
 			result = new TreeMap<String, List<PeptideAccTaxMass>>(new Comparator<String>() {
+				private final HashMap<String, Double> cache = new HashMap<>(200);
 
 				@Override
 				public int compare(String p1, String p2) {
-					double m1 = BioUtil.calculateMassWidthH2O(p1);
-					double m2 = BioUtil.calculateMassWidthH2O(p2);
-					return Double.compare(m1, m2);
+					
+					return Double.compare(BioUtil.calculateMassWidthH2O(p1), BioUtil.calculateMassWidthH2O(p2));
+					
+//					double m1;
+//					double m2;
+//					if (cache.containsKey(p1)) {
+//						m1 = cache.get(p1);
+//					} else {
+//						m1 = BioUtil.calculateMassWidthH2O(p1);
+//					}
+//					if (cache.containsKey(p2)) {
+//						m2 = cache.get(p2);
+//					} else {
+//						m2 = BioUtil.calculateMassWidthH2O(p2);
+//					}
+//					
+//					return Double.compare(m1, m2);
 				}
 			});
 		}
@@ -155,9 +171,9 @@ public class UniprotUtil {
 			}
 			for (int j = 0; j < howInList; j++) {
 				String acc = in.readString();
-//				if ("A0A1J4YX49".equals(acc)) {
-//					log.debug("nasao peptide: " + peptide + " skip: " + skipPeptide);
-//				}
+				// if ("A0A1J4YX49".equals(acc)) {
+				// log.debug("nasao peptide: " + peptide + " skip: " + skipPeptide);
+				// }
 				int tax = in.readInt();
 				if (!skipPeptide)
 					pepList.add(j, new PeptideAccTaxMass(peptide, acc, tax, mass));
