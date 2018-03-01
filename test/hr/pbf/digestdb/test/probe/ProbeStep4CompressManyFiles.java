@@ -11,9 +11,9 @@ import java.util.TreeSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
+import hr.pbf.digestdb.nr.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 
 public class ProbeStep4CompressManyFiles {

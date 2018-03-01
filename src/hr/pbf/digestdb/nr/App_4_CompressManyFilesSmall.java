@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.app;
+package hr.pbf.digestdb.nr;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.cli.IApp;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.util.BioUtil;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;

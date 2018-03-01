@@ -15,6 +15,7 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +26,8 @@ import java.util.TreeMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xerial.snappy.Snappy;
@@ -37,6 +40,7 @@ import java.util.Map.Entry;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
+import hr.pbf.digestdb.uniprot.UniprotSearchFormat2.Type;
 import hr.pbf.digestdb.util.BioUtil;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
@@ -91,21 +95,26 @@ public class UniprotUtil {
 		FastByteArrayOutputStream byteOut = new FastByteArrayOutputStream(grouped.size() * 18);
 		// MyDataOutputStream out = new MyDataOutputStream(byteOut);
 		FastOutput out = new FastOutput(byteOut);
-
+		int countTotal = 0;
+		int countUnique = 0;
 		Set<Entry<String, List<PeptideAccTax>>> entrySet = grouped.entrySet();
 		out.writeInt(entrySet.size());
+		log.debug("WRITE SIzE " + entrySet.size());
 		for (Entry<String, List<PeptideAccTax>> entry : entrySet) {
 			String peptide = entry.getKey();
 			List<PeptideAccTax> p = entry.getValue();
 			out.writeAscii(peptide);
-
-			out.writeShort(p.size());
+			countUnique++;
+			out.writeInt(p.size());
 			for (PeptideAccTax pAccTax : p) {
 				out.writeAscii(pAccTax.getAcc());
 				out.writeInt(pAccTax.getTax());
+				countTotal++;
 			}
 		}
 		out.close();
+		log.debug("format2 zapisao unique  " + countUnique);
+		log.debug("format2 zapisao total   " + countTotal);
 		return byteOut.array;
 	}
 
@@ -117,70 +126,90 @@ public class UniprotUtil {
 	public final static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass,
 			float fromMass, float toMass) throws IOException {
 
-		FastInput in = new FastInput(new FastByteArrayInputStream(format2));
+		try (FastInput in = new FastInput(new FastByteArrayInputStream(format2))) {
 
-		final int how = in.readInt();
-		Map<String, List<PeptideAccTaxMass>> result;
+			final int how = in.readInt();
+			// log.debug("READ SIZE "+ how);
+			Map<String, List<PeptideAccTaxMass>> result;
 
-		if (!sortByMass) {
-			result = new HashMap<String, List<PeptideAccTaxMass>>(how);
-		} else {
-			result = new TreeMap<String, List<PeptideAccTaxMass>>(new Comparator<String>() {
-				private final HashMap<String, Double> cache = new HashMap<>(200);
+			final HashMap<String, Double> cache = new HashMap<>(200);
 
-				@Override
-				public int compare(String p1, String p2) {
-					
-					return Double.compare(BioUtil.calculateMassWidthH2O(p1), BioUtil.calculateMassWidthH2O(p2));
-					
-//					double m1;
-//					double m2;
-//					if (cache.containsKey(p1)) {
-//						m1 = cache.get(p1);
-//					} else {
-//						m1 = BioUtil.calculateMassWidthH2O(p1);
-//					}
-//					if (cache.containsKey(p2)) {
-//						m2 = cache.get(p2);
-//					} else {
-//						m2 = BioUtil.calculateMassWidthH2O(p2);
-//					}
-//					
-//					return Double.compare(m1, m2);
-				}
-			});
-		}
-		for (int i = 0; i < how; i++) {
-			String peptide = in.readString();
-			float mass = (float) BioUtil.calculateMassWidthH2O(peptide);
-			boolean skipPeptide = false;
-			if (mass < fromMass || toMass < mass) {
-				skipPeptide = true;
+			if (!sortByMass) {
+				result = new HashMap<String, List<PeptideAccTaxMass>>(how);
+			} else {
+				result = new TreeMap<String, List<PeptideAccTaxMass>>(new Comparator<String>() {
+
+					// private final HashMap<String, Double> cache = new HashMap<>(200);
+
+					@Override
+					public int compare(String p1, String p2) {
+
+						// return Double.compare(BioUtil.calculateMassWidthH2O(p1),
+						// BioUtil.calculateMassWidthH2O(p2));
+
+						double m1;
+						double m2;
+						if (cache.containsKey(p1)) {
+							m1 = cache.get(p1);
+						} else {
+							m1 = BioUtil.calculateMassWidthH2O(p1);
+						}
+						if (cache.containsKey(p2)) {
+							m2 = cache.get(p2);
+						} else {
+							m2 = BioUtil.calculateMassWidthH2O(p2);
+						}
+						if (m1 == m2) { // important! May be two peptide with equal mass, but diferent sequence, and map
+										// will then refuse samo peptide!
+							return p1.compareTo(p2);
+						}
+
+						return Double.compare(m1, m2);
+					}
+				});
 			}
+			int countTotal = 0;
+			int countUnique = 0;
+			for (int i = 0; i < how; i++) {
+				String peptide = in.readString();
+				int howInList = in.readInt();
 
-			int howInList = in.readShort();
-			ArrayList<PeptideAccTaxMass> pepList = null;
+				double mass = BioUtil.calculateMassWidthH2O(peptide);
+				cache.put(peptide, mass);
 
-			if (!skipPeptide) {
+				boolean skipPeptide = false;
+				if (mass < fromMass || toMass < mass) {
+					skipPeptide = true;
+					log.debug("Skip peptide " + peptide);
+				}
+
+				ArrayList<PeptideAccTaxMass> pepList = null;
 				pepList = new ArrayList<PeptideAccTaxMass>(howInList);
-				if (result.containsKey(peptide)) {
-					result.get(peptide).addAll(pepList);
-				} else {
+
+				if (!skipPeptide) {
+					countUnique++;
+					if (result.containsKey(peptide)) {
+						// log.debug("Sadrzi vec peptide "+ peptide);
+					}
 					result.put(peptide, pepList);
 				}
+				for (int j = 0; j < howInList; j++) {
+					String acc = in.readString();
+					// if ("A0A1J4YX49".equals(acc)) {
+					// log.debug("nasao peptide: " + peptide + " skip: " + skipPeptide);
+					// }
+					int tax = in.readInt();
+					if (!skipPeptide) {
+						countTotal++;
+						pepList.add(new PeptideAccTaxMass(peptide, acc, tax, (float) mass));
+					}
+				}
 			}
-			for (int j = 0; j < howInList; j++) {
-				String acc = in.readString();
-				// if ("A0A1J4YX49".equals(acc)) {
-				// log.debug("nasao peptide: " + peptide + " skip: " + skipPeptide);
-				// }
-				int tax = in.readInt();
-				if (!skipPeptide)
-					pepList.add(j, new PeptideAccTaxMass(peptide, acc, tax, mass));
-			}
+			// log.debug("fromFormat2 nasao ih unique " + countUnique+ " "+ result.size());
+			// log.debug("fromFormat2 nasao ih ukupno " + countTotal);
+			return result;
 		}
-		in.close();
-		return result;
+		// in.close();
 
 	}
 
@@ -244,4 +273,5 @@ public class UniprotUtil {
 	public static byte[] compress(byte[] b) throws IOException {
 		return Snappy.compress(b);
 	}
+
 }

@@ -54,7 +54,7 @@ public class A2_UniprotToFormat2 {
 
 	private static final Logger log = LoggerFactory.getLogger(A2_UniprotToFormat2.class);
 
-	private static int countMax = Integer.MAX_VALUE;
+	private static int countMax =  Integer.MAX_VALUE;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		String format1Dir = "F:\\Downloads\\uniprot\\uniprot_sprot.dat_format1";
@@ -80,8 +80,8 @@ public class A2_UniprotToFormat2 {
 	public void start() throws IOException, InterruptedException {
 		File[] listFiles = fileDbDir.listFiles();
 
-		ExecutorService ex = Executors.newFixedThreadPool(6);
-		Semaphore s = new Semaphore(6);
+		ExecutorService ex = Executors.newFixedThreadPool(8);
+		Semaphore s = new Semaphore(8);
 		int c = 0;
 		for (File f : listFiles) {
 			if (c++ == countMax) {

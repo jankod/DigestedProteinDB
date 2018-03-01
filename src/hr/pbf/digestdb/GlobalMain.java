@@ -9,16 +9,18 @@ import java.sql.SQLException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
-import hr.pbf.digestdb.app.App_15_AddTaxIdToCSV;
+import hr.pbf.digestdb.nr.App_11_MakeLevelDbStore;
+import hr.pbf.digestdb.nr.App_11_MakeLevelDbStore_TEST;
+import hr.pbf.digestdb.nr.App_12_CreateTaxIDAccessionDB;
+import hr.pbf.digestdb.nr.App_14_MaveMVstoreAccessionTaxid;
+import hr.pbf.digestdb.nr.App_15_AddTaxIdToCSV;
 import hr.pbf.digestdb.uniprot.A1_UniprotToFormat1;
 import hr.pbf.digestdb.uniprot.A2_UniprotToFormat2;
+import hr.pbf.digestdb.uniprot.A3_UniprotFormat2ToOther;
+import hr.pbf.digestdb.uniprot.A6_UniprotStatistic;
 import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
-import hr.pbf.digestdb.uniprot.UniprotSearch;
+import hr.pbf.digestdb.uniprot.UniprotSearchFormat2;
 import hr.pbf.digestdb.util.TimeScheduler;
-import hr.pbf.digestdb.app.App_11_MakeLevelDbStore;
-import hr.pbf.digestdb.app.App_11_MakeLevelDbStore_TEST;
-import hr.pbf.digestdb.app.App_12_CreateTaxIDAccessionDB;
-import hr.pbf.digestdb.app.App_14_MaveMVstoreAccessionTaxid;
 
 public class GlobalMain {
 
@@ -32,10 +34,17 @@ public class GlobalMain {
 			// App_11_MakeLevelDbStore_TEST.main(args);
 			// App_14_MaveMVstoreAccessionTaxid.main(args);
 			//App_15_AddTaxIdToCSV.main(args);
-			//A1_UniprotToFormat1.main(args);
-			//A_X2_UniprotCompressSmallFilesLevelDb.main(args);
-			//A2_UniprotToFormat2.main(args);
-			UniprotSearch.main(args);
+			
+			if(MyUtil.argsFirstElementContain("uniprot-a3", args)) {
+				A3_UniprotFormat2ToOther.main(MyUtil.argsMinusFirstElement(args));				
+				//A1_UniprotToFormat1.main(args);
+				//A_X2_UniprotCompressSmallFilesLevelDb.main(args);
+				//A2_UniprotToFormat2.main(args);
+				//UniprotSearchFormat2.main(args);
+			}
+			if(MyUtil.argsFirstElementContain("uniprot-statistic", args)) {
+				A6_UniprotStatistic.main(MyUtil.argsMinusFirstElement(args));
+			}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {

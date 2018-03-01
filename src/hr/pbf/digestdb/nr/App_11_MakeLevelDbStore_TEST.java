@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.app;
+package hr.pbf.digestdb.nr;
 
 import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 //import static org.fusesource.leveldbjni.JniDBFactory.*;

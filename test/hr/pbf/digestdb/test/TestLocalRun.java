@@ -1,6 +1,6 @@
 package hr.pbf.digestdb.test;
 
-import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.nr.App_3_CreateMenyFilesFromCSV;
 
 public class TestLocalRun {
 

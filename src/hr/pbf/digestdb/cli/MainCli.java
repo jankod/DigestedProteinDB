@@ -19,12 +19,12 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
-import hr.pbf.digestdb.app.App_5_Statistic;
-import hr.pbf.digestdb.app.App_6_InsertToMassTable;
-import hr.pbf.digestdb.app.App_7_StatisticOnSortedFileCSV;
-import hr.pbf.digestdb.app.App_8_StatisticProtAccessionFile;
+import hr.pbf.digestdb.nr.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.nr.App_5_Statistic;
+import hr.pbf.digestdb.nr.App_6_InsertToMassTable;
+import hr.pbf.digestdb.nr.App_7_StatisticOnSortedFileCSV;
+import hr.pbf.digestdb.nr.App_8_StatisticProtAccessionFile;
 
 public class MainCli {
 	private static final Logger log = LoggerFactory.getLogger(MainCli.class);

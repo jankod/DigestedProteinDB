@@ -6,7 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import hr.pbf.digestdb.app.App_7_StatisticOnSortedFileCSV;
+import hr.pbf.digestdb.nr.App_7_StatisticOnSortedFileCSV;
 import hr.pbf.digestdb.util.BioUtil;
 
 class TestUtilMethods {

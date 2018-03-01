@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.app;
+package hr.pbf.digestdb.nr;
 
 import java.io.IOException;
 

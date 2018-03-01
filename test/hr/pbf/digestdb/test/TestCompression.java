@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import com.clearspring.analytics.stream.membership.DataInputBuffer;
 
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall;
-import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV;
-import hr.pbf.digestdb.app.App_3_CreateMenyFilesFromCSV.Row;
-import hr.pbf.digestdb.app.App_4_CompressManyFilesSmall.PeptideMassIdRow;
+import hr.pbf.digestdb.nr.App_3_CreateMenyFilesFromCSV;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall;
+import hr.pbf.digestdb.nr.App_3_CreateMenyFilesFromCSV.Row;
+import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.uniprot.MyDataOutputStream;
 import hr.pbf.digestdb.util.BioUtil;
 

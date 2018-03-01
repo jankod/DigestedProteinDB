@@ -100,6 +100,14 @@ public class UniprotModel {
 	}
 	
 	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public final static class AccTax {
+		public String acc;
+		public int tax;
+	}
+	
+	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public final static class PeptideAccTaxMass {
