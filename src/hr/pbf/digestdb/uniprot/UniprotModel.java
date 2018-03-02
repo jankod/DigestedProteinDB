@@ -37,9 +37,70 @@ public class UniprotModel {
 		private int tax;
 		private String protName;
 		private StringBuilder seq = new StringBuilder(200);
-
 	}
 
+	
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public final static class AccTax {
+		public String acc;
+		public int tax;
+	}
+	
+	
+	/**
+	 * CSV line
+	 * @author tag
+	 *
+	 */
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public final static class PeptideMassAccTaxList {
+		private String peptide;
+		private float mass;
+		private List<AccTax> accTaxs;
+	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public final static class PeptideAccTaxMass {
+		private String peptide;
+		private String acc;
+		private int tax;
+		private float mass;
+	}
+	
+	
+	
+	// @Accessors
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public final static class PeptideAccTax implements KryoSerializable {
+		private String peptide;
+		private String acc;
+		private int tax;
+
+		@Override
+		public void write(Kryo kryo, Output o) {
+			o.writeAscii(peptide);
+			o.writeAscii(acc);
+			o.writeInt(tax);
+		}
+
+		@Override
+		public void read(Kryo kryo, Input i) {
+			peptide = i.readString();
+			acc = i.readString();
+			tax = i.readInt();
+		}
+
+	}
+	
+	
 	public static class KryoFloatHolder implements KryoSerializable {
 		private static final Logger log = LoggerFactory.getLogger(UniprotModel.KryoFloatHolder.class);
 
@@ -99,49 +160,5 @@ public class UniprotModel {
 
 	}
 	
-	@Data
-	@AllArgsConstructor
-	@NoArgsConstructor
-	public final static class AccTax {
-		public String acc;
-		public int tax;
-	}
-	
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public final static class PeptideAccTaxMass {
-		private String peptide;
-		private String acc;
-		private int tax;
-		private float mass;
-	}
-	
-	
-	
-	// @Accessors
-	@Data
-	@NoArgsConstructor
-	@AllArgsConstructor
-	public final static class PeptideAccTax implements KryoSerializable {
-		private String peptide;
-		private String acc;
-		private int tax;
-
-		@Override
-		public void write(Kryo kryo, Output o) {
-			o.writeAscii(peptide);
-			o.writeAscii(acc);
-			o.writeInt(tax);
-		}
-
-		@Override
-		public void read(Kryo kryo, Input i) {
-			peptide = i.readString();
-			acc = i.readString();
-			tax = i.readInt();
-		}
-
-	}
 
 }

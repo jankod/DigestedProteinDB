@@ -240,6 +240,24 @@ public class UniprotUtil {
 		return toByteArrayFast(new File(path));
 	}
 
+	public static byte[] toByteArrayFast(File f, long from, long to) throws IOException {
+		if(to <= from) {
+			throw new IOException("to is less then from. from: "+ from + " to: "+ to);
+		}
+		try (RandomAccessFile memoryFile = new RandomAccessFile(f.getPath(), "r")) {
+			long length = f.length();
+			if (length > Integer.MAX_VALUE) {
+				throw new IOException("File length is more then integer: " + length);
+			}
+			MappedByteBuffer map = memoryFile.getChannel().map(FileChannel.MapMode.READ_ONLY, from, to - from);
+			// mappedByteBuffer.array();
+			
+			byte[] all = new byte[(int) length];
+			map.get(all);
+			return all;
+		}
+	}
+	
 	public static byte[] toByteArrayFast(File f) throws IOException {
 		try (RandomAccessFile memoryFile = new RandomAccessFile(f.getPath(), "r")) {
 			long length = f.length();

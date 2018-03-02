@@ -42,7 +42,9 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.iq80.snappy.SnappyFramedInputStream;
 import org.iq80.snappy.SnappyFramedOutputStream;
 
+import com.esotericsoftware.kryo.io.FastInput;
 import com.esotericsoftware.kryo.io.FastOutput;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.minlog.Log;
 
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
@@ -630,6 +632,10 @@ public class BioUtil {
 
 		throw new NotImplementedException("");
 
+	}
+
+	public static Input newFastDataInput(String path) throws FileNotFoundException {
+		return new FastInput(new FileInputStream(new File(path)));
 	}
 
 }
