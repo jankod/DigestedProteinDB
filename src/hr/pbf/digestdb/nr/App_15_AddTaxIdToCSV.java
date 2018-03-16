@@ -1,24 +1,20 @@
 package hr.pbf.digestdb.nr;
 
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
+//import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 //import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map.Entry;
 
-import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.SystemUtils;
@@ -31,15 +27,13 @@ import org.iq80.leveldb.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.KryoDataOutput;
-import com.esotericsoftware.kryo.io.Output;
 import com.google.common.base.Charsets;
 
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.CallbackMass;
 import hr.pbf.digestdb.util.MassCSV;
+import hr.pbf.digestdb.util.MyLevelDB;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
@@ -69,7 +63,7 @@ public class App_15_AddTaxIdToCSV {
 			o.writeInt(r.getTaxId());
 		}
 
-		db.put(BiteUtil.floatToByteArray(mass), out.toByteArray());
+		db.put(BiteUtil.toBytes(mass), out.toByteArray());
 		o.close();
 	}
 	public static void mainOld(String[] args) throws IOException {
@@ -83,12 +77,12 @@ public class App_15_AddTaxIdToCSV {
 		String dirResult = "c:/tmp/";
 		String leveldbPath = dirResult + "nr_mass_leveldb";
 		System.out.println("Level DB: " + leveldbPath);
-		db = factory.open(new File(leveldbPath), options);
+		db = MyLevelDB.open(leveldbPath, options);
 		DBIterator it = db.iterator();
-		it.seek(BiteUtil.floatToByteArray(446.22375F));
+		it.seek(BiteUtil.toBytes(446.22375F));
 		while(it.hasNext()) {
 			Entry<byte[], byte[]> t = it.next();
-			float key = BiteUtil.byteArrayToFloat(t.getKey());
+			float key = BiteUtil.toFloat(t.getKey());
 			byte[] value = t.getValue();
 			DataInputStream in = new DataInputStream(new ByteArrayInputStream(value));
 			int length = in.readInt();
@@ -144,7 +138,7 @@ public class App_15_AddTaxIdToCSV {
 		options.paranoidChecks(false);
 
 		System.out.println("Level DB: " + leveldbPath);
-		db = factory.open(new File(leveldbPath), options);
+		db = MyLevelDB.open(leveldbPath, options);
 
 		// MVStoreTool.compact(storeDeadFileDb, true);
 		// MVStoreTool.info(storeFileDb);

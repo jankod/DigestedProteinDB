@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import hr.pbf.digestdb.uniprot.A7_UniprotProtNamesToLevelDB;
 import hr.pbf.digestdb.uniprot.UniprotModel;
 import hr.pbf.digestdb.uniprot.UniprotUtil;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
@@ -24,6 +25,15 @@ import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
 import junit.framework.Assert;
 
 class UniprotUtilTest {
+
+	@Test
+	void testRemoveLine() {
+		String res = A7_UniprotProtNamesToLevelDB
+				.removeEvidenceAtributes("A0A109ZZL0      Methyl coenzyme-M reductase {ECO:0000313|EMBL:AMB19266.1} ");
+		
+		assertEquals("A0A109ZZL0      Methyl coenzyme-M reductase", res);
+
+	}
 
 	@Test
 	void testReduceMasses() throws Exception {

@@ -86,7 +86,7 @@ public class UniprotReader {
 		// level.printStatus();
 		DB db = level.getDb();
 
-		long[] size = db.getApproximateSizes(new Range(BiteUtil.floatToByteArray(5), BiteUtil.floatToByteArray(60000)));
+		long[] size = db.getApproximateSizes(new Range(BiteUtil.toBytes(5), BiteUtil.toBytes(60000)));
 		System.out.println("Size approx "+ size[0]);
 
 		DBIterator it = db.iterator();
@@ -99,7 +99,7 @@ public class UniprotReader {
 			byte[] k = entry.getKey();
 
 			List<PeptideAccTax> peptides = level.bytesToPeptides(v);
-			float mass = BiteUtil.byteArrayToFloat(k);
+			float mass = BiteUtil.toFloat(k);
 //			log.debug("mass " + mass);
 			for (PeptideAccTax peptideAccTax : peptides) {
 //				log.debug(peptideAccTax.toString());

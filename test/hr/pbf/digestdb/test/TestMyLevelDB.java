@@ -36,7 +36,7 @@ class TestMyLevelDB {
 		assertEquals(1656094, taxId);
 
 		DBIterator it = db.getIterator();
-		System.out.println(BiteUtil.toByte(0));
+		System.out.println(BiteUtil.toBytes(0));
 		int i = 0;
 		while (false || it.hasNext()) {
 			if (++i > 100 && i % 10000 == 0) {

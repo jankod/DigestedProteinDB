@@ -1,7 +1,7 @@
 package hr.pbf.digestdb.util;
 
 import static hr.pbf.digestdb.util.BiteUtil.toStringFromByte;
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
+//import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 //import static org.fusesource.leveldbjni.JniDBFactory.*;
 
 import java.io.File;
@@ -12,12 +12,17 @@ import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
 import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 
 public class MyLevelDB {
 
 	private String path;
 	private DB db;
 
+	public static DB open(String pathDb, Options options) throws IOException {
+		return Iq80DBFactory.factory.open(new File(pathDb), options);
+	}
+	
 	public MyLevelDB(String path) throws IOException {
 		this.path = path;
 
@@ -28,7 +33,7 @@ public class MyLevelDB {
 		options.compressionType(CompressionType.SNAPPY);
 		options.verifyChecksums(false);
 		options.paranoidChecks(false);
-		db = factory.open(new File(path), options);
+		db = MyLevelDB.open(path, options);
 	}
 
 	public String getStatus() {
@@ -58,7 +63,7 @@ public class MyLevelDB {
 	 */
 	public int getInt(String key) {
 		DBIterator i = db.iterator();
-		byte[] bk = BiteUtil.toByte(key);
+		byte[] bk = BiteUtil.toBytes(key);
 		i.seek(bk);
 		if (i.hasNext()) {
 			Entry<byte[], byte[]> res = i.next();
@@ -74,5 +79,16 @@ public class MyLevelDB {
 			e.printStackTrace();
 		}
 		return -1;
+	}
+
+	public static Options getOptions() {
+		Options options = new Options();
+		options.createIfMissing(true);
+
+		options.cacheSize(100 * 1048576 * 10); // 100MB cache
+		options.compressionType(CompressionType.SNAPPY);
+		options.verifyChecksums(false);
+		options.paranoidChecks(false);
+		return options;
 	}
 }

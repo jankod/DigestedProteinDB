@@ -1,15 +1,15 @@
 package hr.pbf.digestdb.test.probe;
 
-import org.iq80.leveldb.*;
+import java.io.IOException;
 
-import hr.pbf.digestdb.util.BiteUtil;
+import org.iq80.leveldb.CompressionType;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.WriteBatch;
+
 import hr.pbf.digestdb.util.CallbackMass;
 import hr.pbf.digestdb.util.MassCSV;
-
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-import static org.iq80.leveldb.impl.Iq80DBFactory.*;
-
-import java.io.*;
+import hr.pbf.digestdb.util.MyLevelDB;
 
 public class LevelDBnativeProbe {
 
@@ -22,7 +22,8 @@ public class LevelDBnativeProbe {
 		options.verifyChecksums(false);
 		options.paranoidChecks(false);
 
-		DB db = factory.open(new File("c:/tmp/leveldb_jni"), options);
+		
+		DB db = MyLevelDB.open("c:/tmp/leveldb_jni", options);
 		try {
 
 			MassCSV csv = new MassCSV("C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\nr_mass_sorted_200_000.csv");

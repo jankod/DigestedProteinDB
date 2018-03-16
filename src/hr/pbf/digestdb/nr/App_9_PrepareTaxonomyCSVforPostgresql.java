@@ -1,17 +1,8 @@
 package hr.pbf.digestdb.nr;
 
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -19,11 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.WriteBatch;
 
-import com.google.common.base.Splitter;
-
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
-import hr.pbf.digestdb.util.BiteUtil;
+import hr.pbf.digestdb.util.MyLevelDB;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
 
@@ -91,7 +80,7 @@ public class App_9_PrepareTaxonomyCSVforPostgresql implements IApp {
 		options.createIfMissing(true);
 		options.cacheSize(100 * 1048576 * 6); // 100MB * 6cache
 
-		DB db = factory.open(new File(dbPath), options);
+		DB db = MyLevelDB.open(dbPath, options);
 		return db;
 	}
 

@@ -1,18 +1,8 @@
 package hr.pbf.digestdb.nr;
 
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.NumberFormat;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.iq80.leveldb.CompressionType;
@@ -20,13 +10,13 @@ import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.WriteBatch;
-import org.iq80.leveldb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.primitives.Ints;
 
 import hr.pbf.digestdb.util.BiteUtil;
+import hr.pbf.digestdb.util.MyLevelDB;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
@@ -77,7 +67,7 @@ public class App_11_MakeLevelDbStore {
 
 		String newDbPath = "/home/users/tag/nr_db/leveldb_mass_db";
 		System.out.println("db: " + newDbPath);
-		DB db = factory.open(new File(newDbPath), options);
+		DB db = MyLevelDB.open(newDbPath, options);
 
 		MutableString line = new MutableString();
 		boolean writen = false;
@@ -101,7 +91,7 @@ public class App_11_MakeLevelDbStore {
 				
 
 				// ByteBuffer.allocate(4).putFloat((float) mass).array()
-				batch.put(BiteUtil.toByte((int) (mass * 100_000)), BiteUtil.toByte(peptide + "_" + accVersion));
+				batch.put(BiteUtil.toBytes((int) (mass * 100_000)), BiteUtil.toBytes(peptide + "_" + accVersion));
 				if (count % 400_000 == 0) {
 					db.write(batch);
 					batch.close();

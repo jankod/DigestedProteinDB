@@ -39,18 +39,22 @@ public class UniprotModel {
 		private StringBuilder seq = new StringBuilder(200);
 	}
 
-	
 	@Data
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public final static class AccTax {
 		public String acc;
 		public int tax;
+
+		public String toString() {
+			return acc + ":" + tax;
+		}
+
 	}
-	
-	
+
 	/**
 	 * CSV line
+	 * 
 	 * @author tag
 	 *
 	 */
@@ -61,8 +65,9 @@ public class UniprotModel {
 		private String peptide;
 		private float mass;
 		private List<AccTax> accTaxs;
+
 	}
-	
+
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
@@ -72,9 +77,7 @@ public class UniprotModel {
 		private int tax;
 		private float mass;
 	}
-	
-	
-	
+
 	// @Accessors
 	@Data
 	@NoArgsConstructor
@@ -99,8 +102,7 @@ public class UniprotModel {
 		}
 
 	}
-	
-	
+
 	public static class KryoFloatHolder implements KryoSerializable {
 		private static final Logger log = LoggerFactory.getLogger(UniprotModel.KryoFloatHolder.class);
 
@@ -136,7 +138,7 @@ public class UniprotModel {
 			int howMany = i.readInt();
 			data = new ArrayList<>(howMany);
 			for (int j = 0; j < howMany; j++) {
-//				log.debug("reqad");
+				// log.debug("reqad");
 				PeptideAccTax p = new PeptideAccTax();
 				data.add(j, p);
 				p.setPeptide(i.readString());
@@ -159,6 +161,5 @@ public class UniprotModel {
 		}
 
 	}
-	
 
 }

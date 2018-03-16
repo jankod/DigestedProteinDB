@@ -1,29 +1,23 @@
 package hr.pbf.digestdb.uniprot;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.iq80.leveldb.CompressionType;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.util.BiteUtil;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
-
-import org.apache.commons.io.FileUtils;
-import org.iq80.leveldb.*;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-import static org.iq80.leveldb.impl.Iq80DBFactory.*;
-
-import java.io.*;
 
 public class LevelDbUniprot {
 	private static final Logger log = LoggerFactory.getLogger(LevelDbUniprot.class);
@@ -46,8 +40,8 @@ public class LevelDbUniprot {
 		DBComparator comparator = new DBComparator() {
 			public int compare(byte[] key1, byte[] key2) {
 				// log.debug("key1 "+ key1.length + " key2 "+ key2.length);
-				float f1 = BiteUtil.byteArrayToFloat(key1);
-				float f2 = BiteUtil.byteArrayToFloat(key2);
+				float f1 = BiteUtil.toFloat(key1);
+				float f2 = BiteUtil.toFloat(key2);
 				return Float.compare(f1, f2);
 			}
 
@@ -73,7 +67,8 @@ public class LevelDbUniprot {
 			}
 		});
 
-		db = factory.open(f, options);
+		
+		db = Iq80DBFactory.factory.open(f, options);
 
 	}
 
@@ -98,7 +93,7 @@ public class LevelDbUniprot {
 	// }
 
 	public byte[] floatToBytes(float f) {
-		return BiteUtil.floatToByteArray(f);
+		return BiteUtil.toBytes(f);
 	}
 
 	public List<PeptideAccTax> bytesToPeptides(byte[] b) throws IOException {

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xerial.snappy.Snappy;
@@ -25,6 +26,7 @@ import com.esotericsoftware.kryo.io.UnsafeOutput;
 import hr.pbf.digestdb.uniprot.UniprotModel.AccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideMassAccTaxList;
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 
 public class UniprotFormat3 {
@@ -45,7 +47,7 @@ public class UniprotFormat3 {
 	}
 
 	public void read(float fromMass, float toMass) {
-		
+
 	}
 
 	public static byte[] compressASCII(String value) throws UnsupportedEncodingException, IOException {
@@ -69,18 +71,6 @@ public class UniprotFormat3 {
 		}
 		return peptide + "\t" + buffer.toString();
 	}
-
-	// public static PeptideMassAccTaxList unformatValue(String line) {
-	// PeptideMassAccTaxList result = new PeptideMassAccTaxList();
-	// String[] split = StringUtils.split(line, "\t");
-	// String peptide = split[0];
-	// String[] accTaxrow = StringUtils.split(split[1], ",");
-	// for (String accTax : accTaxrow) {
-	// String[] oneAccTax = StringUtils.split(accTax);
-	//
-	// }
-	// }
-
 	public PeptideMassAccTaxList get(float mass) throws IOException {
 
 		long[] postiotions = index.get(mass);
@@ -94,9 +84,31 @@ public class UniprotFormat3 {
 		return null;
 	}
 
-
 	public Map<Float, PeptideAccTax> search(float from, float to) {
 		return null;
+	}
+
+	public static byte[] compressPeptidesJava(Map<String, List<AccTax>> peptidesAccTax) throws IOException {
+		// UnsafeOutput out = new UnsafeOutput(new
+		// FastByteArrayOutputStream(peptidesAccTax.size() * 16 * 2));
+		FastByteArrayOutputStream byteOut = new FastByteArrayOutputStream(peptidesAccTax.size() * 8 * 16);
+		MyDataOutputStream out = new MyDataOutputStream(byteOut);
+
+		Set<Entry<String, List<AccTax>>> entrySet = peptidesAccTax.entrySet();
+		out.writeInt(entrySet.size());
+		for (Entry<String, List<AccTax>> entry : entrySet) {
+			String peptide = entry.getKey();
+			List<AccTax> accTaxList = entry.getValue();
+			out.writeUTF(peptide);
+			out.writeInt(accTaxList.size());
+			for (AccTax accTax : accTaxList) {
+				out.writeUTF(accTax.getAcc());
+				out.writeInt(accTax.getTax());
+			}
+		}
+		out.close();
+		byteOut.trim();
+		return byteOut.array;
 	}
 
 	public static byte[] compressPeptides(HashMap<String, List<AccTax>> peptidesAccTax) throws IOException {
@@ -118,7 +130,29 @@ public class UniprotFormat3 {
 		return Snappy.compress(out.getBuffer());
 	}
 
+	public static TreeMap<String, List<AccTax>> uncompressPeptidesJava(byte[] compressed) throws IOException {
+		try (MyDataInputStream in = new MyDataInputStream(new FastByteArrayInputStream(compressed))) {
+			int howPeptides = in.readInt();
+			TreeMap<String, List<AccTax>> result = new TreeMap<>();
+			for (int i = 0; i < howPeptides; i++) {
+				String peptide = in.readUTF();
+				int howAccTax = in.readInt();
+				ArrayList<AccTax> accTaxs = new ArrayList<>(howAccTax);
+				for (int j = 0; j < howAccTax; j++) {
+					if (!accTaxs.add(new AccTax(in.readUTF(), in.readInt()))) {
+						throw new RuntimeException("Not added accc");
+					}
+				}
+				result.put(peptide, accTaxs);
+
+			}
+			return result;
+		}
+
+	}
+
 	public static HashMap<String, List<AccTax>> uncompressPeptides(byte[] compressed) throws IOException {
+		// KryoException: Buffer underflow.
 		UnsafeInput in = new UnsafeInput(Snappy.uncompress(compressed));
 		int howPeptides = in.readVarInt(true);
 		HashMap<String, List<AccTax>> result = new HashMap<>(howPeptides);

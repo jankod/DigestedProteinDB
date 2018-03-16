@@ -1,27 +1,20 @@
 package hr.pbf.digestdb.nr;
 
-import static hr.pbf.digestdb.util.BiteUtil.toByte;
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
+import static hr.pbf.digestdb.util.BiteUtil.toBytes;
 
-
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.NumberFormat;
 
 import org.apache.commons.lang3.StringUtils;
 import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
-import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.Options;
 import org.iq80.leveldb.WriteBatch;
-import org.iq80.leveldb.WriteOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.util.BiteUtil;
+import hr.pbf.digestdb.util.MyLevelDB;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
@@ -61,7 +54,7 @@ public class App_12_CreateTaxIDAccessionDB {
 		String newDbPath = "/home/users/tag/nr_db/leveldb_accession2taxid_dead";
 		String accessionTaxIdPath = "/home/users/tag/nr_db/dead_prot.accession2taxid";
 		System.out.println("db: " + newDbPath);
-		DB db = factory.open(new File(newDbPath), options);
+		DB db = MyLevelDB.open(newDbPath, options);
 
 		TimeScheduler.runEvery10Minutes(new Runnable() {
 
@@ -86,7 +79,7 @@ public class App_12_CreateTaxIDAccessionDB {
 				String acc = split[0].trim();
 				int taxId = Integer.parseInt(split[2].trim());
 
-				batch.put(toByte(acc), toByte(taxId));
+				batch.put(toBytes(acc), toBytes(taxId));
 				if (count % 400_000 == 0) {
 					db.write(batch);
 					batch.close();

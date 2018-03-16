@@ -1,10 +1,5 @@
 package hr.pbf.digestdb.test.probe;
 
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-
-import java.io.File;
 import java.io.IOException;
 
 import org.iq80.leveldb.CompressionType;
@@ -12,13 +7,14 @@ import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 
 import hr.pbf.digestdb.util.BiteUtil;
+import hr.pbf.digestdb.util.MyLevelDB;
 
 public class AccessionTaxIdDB {
 
 	
 	private DB db;
 
-	public AccessionTaxIdDB(String dbPath) throws IOException {
+	public AccessionTaxIdDB(String pathDB) throws IOException {
 		
 		Options options = new Options();
 		options.createIfMissing(true);
@@ -26,7 +22,7 @@ public class AccessionTaxIdDB {
 		options.cacheSize(100 * 1048576 * 10); // 100MB cache
 		options.compressionType(CompressionType.SNAPPY);
 		
-		db = factory.open(new File(dbPath), options);
+		db = MyLevelDB.open(pathDB, options);
 		
 	}
 	
@@ -40,7 +36,7 @@ public class AccessionTaxIdDB {
 	 * @param value
 	 */
 	public void put(String key, String value) {
-		db.put(BiteUtil.toByte(key), BiteUtil.toByte(value));
+		db.put(BiteUtil.toBytes(key), BiteUtil.toBytes(value));
 	}
 	
 }

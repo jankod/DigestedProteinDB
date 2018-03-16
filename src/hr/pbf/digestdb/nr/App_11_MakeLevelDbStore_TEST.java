@@ -1,10 +1,5 @@
 package hr.pbf.digestdb.nr;
 
-import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-
-import java.io.File;
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -21,6 +16,7 @@ import com.google.common.primitives.Ints;
 
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
+import hr.pbf.digestdb.util.MyLevelDB;
 
 public class App_11_MakeLevelDbStore_TEST {
 
@@ -57,7 +53,7 @@ public class App_11_MakeLevelDbStore_TEST {
 
 		String newDbPath = "/home/users/tag/nr_db/leveldb_mass_db";
 		System.out.println("db: " + newDbPath);
-		DB db = factory.open(new File(newDbPath), options);
+		DB db = MyLevelDB.open(newDbPath, options);
 
 		
 		StopWatch stopWatch = new StopWatch();
@@ -73,7 +69,7 @@ public class App_11_MakeLevelDbStore_TEST {
 		
 		
 		
-		byte[] m1Byte = BiteUtil.toByte((int) (m1 * 100_000));
+		byte[] m1Byte = BiteUtil.toBytes((int) (m1 * 100_000));
 		//it.seek(m1Byte);
 		int c = 0;
 		while (it.hasNext()) {
