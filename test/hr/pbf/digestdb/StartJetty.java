@@ -22,6 +22,8 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
+
 public class StartJetty {
 	private static Server server;
 
@@ -81,6 +83,11 @@ public class StartJetty {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			try {
+				server.stop();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 			System.exit(100);
 		}
 	}

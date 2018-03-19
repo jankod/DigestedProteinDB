@@ -64,10 +64,10 @@ public class UniprotLevelDbFinder implements Closeable {
 		opt.comparator(comparator);
 		
 		db = LevelDButil.open(levelDbPath, opt);
-		try (FileInputStream in = new FileInputStream(new File(indexPath))) {
-			MassIndex index = SerializationUtils.deserialize(in);
-			indexMap = index.getMap();
-		}
+//		try (FileInputStream in = new FileInputStream(new File(indexPath))) {
+//			MassIndex index = SerializationUtils.deserialize(in);
+//			indexMap = index.getMap();
+//		}
 
 	}
 
