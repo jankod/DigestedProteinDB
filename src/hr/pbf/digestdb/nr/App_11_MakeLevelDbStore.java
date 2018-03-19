@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.primitives.Ints;
 
 import hr.pbf.digestdb.util.BiteUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
@@ -67,7 +67,7 @@ public class App_11_MakeLevelDbStore {
 
 		String newDbPath = "/home/users/tag/nr_db/leveldb_mass_db";
 		System.out.println("db: " + newDbPath);
-		DB db = MyLevelDB.open(newDbPath, options);
+		DB db = LevelDButil.open(newDbPath, options);
 
 		MutableString line = new MutableString();
 		boolean writen = false;

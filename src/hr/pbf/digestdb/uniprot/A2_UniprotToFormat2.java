@@ -113,7 +113,7 @@ public class A2_UniprotToFormat2 {
 	}
 
 	private void convert(File f) throws IOException {
-		// log.debug("Start convert " + f.getName());
+		// log.debug("StartJetty convert " + f.getName());
 		byte[] format1bytes = UniprotUtil.toByteArrayFast(f);
 
 		ArrayList<PeptideAccTax> pepList = UniprotUtil.fromFormat1(format1bytes);

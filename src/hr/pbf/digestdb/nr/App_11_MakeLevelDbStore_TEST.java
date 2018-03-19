@@ -16,7 +16,7 @@ import com.google.common.primitives.Ints;
 
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 
 public class App_11_MakeLevelDbStore_TEST {
 
@@ -53,7 +53,7 @@ public class App_11_MakeLevelDbStore_TEST {
 
 		String newDbPath = "/home/users/tag/nr_db/leveldb_mass_db";
 		System.out.println("db: " + newDbPath);
-		DB db = MyLevelDB.open(newDbPath, options);
+		DB db = LevelDButil.open(newDbPath, options);
 
 		
 		StopWatch stopWatch = new StopWatch();

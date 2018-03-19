@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
 
-import hr.pbf.digestdb.AppConstants;
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.nr.App_4_CompressManyFilesSmall.PeptideMassIdRow;
 import hr.pbf.digestdb.util.BioUtil;

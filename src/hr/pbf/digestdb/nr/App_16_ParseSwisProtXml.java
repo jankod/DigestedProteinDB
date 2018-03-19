@@ -6,7 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import hr.pbf.digestdb.test.probe.SaxParserProbe;
+import hr.pbf.digestdb.test.experiments.SaxParserProbe;
 
 public class App_16_ParseSwisProtXml {
 

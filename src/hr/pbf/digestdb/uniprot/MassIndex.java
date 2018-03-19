@@ -31,6 +31,17 @@ public class MassIndex implements Externalizable {
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		MassIndex massindex = MassIndex.load("C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact");
 		System.out.println("Dobio "+ massindex.getMap().size());
+		
+		
+		toMassIndexFast(massindex);
+	}
+	
+	
+	
+
+	private static void toMassIndexFast(MassIndex massindex) {
+		TreeMap<Float, Integer> m = massindex.getMap();
+		MassPeptideArrayIndex index = new MassPeptideArrayIndex(m.size());
 	}
 
 	public static final MassIndex load(String path) throws IOException, ClassNotFoundException {

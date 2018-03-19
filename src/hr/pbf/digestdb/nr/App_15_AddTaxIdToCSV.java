@@ -33,7 +33,7 @@ import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.CallbackMass;
 import hr.pbf.digestdb.util.MassCSV;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
@@ -77,7 +77,7 @@ public class App_15_AddTaxIdToCSV {
 		String dirResult = "c:/tmp/";
 		String leveldbPath = dirResult + "nr_mass_leveldb";
 		System.out.println("Level DB: " + leveldbPath);
-		db = MyLevelDB.open(leveldbPath, options);
+		db = LevelDButil.open(leveldbPath, options);
 		DBIterator it = db.iterator();
 		it.seek(BiteUtil.toBytes(446.22375F));
 		while(it.hasNext()) {
@@ -138,7 +138,7 @@ public class App_15_AddTaxIdToCSV {
 		options.paranoidChecks(false);
 
 		System.out.println("Level DB: " + leveldbPath);
-		db = MyLevelDB.open(leveldbPath, options);
+		db = LevelDButil.open(leveldbPath, options);
 
 		// MVStoreTool.compact(storeDeadFileDb, true);
 		// MVStoreTool.info(storeFileDb);

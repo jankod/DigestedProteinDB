@@ -4,8 +4,18 @@
 	<groupId>DigestedProteinDB</groupId>
 	<artifactId>DigestedProteinDB</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<properties>
 		<lmdbjni.v>0.4.7</lmdbjni.v>
+		<jetty9.version>9.4.8.v20171121</jetty9.version>
+		<javax.javaee-api.version>8.0</javax.javaee-api.version>
+		<el-api.version>3.0.0</el-api.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<default.encoding>UTF-8</default.encoding>
+		<!-- allowed values: R7, 1.0, 1.5, 2.0 or none -->
+		<wtp.version>2.0</wtp.version>
 	</properties>
 	<dependencies>
 
@@ -14,8 +24,6 @@
 			<artifactId>paldb</artifactId>
 			<version>1.2.0</version>
 		</dependency>
-
-
 
 		<dependency>
 			<groupId>com.ning</groupId>
@@ -62,8 +70,8 @@
 			</dependency> <dependency> <groupId>org.deephacks.lmdbjni</groupId> <artifactId>lmdbjni-win64</artifactId> 
 			<version>0.4.6</version> </dependency> -->
 
-		<!-- <dependency> <groupId>org.mapdb</groupId> <artifactId>mapdb</artifactId> 
-			<version>3.0.5</version> </dependency> -->
+		 <dependency> <groupId>org.mapdb</groupId> <artifactId>mapdb</artifactId> 
+			<version>3.0.5</version> </dependency> 
 
 		<!-- <dependency> <groupId>org.fusesource.leveldbjni</groupId> <artifactId>leveldbjni-all</artifactId> 
 			<version>1.8</version> </dependency> -->
@@ -178,7 +186,7 @@
 			<version>3.6</version>
 		</dependency>
 
-		<dependency>
+		 <dependency>
 			<groupId>tech.tablesaw</groupId>
 			<artifactId>tablesaw-core</artifactId>
 			<version>0.11.2</version>
@@ -247,6 +255,50 @@
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
 		</dependency>
+		
+		
+		<!-- WEB JETTY -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>${javax.javaee-api.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JETTY DEPENDENCIES FOR TESTING -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty9.version}</version>
+			
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jmx</artifactId>
+			<version>${jetty9.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- JETTY JSP JSTL -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-annotations</artifactId>
+			<version>${jetty9.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>apache-jsp</artifactId>
+			<version>${jetty9.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>apache-jstl</artifactId>
+			<version>${jetty9.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
 
 	</dependencies>
 	<repositories>
@@ -258,15 +310,16 @@
 	</repositories>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
 		<plugins>
-			<plugin>
+			 <plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>
+			</plugin> 
 		</plugins>
 	</build>
 </project>

@@ -17,7 +17,7 @@ import org.h2.tools.CompressTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.test.probe.CompressedPeptide;
+import hr.pbf.digestdb.test.experiments.CompressedPeptide;
 import hr.pbf.digestdb.uniprot.UniprotUtil;
 
 public class TestCompress {

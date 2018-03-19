@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 
 public class A7_UniprotProtNamesToLevelDB {
 	private static final Logger log = LoggerFactory.getLogger(A7_UniprotProtNamesToLevelDB.class);
@@ -38,9 +38,9 @@ public class A7_UniprotProtNamesToLevelDB {
 	}
 
 	private static void saveToLevelDB(String pathCSV, String pathStore) throws IOException {
-		DB db = MyLevelDB.open(pathStore, getLevelDBOptions());
+		DB db = LevelDButil.open(pathStore, getLevelDBOptions());
 
-		log.debug("Start, path " + pathStore);
+		log.debug("StartJetty, path " + pathStore);
 		long c = 0;
 		boolean writenBatch = false;
 		WriteBatch batch = db.createWriteBatch();

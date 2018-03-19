@@ -64,7 +64,7 @@ public class TaxIdNameDB {
 	 */
 	private static TaxIdNameDB createFromNamesDMP(String pathCsv, String pathDb) throws IOException {
 		BufferedReader reader = BioUtil.newFileReader(pathCsv);
-		// DB db = MyLevelDB.open(pathLevelDb, MyLevelDB.getOptions());
+		// DB db = LevelDButil.open(pathLevelDb, LevelDButil.getOptions());
 		StoreWriter w = PalDB.createWriter(new File(pathDb));
 
 		String line = null;

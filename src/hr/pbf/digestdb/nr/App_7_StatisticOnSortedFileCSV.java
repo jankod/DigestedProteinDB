@@ -17,7 +17,6 @@ import org.apache.commons.lang3.time.StopWatch;
 
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
-import tech.tablesaw.splitting.dates.SplitUtils;
 
 /**
  * Parse sorted CSV file of mass. CSV: mass peptide accession

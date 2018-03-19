@@ -5,37 +5,36 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.util.Map.Entry;
 
+import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import hr.pbf.digestdb.util.BiteUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 
 class TestMyLevelDB {
 
-	private static MyLevelDB db;
+	private static DB db;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		db = new MyLevelDB(
-				"C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\leveldb_accession2taxid_dead");
+		db = LevelDButil.open(
+				"C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\sample_data\\leveldb_accession2taxid_dead",
+				LevelDButil.getStandardOptions());
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-		System.out.println(db.getStatus());
+		System.out.println(LevelDButil.getStatus(db));
 		db.close();
 	}
 
 	@Test
 	void test1() {
 
-		int taxId = db.getInt("WP_070124588");
-		assertEquals(1656094, taxId);
-
-		DBIterator it = db.getIterator();
+		DBIterator it = db.iterator();
 		System.out.println(BiteUtil.toBytes(0));
 		int i = 0;
 		while (false || it.hasNext()) {

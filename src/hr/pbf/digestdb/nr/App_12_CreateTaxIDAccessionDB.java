@@ -14,7 +14,7 @@ import org.iq80.leveldb.WriteBatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 import hr.pbf.digestdb.util.TimeScheduler;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
@@ -54,7 +54,7 @@ public class App_12_CreateTaxIDAccessionDB {
 		String newDbPath = "/home/users/tag/nr_db/leveldb_accession2taxid_dead";
 		String accessionTaxIdPath = "/home/users/tag/nr_db/dead_prot.accession2taxid";
 		System.out.println("db: " + newDbPath);
-		DB db = MyLevelDB.open(newDbPath, options);
+		DB db = LevelDButil.open(newDbPath, options);
 
 		TimeScheduler.runEvery10Minutes(new Runnable() {
 

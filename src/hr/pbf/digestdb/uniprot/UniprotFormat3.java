@@ -84,10 +84,6 @@ public class UniprotFormat3 {
 		return null;
 	}
 
-	public Map<Float, PeptideAccTax> search(float from, float to) {
-		return null;
-	}
-
 	public static byte[] compressPeptidesJava(Map<String, List<AccTax>> peptidesAccTax) throws IOException {
 		// UnsafeOutput out = new UnsafeOutput(new
 		// FastByteArrayOutputStream(peptidesAccTax.size() * 16 * 2));

@@ -36,7 +36,7 @@ import hr.pbf.digestdb.uniprot.UniprotModel.AccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideMassAccTaxList;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 
 public class A4_UniprotCsvToLevelDB {
 	private static final Logger log = LoggerFactory.getLogger(A4_UniprotCsvToLevelDB.class);
@@ -83,7 +83,7 @@ public class A4_UniprotCsvToLevelDB {
 
 		Options options = getLevelDBOptions();
 
-		DB db = MyLevelDB.open(pathDb, options);
+		DB db = LevelDButil.open(pathDb, options);
 		batch = db.createWriteBatch();
 		log.debug("start");
 
@@ -166,7 +166,7 @@ public class A4_UniprotCsvToLevelDB {
 			pathDb = "/home/users/tag/uniprot/trembl.leveldb";
 		}
 		Options options = getLevelDBOptions();
-		DB db = MyLevelDB.open(pathDb, options);
+		DB db = LevelDButil.open(pathDb, options);
 
 		DBIterator it = db.iterator();
 		
@@ -203,7 +203,7 @@ public class A4_UniprotCsvToLevelDB {
 		}
 		// JniDBFactory.pushMemoryPool(1024 * 512);
 		Options options = getLevelDBOptions();
-		DB db = MyLevelDB.open(pathDb, options);
+		DB db = LevelDButil.open(pathDb, options);
 		StopWatch time= new StopWatch();
 		time.start();
 

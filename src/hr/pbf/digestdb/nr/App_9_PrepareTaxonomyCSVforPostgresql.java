@@ -12,7 +12,7 @@ import org.iq80.leveldb.WriteBatch;
 
 import hr.pbf.digestdb.cli.IApp;
 import hr.pbf.digestdb.util.BioUtil;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 import it.unimi.dsi.io.FastBufferedReader;
 import it.unimi.dsi.lang.MutableString;
 
@@ -80,7 +80,7 @@ public class App_9_PrepareTaxonomyCSVforPostgresql implements IApp {
 		options.createIfMissing(true);
 		options.cacheSize(100 * 1048576 * 6); // 100MB * 6cache
 
-		DB db = MyLevelDB.open(dbPath, options);
+		DB db = LevelDButil.open(dbPath, options);
 		return db;
 	}
 

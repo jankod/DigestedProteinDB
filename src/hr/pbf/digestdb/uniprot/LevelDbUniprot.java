@@ -27,7 +27,7 @@ public class LevelDbUniprot {
 
 		File f = new File(pathLevelDb);
 		
-		log.debug("Radim bazu na "+ f.getAbsolutePath());
+//		log.debug("Radim bazu na "+ f.getAbsolutePath());
 		Options options = new Options();
 		options.blockSize(8 * 1024);
 //		options.verifyChecksums(true);
@@ -86,23 +86,12 @@ public class LevelDbUniprot {
 		return db;
 	}
 
-	// public void add(Float mass, List<PeptideAccTax> peptides) throws IOException
-	// {
-	// byte[] massBytes = BiteUtil.floatToByteArray(mass);
-	// byte[] pepBytes = peptidesToBytes(peptides);
-	// }
 
 	public byte[] floatToBytes(float f) {
 		return BiteUtil.toBytes(f);
 	}
 
 	public List<PeptideAccTax> bytesToPeptides(byte[] b) throws IOException {
-//		if(true) {
-//			Kryo k = new Kryo();
-//			@SuppressWarnings("unchecked")
-//			List<PeptideAccTax> o = k.readObject(new Input(b), ArrayList.class);
-//			return o;
-//		}
 		DataInputStream in = new DataInputStream(new FastByteArrayInputStream(b));
 		int how = in.readInt();
 		ArrayList<PeptideAccTax> result = new ArrayList<>(how);
@@ -121,17 +110,6 @@ public class LevelDbUniprot {
 	}
 
 	public byte[] peptidesToBytes(List<PeptideAccTax> peptides) throws IOException {
-//		if(true) {
-//			Kryo k = new Kryo();
-////			List<PeptideAccTax> o = k.readObject(new Input(b), List.class);
-//			ByteArrayOutputStream outb = new ByteArrayOutputStream();
-//			Output output = new Output(outb);
-//			k.writeObject(output, peptides);
-//			output.flush();
-//			output.close();
-//			return outb.toByteArray();
-//		}
-		
 		FastByteArrayOutputStream out = new FastByteArrayOutputStream(peptides.size() * 22);
 		
 		MyDataOutputStream d = new MyDataOutputStream(out);

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.xerial.snappy.Snappy;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
-import hr.pbf.digestdb.util.MyLevelDB;
+import hr.pbf.digestdb.util.LevelDButil;
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
 public class A3_UniprotFormat2ToOther {
@@ -52,7 +52,7 @@ public class A3_UniprotFormat2ToOther {
 				return Float.compare(f1, f2);
 			}
 		});
-//		MyLevelDB levelDB = new MyLevelDB("");
+//		LevelDButil levelDB = new LevelDButil("");
 		FINISH: for (File file : files) {
 			log.debug(file.getName());
 			byte[] bytes = UniprotUtil.toByteArrayFast(file);
