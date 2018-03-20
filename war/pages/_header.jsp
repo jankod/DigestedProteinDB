@@ -10,22 +10,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
-    <link type="text/css" rel="stylesheet" href="main.css">
+
 
     <title>Trypsin database <c:out value="${headTitle}"/></title>
-    <script type="text/javascript">
-        var pageName = "<c:out value="${pageName}" />";
-    </script>
 
-    <link rel="stylesheet"
-          href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 
-    <script src="node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="gwt/gwt.nocache.js"></script>
-    <link rel="stylesheet" href="main.css">
+
+    <link rel="stylesheet" type="text/css" href="js/datatables.min.css"/>
+
+    <script type="text/javascript" src="js/datatables.min.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="main.css">
+
 </head>
 
 

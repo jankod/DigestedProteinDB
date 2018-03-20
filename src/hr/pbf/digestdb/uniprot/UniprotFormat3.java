@@ -79,7 +79,6 @@ public class UniprotFormat3 {
 		Scanner s = new Scanner(uncompress);
 		while (s.hasNextLine()) {
 			String line = s.nextLine();
-
 		}
 		return null;
 	}

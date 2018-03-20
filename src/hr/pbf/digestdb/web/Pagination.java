@@ -4,6 +4,26 @@ public class Pagination {
 	/** The first page. */
 	private static final int FIRST_PAGE = 1;
 
+	/**
+	 * Convert a string to an integer.
+	 * 
+	 * @param str
+	 *            Your string.
+	 * @param defaultValue
+	 *            Default value when failed.
+	 * @return A legal integer to use in this {@code Pagination}.
+	 */
+	private static int toLegalInt(String str, int defaultValue) {
+		int i;
+		try {
+			i = Integer.parseInt(str, 10);
+			if (i > 0)
+				return i;
+		} catch (Exception e) {
+		}
+		return defaultValue;
+	}
+
 	/** Current page. */
 	private int currentPage;
 
@@ -17,20 +37,15 @@ public class Pagination {
 	private int numberOfPages;
 
 	/**
-	 * Create a pagination.
+	 * Create a pagination, page size would be set to 10.
 	 * 
 	 * @param page
 	 *            Current page number you got from front end, 1 if illegal.
 	 * @param total
 	 *            Total amount of entries.
-	 * @param size
-	 *            Amount of entries to show per page, 10 if illegal.
 	 */
-	public Pagination(String page, int total, String size) {
-		this.currentPage = toLegalInt(page, 1);
-		this.total = total;
-		this.size = toLegalInt(size, 10);
-		init();
+	public Pagination(String page, int total) {
+		this(page, total, 10);
 	}
 
 	/**
@@ -51,35 +66,96 @@ public class Pagination {
 	}
 
 	/**
-	 * Create a pagination, page size would be set to 10.
+	 * Create a pagination.
 	 * 
 	 * @param page
 	 *            Current page number you got from front end, 1 if illegal.
 	 * @param total
 	 *            Total amount of entries.
+	 * @param size
+	 *            Amount of entries to show per page, 10 if illegal.
 	 */
-	public Pagination(String page, int total) {
-		this(page, total, 10);
+	public Pagination(String page, int total, String size) {
+		this.currentPage = toLegalInt(page, 1);
+		this.total = total;
+		this.size = toLegalInt(size, 10);
+		init();
 	}
 
 	/**
-	 * Convert a string to an integer.
-	 * 
-	 * @param str
-	 *            Your string.
-	 * @param defaultValue
-	 *            Default value when failed.
-	 * @return A legal integer to use in this {@code Pagination}.
+	 * Returns current page number.
 	 */
-	private static int toLegalInt(String str, int defaultValue) {
-		int i;
-		try {
-			i = Integer.parseInt(str, 10);
-			if (i > 0)
-				return i;
-		} catch (Exception e) {
-		}
-		return defaultValue;
+	public int getCurrentPage() {
+		return currentPage;
+	}
+
+	/**
+	 * Returns first page. Should always be 1.
+	 */
+	public int getFirstPage() {
+		return FIRST_PAGE;
+	}
+
+	/**
+	 * Get index of the first entry in this page. You can use this value in DB like
+	 * <p>
+	 * {@code select * from TABLE_NAME limit [index], 10} (MariaDB),
+	 * </p>
+	 * <p>
+	 * {@code db.COLLECTION_NAME.find().skip([index]).limit(10)} (MongoDB).
+	 * </p>
+	 */
+	public int getIndex() {
+		return size * (currentPage - 1);
+	}
+
+	/**
+	 * Returns the last page.
+	 */
+	public int getLastPage() {
+		return numberOfPages;
+	}
+
+	/**
+	 * Returns the next page number.
+	 */
+	public int getNextPage() {
+		return (currentPage < numberOfPages) ? (currentPage + 1) : numberOfPages;
+	}
+
+	/**
+	 * Returns total of pages.
+	 */
+	public int getNumberOfPages() {
+		return numberOfPages;
+	}
+
+	/**
+	 * Returns the previous page number.
+	 */
+	public int getPrevPage() {
+		return (currentPage > 1) ? (currentPage - 1) : 1;
+	}
+
+	/**
+	 * Returns the page size, namely, it is the amount of entries showing per page.
+	 * You can use this value in DB like
+	 * <p>
+	 * {@code select * from TABLE_NAME limit 0, [size]} (MariaDB),
+	 * </p>
+	 * <p>
+	 * {@code db.COLLECTION_NAME.find().skip(0).limit([size])} (MongoDB).
+	 * </p>
+	 */
+	public int getSize() {
+		return size;
+	}
+
+	/**
+	 * Returns total of entries.
+	 */
+	public int getTotal() {
+		return total;
 	}
 
 	/**
@@ -101,82 +177,6 @@ public class Pagination {
 	 */
 	public boolean isLastPage() {
 		return currentPage == numberOfPages;
-	}
-
-	/**
-	 * Returns current page number.
-	 */
-	public int getCurrentPage() {
-		return currentPage;
-	}
-
-	/**
-	 * Returns first page. Should always be 1.
-	 */
-	public int getFirstPage() {
-		return FIRST_PAGE;
-	}
-
-	/**
-	 * Returns the previous page number.
-	 */
-	public int getPrevPage() {
-		return (currentPage > 1) ? (currentPage - 1) : 1;
-	}
-
-	/**
-	 * Returns the next page number.
-	 */
-	public int getNextPage() {
-		return (currentPage < numberOfPages) ? (currentPage + 1) : numberOfPages;
-	}
-
-	/**
-	 * Returns the page size, namely, it is the amount of entries showing per page.
-	 * You can use this value in DB like
-	 * <p>
-	 * {@code select * from TABLE_NAME limit 0, [size]} (MariaDB),
-	 * </p>
-	 * <p>
-	 * {@code db.COLLECTION_NAME.find().skip(0).limit([size])} (MongoDB).
-	 * </p>
-	 */
-	public int getSize() {
-		return size;
-	}
-
-	/**
-	 * Get index of the first entry in this page. You can use this value in DB like
-	 * <p>
-	 * {@code select * from TABLE_NAME limit [index], 10} (MariaDB),
-	 * </p>
-	 * <p>
-	 * {@code db.COLLECTION_NAME.find().skip([index]).limit(10)} (MongoDB).
-	 * </p>
-	 */
-	public int getIndex() {
-		return size * (currentPage - 1);
-	}
-
-	/**
-	 * Returns total of entries.
-	 */
-	public int getTotal() {
-		return total;
-	}
-
-	/**
-	 * Returns total of pages.
-	 */
-	public int getNumberOfPages() {
-		return numberOfPages;
-	}
-
-	/**
-	 * Returns the last page.
-	 */
-	public int getLastPage() {
-		return numberOfPages;
 	}
 
 	/**

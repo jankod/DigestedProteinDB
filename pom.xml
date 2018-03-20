@@ -244,8 +244,11 @@
 		</dependency>
 
 
-		 <dependency> <groupId>com.google.guava</groupId> <artifactId>guava</artifactId> 
-			<version>24.1-jre</version> </dependency> 
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>24.1-jre</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.clearspring.analytics</groupId>
@@ -305,11 +308,8 @@
 		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>jstl</artifactId> 
 			<version>1.2</version> <scope>provided</scope> </dependency> -->
 
-<!-- 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>${el-api.version}</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>javax.el</groupId> <artifactId>javax.el-api</artifactId> 
+			<version>${el-api.version}</version> </dependency> -->
 
 		<!-- JETTY DEPENDENCIES FOR TESTING -->
 		<dependency>
@@ -344,6 +344,26 @@
 			<version>${jetty9.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+
+		<dependency>
+			<groupId>displaytag</groupId>
+			<artifactId>displaytag</artifactId>
+			<version>1.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl104-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.3</version>
+		</dependency>
+
 
 
 	</dependencies>

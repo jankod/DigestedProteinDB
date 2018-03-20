@@ -4,14 +4,19 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.jasper.tagplugins.jstl.core.ForEach;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.DBIterator;
@@ -27,6 +32,7 @@ import com.linkedin.paldb.api.PalDB;
 import com.linkedin.paldb.api.StoreReader;
 
 import hr.pbf.digestdb.uniprot.UniprotModel.AccTax;
+import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.LevelDButil;
 
@@ -77,6 +83,10 @@ public class UniprotLevelDbFinder implements Closeable {
 
 	}
 
+	public SortedTableMap<Float, Integer> getMapIndex() {
+		return mapIndex;
+	}
+
 	@Override
 	public void close() throws IOException {
 		if (db != null) {
@@ -88,11 +98,37 @@ public class UniprotLevelDbFinder implements Closeable {
 		log.debug("CLOSE regular database");
 	}
 
+	public List<UniprotModel.PeptideAccTax> searchMass(double mass) throws IOException {
+		DBIterator it = db.iterator();
+		it.seek(BiteUtil.toBytes((float) mass));
+		if (it.hasNext()) {
+			Entry<byte[], byte[]> next = it.next();
+			float mass2 = BiteUtil.toFloat(next.getKey());
+			if (mass != mass2) {
+				log.warn("Not the some mass {}:{}", mass, mass2);
+				return Collections.emptyList();
+			}
+			TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(next.getValue());
+			Set<Entry<String, List<AccTax>>> entrySet = v.entrySet();
+			
+			ArrayList<PeptideAccTax> result = new  ArrayList<>();
+			for (Entry<String, List<AccTax>> entry : entrySet) {
+				List<AccTax> value = entry.getValue();
+				for (AccTax accTax : value) {
+					result.add(new PeptideAccTax(entry.getKey(), accTax.getAcc(), accTax.getTax()));
+				}
+			}
+			return result;
+		}
+		return null;
+	}
+
 	public SearchResult searchIndex(double from, double to) {
 
-		ConcurrentNavigableMap<Float, Integer> subMap = mapIndex.subMap((float)from, true, (float)to, true);
+		ConcurrentNavigableMap<Float, Integer> subMap = mapIndex.subMap((float) from, true, (float) to, true);
 
-//		SortedMap<Float, Integer> subMap = indexMap.subMap((float) from, true, (float) to, true);
+		// SortedMap<Float, Integer> subMap = indexMap.subMap((float) from, true,
+		// (float) to, true);
 		SearchResult result = new SearchResult();
 		result.totalMass = subMap.size();
 		subMap.forEach(new BiConsumer<Float, Integer>() {
@@ -103,12 +139,25 @@ public class UniprotLevelDbFinder implements Closeable {
 			}
 
 		});
+		result.subMap = subMap;
 		return result;
 	}
 
 	public static class SearchResult {
 		public int totalMass = 0;
 		public int totalPeptides = 0;
+		public ConcurrentNavigableMap<Float, Integer> subMap;
+
+		@Override
+		public String toString() {
+			String res = "<br>Total mass: " + totalMass + "<br>Total peptides: " + totalPeptides;
+
+			for (Entry<Float, Integer> set : subMap.entrySet()) {
+				res += "<br><a href='showMass.jsp?mass=" + set.getKey() + "'>" + set.getKey() + "</a> : "
+						+ set.getValue();
+			}
+			return res;
+		}
 
 	}
 }

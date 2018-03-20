@@ -16,21 +16,6 @@ public class WebListener implements ServletContextListener {
 	private static final Logger log = LoggerFactory.getLogger(WebListener.class);
 	private static UniprotLevelDbFinder finder;
 
-	@Override
-	public void contextInitialized(ServletContextEvent cnt) {
-		try {
-			String levelDbPath = "F:\\tmp\\trembl.leveldb";
-			//String indexPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
-			String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
-			log.debug("Trembl path " + levelDbPath);
-			log.debug("Index path " + ssTablePath);
-			finder = new UniprotLevelDbFinder(levelDbPath, ssTablePath);
-
-		} catch (IOException e) {
-			log.error("", e);
-		}
-	}
-
 	public static UniprotLevelDbFinder getFinder() {
 		return finder;
 	}
@@ -45,6 +30,21 @@ public class WebListener implements ServletContextListener {
 			} catch (IOException e) {
 				log.error("", e);
 			}
+		}
+	}
+
+	@Override
+	public void contextInitialized(ServletContextEvent cnt) {
+		try {
+			String levelDbPath = "F:\\tmp\\trembl.leveldb";
+			//String indexPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
+			String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
+			log.debug("Trembl path " + levelDbPath);
+			log.debug("Index path " + ssTablePath);
+			finder = new UniprotLevelDbFinder(levelDbPath, ssTablePath);
+
+		} catch (IOException e) {
+			log.error("", e);
 		}
 	}
 

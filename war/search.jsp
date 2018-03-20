@@ -11,26 +11,34 @@
 <body>
 		<%@ include file="pages/_navbar.jsp"%>
 		<div class="container main">
+		
+		<div>
+		From mass: <%=request.getParameter("fromMass") %> Da<br>
+		To mass: <%=request.getParameter("toMass") %> Da
+		
+		</div>
+		
 				<div>
 						<%
+							String errMsg = null;
 							try {
 								double fromMass = Double.parseDouble(request.getParameter("fromMass"));
 								double toMass = Double.parseDouble(request.getParameter("toMass"));
 
 								UniprotLevelDbFinder finder = WebListener.getFinder();
 								UniprotLevelDbFinder.SearchResult res = finder.searchIndex(fromMass, toMass);
-						%>
-						<div>
-								Total mass
-								<%=res.totalMass%></div>
-						<div>
-								Total peptides:
-								<%=res.totalPeptides%></div>
-						<%
+							
+								out.write(res.toString());
+								
 							} catch (Throwable t) {
-
+								errMsg = t.getMessage();
 							}
 						%>
+						
+						<div class="alert alert-dark" role="alert">
+						</div>
+						
+							
 				</div>
 		</div>
 </body>
