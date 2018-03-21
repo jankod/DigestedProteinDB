@@ -22,10 +22,15 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
 import org.iq80.leveldb.Options;
+import org.mapdb.Serializer;
+import org.mapdb.SortedTableMap;
+import org.mapdb.volume.MappedFileVol;
+import org.mapdb.volume.Volume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.io.KryoDataInput;
+import com.linkedin.paldb.api.Configuration;
 import com.linkedin.paldb.api.PalDB;
 import com.linkedin.paldb.api.StoreReader;
 import com.linkedin.paldb.api.StoreWriter;
@@ -43,12 +48,52 @@ public class ProtNamesLevelDbToPalDB {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		// convertLevelDbToPalDB();
+		convertToSSTable();
+		read();
+	}
 
-		StoreReader r = PalDB.createReader(new File(pathDb + ".paldb"));
+	private static void convertToSSTable() throws IOException {
+		DB db = LevelDButil.open(pathDb, LevelDButil.getStandardOptions());
+		DBIterator it = db.iterator();
+		it.seekToFirst();
+
+		// create memory mapped volume
+		Volume volume = MappedFileVol.FACTORY.makeVolume(pathDb + ".sstable", false);
+
+		// open consumer which will feed map with content
+		SortedTableMap.Sink<String, String> sink = SortedTableMap.create(volume, Serializer.STRING, Serializer.STRING)
+				.createFromSink();
+
+		while (it.hasNext()) {
+			Map.Entry<byte[], byte[]> entry = (Map.Entry<byte[], byte[]>) it.next();
+			String acc = new String(entry.getKey(), StandardCharsets.US_ASCII);
+			String protName = new String(entry.getValue(), StandardCharsets.US_ASCII);
+			sink.put(acc, protName);
+		}
+
+		db.close();
+
+		// finally open created map
+		SortedTableMap<String,String> map = sink.create();
+		volume.close();
+		log.debug("map "+ map.size());
+		map.close();
+
+		log.debug("FINISH");
+	}
+
+	private static void read() {
+
+		pathDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.paldb";
+
+		pathDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.leveldb.paldb";
+		StoreReader r = PalDB.createReader(new File(pathDb));
+
 		Iterable<Entry<byte[], byte[]>> it = r.iterable();
 		int c = 0;
 		for (Entry<byte[], byte[]> entry : it) {
-			//System.out.println(new String(entry.getKey()) + " " + new String(entry.getValue()));
+			// System.out.println(new String(entry.getKey()) + " " + new
+			// String(entry.getValue()));
 			System.out.println(entry);
 			if (c++ > 100) {
 				break;
@@ -61,18 +106,20 @@ public class ProtNamesLevelDbToPalDB {
 	static String pathDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.leveldb";
 
 	private static void convertLevelDbToPalDB() throws IOException {
-		DB db = LevelDButil.open(pathDb, new Options());
+		DB db = LevelDButil.open(pathDb, LevelDButil.getStandardOptions());
 		DBIterator it = db.iterator();
 		it.seekToFirst();
-
-		StoreWriter writer = PalDB.createWriter(new File(pathDb + ".paldb"));
-		writer.getConfiguration().set("compression.enabled", "true");
+		Configuration config = PalDB.newConfiguration();
+		config.set(Configuration.CACHE_ENABLED, "true");
+		config.set(Configuration.COMPRESSION_ENABLED, "true");
+		StoreWriter writer = PalDB.createWriter(new File(pathDb + ".paldb"), config);
 
 		while (it.hasNext()) {
 			Map.Entry<byte[], byte[]> entry = (Map.Entry<byte[], byte[]>) it.next();
 			// String acc = new String(entry.getKey(), StandardCharsets.US_ASCII);
 			// String protName = new String(entry.getValue(), StandardCharsets.US_ASCII);
 			writer.put(entry.getKey(), entry.getValue());
+			// writer.put(acc, protName);
 		}
 		writer.close();
 

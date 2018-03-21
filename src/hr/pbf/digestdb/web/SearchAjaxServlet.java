@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 
+import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder;
+import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder.SearchIndexResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -34,19 +38,9 @@ class Row {
 	String peptide;
 	String protein;
 	String taxonomy;
-
-	// { "data": "num" },
-	// { "data": "mass" },
-	// { "data": "peptide" },
-	// { "data": "protein" },
-	// { "data": "taxonomy" }
 }
 
-// @Data
-// @AllArgsConstructor
-// class Result {
-//
-// }
+
 
 public class SearchAjaxServlet extends HttpServlet {
 
@@ -55,31 +49,84 @@ public class SearchAjaxServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		 searchByServerSideProcessing(req, resp);
+		// searchByAjax(req, resp);
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		searchByAjax(req, resp);
+	}
+
+	private void searchByAjax(HttpServletRequest req, HttpServletResponse resp) {
+		UniprotLevelDbFinder finder = WebListener.getFinder();
+		float massFrom;
+		float massTo;
+		try {
+			massFrom = Float.parseFloat(req.getParameter("massFrom"));
+			massTo = Float.parseFloat(req.getParameter("massTo"));
+		} catch (NullPointerException e) {
+			massFrom = 400;
+			massTo = 6000;
+		}
+		SearchIndexResult res = finder.searchIndex(massFrom, massTo);
+
+		Set<Entry<Float, Integer>> entrySet = res.subMap.entrySet();
+		ArrayList<Row> result = new ArrayList<>();
+		int i = 0;
+		for (Entry<Float, Integer> entry : entrySet) {
+			Row r = new Row(i++, entry.getKey(), "pepr " + i, "prot " + i, "taxonomy " + i);
+			result.add(r);
+		}
+
+	}
+
+	private void searchByServerSideProcessing(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		ArrayList<Row> result = new ArrayList<>();
 		DataTablesRequest dtReq = new DataTablesRequest();
 		try {
-			log.debug("map " + req.getParameterMap());
+			// log.debug("map " + req.getParameterMap());
 
 			Enumeration<String> names = req.getParameterNames();
 			while (names.hasMoreElements()) {
 				String n = (String) names.nextElement();
-				log.debug("n: "+ n + " = "+ req.getParameter(n));
+				log.debug("n: " + n + " = " + req.getParameter(n));
 				dtReq = new Gson().fromJson(n, DataTablesRequest.class);
 			}
+			UniprotLevelDbFinder finder = WebListener.getFinder();
+			float massFrom;
+			float massTo;
+			try {
+				massFrom = Float.parseFloat(req.getParameter("massFrom"));
+				massTo = Float.parseFloat(req.getParameter("massTo"));
+			} catch (NullPointerException e) {
+				massFrom = 400;
+				massTo = 6000;
+			}
+			SearchIndexResult res = finder.searchIndex(massFrom, massTo);
+			// log.debug(ToStringBuilder.reflectionToString(dtReq));
 
+			Set<Entry<Float, Integer>> entrySet = res.subMap.entrySet();
+			long countPeptides = res.countPeptides();
+			long start = dtReq.getStart();
+			long end = dtReq.getStart() + dtReq.getLength();
+			for (int i = 0; i < countPeptides; i++) {
+				if (i > start && i < end) {
+					Row r = new Row(i, (float) i, "pepr " + i, "prot " + i, "taxonomy " + i);
+					result.add(r);
+				}
+			}
+			for (long i = dtReq.getStart(); i < dtReq.getStart() + dtReq.getLength(); i++) {
+				// Row r = new Row(i, i + 2323.323f, "pepr " + i, "prot " + i, "taxonomy " + i);
+				// result.add(r);
+			}
 
-//			log.debug(ToStringBuilder.reflectionToString(dtReq));
-			
 		} catch (Throwable e) {
 			log.error("", e);
 			throw new RuntimeException(e);
 		}
 
-		for (int i = dtReq.getStart(); i < dtReq.getStart() + dtReq.getLength(); i++) {
-			Row r = new Row(i, i + 2323.323f, "pepr " + i, "prot " + i, "taxonomy " + i);
-			result.add(r);
-		}
-		log.debug("izbacujem " + result.size());
+//		log.debug("izbacujem " + result.size());
 
 		DataTablesResponse<Row> dtResp = new DataTablesResponse<>();
 		dtResp.setData(result);

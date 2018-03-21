@@ -78,6 +78,20 @@ public class UniprotModel {
 		private float mass;
 	}
 
+	
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public final static class PeptideAccTaxNames{
+		private String peptide;
+		private String acc;
+		private String protName;
+		private String taxName;
+		private int tax;
+	}
+	
+	
 	// @Accessors
 	@Data
 	@NoArgsConstructor

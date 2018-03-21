@@ -6,6 +6,25 @@
 <%@ include file="pages/_navbar.jsp" %>
 <div class="container main">
 
+    <div class="card" style="width: 28rem;">
+        <div class="card-body">
+            <form class="" novalidate method="get" action="data.jsp">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" class="form-control" id="massFrom" name="massFrom" placeholder="Mass from"
+                               value="2000">
+                    </div>
+                    <div class="col">
+                        <input type="text" class="form-control" id="massTo" name="massTo" placeholder="Mass to"
+                               value="2000.3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <table id="table" class="table table-striped table-bordered" style="width:100%">
         <thead>
@@ -27,14 +46,18 @@
                 "searching": false,
                 "ajax": {
                     url: "/search",
+                    // url: window.location.href,
                     type: "POST",
-                  //  contentType: 'application/json;',
+                    //  contentType: 'application/json;',
                     //contentType: 'application/json; charset=utf-8',
 
                     //   dataSrc: '',
                     data: function (d) {
-                      //  return d;
-                      return  JSON.stringify(d);
+                        //  return d;
+                        var data = JSON.stringify(d);
+                        data.massFrom = $("#massFrom").val();
+                        data.massTo = $("#massTo").val();
+                        return data;
                     }
 
                     // }
@@ -50,6 +73,7 @@
                 lengthMenu: [20, 50, 100]
             });
         });
+
         function planify(data) {
             for (var i = 0; i < data.columns.length; i++) {
                 column = data.columns[i];

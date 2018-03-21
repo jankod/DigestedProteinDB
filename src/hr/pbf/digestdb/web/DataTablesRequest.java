@@ -46,7 +46,7 @@ public class DataTablesRequest {
 	 * set (0 index based - i.e. 0 is the first record).
 	 * 
 	 */
-	private int start;
+	private long start;
 
 	/**
 	 * Number of records that the table can display in the current draw. It is
@@ -56,7 +56,7 @@ public class DataTablesRequest {
 	 * benefits of server-side processing!)
 	 * 
 	 */
-	private int length;
+	private long length;
 
 	private DataTablesSearch search;
 
@@ -75,7 +75,7 @@ public class DataTablesRequest {
 		return draw;
 	}
 
-	public int getLength() {
+	public long getLength() {
 		return length;
 	}
 
@@ -87,7 +87,7 @@ public class DataTablesRequest {
 		return search;
 	}
 
-	public int getStart() {
+	public long getStart() {
 		return start;
 	}
 

@@ -37,7 +37,8 @@ public class WebListener implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent cnt) {
 		try {
 			String levelDbPath = "F:\\tmp\\trembl.leveldb";
-			//String indexPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
+			// String indexPath =
+			// "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
 			String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
 			log.debug("Trembl path " + levelDbPath);
 			log.debug("Index path " + ssTablePath);
