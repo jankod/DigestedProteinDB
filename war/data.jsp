@@ -8,7 +8,7 @@
 
     <div class="card" style="width: 28rem;">
         <div class="card-body">
-            <form class="" novalidate method="get" action="data.jsp">
+            <form class="" novalidate method="get" action="data.jsp" id="formSearch">
                 <div class="row">
                     <div class="col">
                         <input type="text" class="form-control" id="massFrom" name="massFrom" placeholder="Mass from"
@@ -38,8 +38,9 @@
         </thead>
     </table>
     <script>
+
         $(document).ready(function () {
-            $('#table').DataTable({
+            var table =  $('#table').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ordering": false,
@@ -57,6 +58,7 @@
                         var data = JSON.stringify(d);
                         data.massFrom = $("#massFrom").val();
                         data.massTo = $("#massTo").val();
+                        console.log("data", data);
                         return data;
                     }
 
@@ -72,6 +74,12 @@
                 order: [[0, 'asc']],
                 lengthMenu: [20, 50, 100]
             });
+
+            $("#formSearch").submit(function (event) {
+               table.ajax.reload();
+                event.preventDefault();
+            });
+
         });
 
         function planify(data) {

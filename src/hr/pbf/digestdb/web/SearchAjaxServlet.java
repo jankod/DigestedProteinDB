@@ -55,7 +55,7 @@ public class SearchAjaxServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		searchByAjax(req, resp);
+	//	searchByAjax(req, resp);
 	}
 
 	private void searchByAjax(HttpServletRequest req, HttpServletResponse resp) {
@@ -90,7 +90,7 @@ public class SearchAjaxServlet extends HttpServlet {
 			Enumeration<String> names = req.getParameterNames();
 			while (names.hasMoreElements()) {
 				String n = (String) names.nextElement();
-				log.debug("n: " + n + " = " + req.getParameter(n));
+//				log.debug("n: " + n + " = " + req.getParameter(n));
 				dtReq = new Gson().fromJson(n, DataTablesRequest.class);
 			}
 			UniprotLevelDbFinder finder = WebListener.getFinder();
@@ -103,6 +103,7 @@ public class SearchAjaxServlet extends HttpServlet {
 				massFrom = 400;
 				massTo = 6000;
 			}
+			log.debug("mass {} {}", massFrom, massTo);
 			SearchIndexResult res = finder.searchIndex(massFrom, massTo);
 			// log.debug(ToStringBuilder.reflectionToString(dtReq));
 
@@ -111,10 +112,10 @@ public class SearchAjaxServlet extends HttpServlet {
 			long start = dtReq.getStart();
 			long end = dtReq.getStart() + dtReq.getLength();
 			for (int i = 0; i < countPeptides; i++) {
-				if (i > start && i < end) {
-					Row r = new Row(i, (float) i, "pepr " + i, "prot " + i, "taxonomy " + i);
-					result.add(r);
-				}
+//				if (i > start && i < end) {
+//					Row r = new Row(i, (float) i, "pepr " + i, "prot " + i, "taxonomy " + i);
+//					result.add(r);
+//				}
 			}
 			for (long i = dtReq.getStart(); i < dtReq.getStart() + dtReq.getLength(); i++) {
 				// Row r = new Row(i, i + 2323.323f, "pepr " + i, "prot " + i, "taxonomy " + i);

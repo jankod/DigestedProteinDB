@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder;
 
 public class WebListener implements ServletContextListener {
-	private static final Logger log = LoggerFactory.getLogger(WebListener.class);
-	private static UniprotLevelDbFinder finder;
+	private static final Logger			log	= LoggerFactory.getLogger(WebListener.class);
+	private static UniprotLevelDbFinder	finder;
 
 	public static UniprotLevelDbFinder getFinder() {
 		return finder;
@@ -33,6 +33,7 @@ public class WebListener implements ServletContextListener {
 		}
 	}
 
+	
 	@Override
 	public void contextInitialized(ServletContextEvent cnt) {
 		try {

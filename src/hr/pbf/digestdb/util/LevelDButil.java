@@ -32,7 +32,7 @@ public class LevelDButil {
 
 	
 	
-	public static DBComparator getJaComparator() {
+	public static DBComparator getFloatKeyComparator() {
 		DBComparator dbComparator = new DBComparator() {
 
 			@Override

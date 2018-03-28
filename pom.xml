@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>DigestedProteinDB</groupId>
@@ -18,6 +19,19 @@
 		<wtp.version>2.0</wtp.version>
 	</properties>
 	<dependencies>
+
+
+		<dependency>
+			<groupId>me.lemire.integercompression</groupId>
+			<artifactId>JavaFastPFOR</artifactId>
+			<version>[0.1,)</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-configuration2</artifactId>
+			<version>2.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.linkedin.paldb</groupId>
@@ -304,7 +318,7 @@
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 
 		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>jstl</artifactId> 
 			<version>1.2</version> <scope>provided</scope> </dependency> -->

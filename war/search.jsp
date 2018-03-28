@@ -63,7 +63,13 @@
 </div>
 <script>
     $(document).ready(function () {
-        $('#table').DataTable({});
+        $('#table').DataTable({
+          //  "dom": '<"top"iflp<"clear">>rt<"bottom"pil<"clear">>'
+            "dom": 'lrtip'
+            //"dom": '<lf<t>ip>'
+            //dom: '<"row btn-group"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"l>><"row"rt><"row"ip>',
+
+        });
     });
 
 </script>

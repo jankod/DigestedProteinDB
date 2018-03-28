@@ -37,18 +37,23 @@ import hr.pbf.digestdb.uniprot.UniprotModel.PeptideMassAccTaxList;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.LevelDButil;
+import hr.pbf.digestdb.util.UniprotConfig;
+import hr.pbf.digestdb.util.UniprotConfig.Name;
 
 public class A4_UniprotCsvToLevelDB {
-	private static final Logger log = LoggerFactory.getLogger(A4_UniprotCsvToLevelDB.class);
-	static boolean writenBatch = false;
-	static long count = 0;
-	static byte[] buffer = new byte[1024 * 128 * 16];
-	private static WriteBatch batch;
+	private static final Logger	log			= LoggerFactory.getLogger(A4_UniprotCsvToLevelDB.class);
+	static boolean				writenBatch	= false;
+	static long					count		= 0;
+	static byte[]				buffer		= new byte[1024 * 128 * 16];
+	private static WriteBatch	batch;
 
-	static String pathCsv = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_for_test.csv";
-	static String pathDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_for_text.leveldb";
+	private static TreeMap<String, List<AccTax>> pepatidesOfOneMass = new TreeMap<>();
+	// private static String pathCsv;
+	// private static String pathDb;
 
 	public static void main(String[] args) throws UnsupportedEncodingException, FileNotFoundException, IOException {
+		String pathCsv = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_for_test.csv";
+		String pathDb = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_for_text.leveldb";
 		if (SystemUtils.IS_OS_LINUX) {
 			pathCsv = "/home/users/tag/uniprot/trembl.csv";
 			pathDb = "/home/users/tag/uniprot/trembl.leveldb";
@@ -57,12 +62,13 @@ public class A4_UniprotCsvToLevelDB {
 
 		StopWatch s = new StopWatch();
 		s.start();
-		// createLevelDB();
-		//searchLevelDB(500.1f, 501f);
-		//createIndexfromLeveldb();
+		// createLevelDB(pathCsv, pathDb);
+		// searchLevelDB(500.1f, 501f);
+		// System.out.println((float) BioUtil.calculateMassWidthH2O("AHGNC"));
+		createIndexfromLeveldb(UniprotConfig.get(Name.PATH_TREMB_LEVELDB));
 
 		s.stop();
-		log.debug(DurationFormatUtils.formatDurationHMS(s.getTime()));
+		log.debug("Traje: "+ DurationFormatUtils.formatDurationHMS(s.getTime()));
 
 	}
 
@@ -76,9 +82,12 @@ public class A4_UniprotCsvToLevelDB {
 	/**
 	 * Na linuxu napraio 13.353.898 komada
 	 * 
+	 * @param pathDb
+	 * @param pathCsv
+	 * 
 	 * @throws IOException
 	 */
-	private static void createLevelDB() throws IOException {
+	private static void createLevelDB(String pathCsv, String pathDb) throws IOException {
 		// UniprotCSVformat csv = new UniprotCSVformat(pathCsv);
 
 		Options options = getLevelDBOptions();
@@ -149,8 +158,6 @@ public class A4_UniprotCsvToLevelDB {
 		count++;
 	}
 
-	private static TreeMap<String, List<AccTax>> pepatidesOfOneMass = new TreeMap<>();
-
 	protected static void saveToMemory(PeptideMassAccTaxList result) {
 		if (pepatidesOfOneMass.containsKey(result.getPeptide())) {
 			throw new RuntimeException("Something wrong, contain peptide: " + result.getPeptide());
@@ -160,51 +167,68 @@ public class A4_UniprotCsvToLevelDB {
 		pepatidesOfOneMass.put(result.getPeptide(), result.getAccTaxs());
 	}
 
-	
-	public static void createIndexfromLeveldb() throws IOException {
-		if (SystemUtils.IS_OS_LINUX) {
-			pathDb = "/home/users/tag/uniprot/trembl.leveldb";
-		}
+	public static void createIndexfromLeveldb(String path) throws IOException {
+		log.debug("Pretrazujem sa: " + path);
 		Options options = getLevelDBOptions();
-		DB db = LevelDButil.open(pathDb, options);
+		DB db = LevelDButil.open(path, options);
 
 		DBIterator it = db.iterator();
-		
+
 		// float uniquer, => koliko peptida ima
-		TreeMap<Float, Integer> index =new TreeMap<>();
+		TreeMap<Float, Integer> index = new TreeMap<>();
 		it.seekToFirst();
+		int c = 0;
 		while (it.hasNext()) {
 			Entry<byte[], byte[]> entry = it.next();
-			byte[] k = entry.getKey(); // iterator.peekNext().getKey();
-
-			byte[] v = entry.getValue(); // iterator.peekNext().getValue();
+			byte[] k = entry.getKey();
+			byte[] v = entry.getValue();
 			float mass = BiteUtil.toFloat(k);
 			Map<String, List<AccTax>> res = UniprotFormat3.uncompressPeptidesJava(v);
-			//Set<Entry<String, List<AccTax>>> entrySet = res.entrySet();
-			index.put(mass, res.size());
+			long indexValue = 0;
+			Set<Entry<String, List<AccTax>>> entrySet = res.entrySet();
+			for (Entry<String, List<AccTax>> entry2 : entrySet) {
+				indexValue += entry2.getValue().size();
+			}
+
+			if (indexValue > Integer.MAX_VALUE) {
+				log.warn("max value {} for mass {}", indexValue, mass);
+			}
+			index.put(mass, (int) indexValue);
+
+			// Set<Entry<String, List<AccTax>>> entrySet = res.entrySet();
+			// for (Entry<String, List<AccTax>> entry2 : entrySet) {
+			// System.out.println(mass + "\t" + entry2.getKey() + "\t" +
+			// entry2.getValue().size());
+			// }
+			if (c++ > 2) {
+				it.close();
+				db.close();
+				return;
+			}
 		}
-		log.debug("Imam index: "+ index.size());
-		
-		 //13353898  + 
+		log.debug("Imam index: " + index.size());
+
+		// 13.353.898 +
 		// 107600000
-		File fileIndex = new File(pathDb+".index");
+		File fileIndex = new File(path + ".index");
 		FileOutputStream fout = new FileOutputStream(fileIndex);
 		SerializationUtils.serialize(index, fout);
-		log.debug("seriajaliziran na "+ fileIndex);
+		log.debug("seriajaliziran na " + fileIndex);
 		fout.close();
 		it.close();
 		db.close();
 	}
-	private static void searchLevelDB(float from, float to) throws IOException {
-		if (SystemUtils.IS_OS_LINUX) {
-			pathCsv = "/home/users/tag/uniprot/trembl.csv";
-			pathDb = "/home/users/tag/uniprot/trembl.leveldb";
 
-		}
+	private static void searchLevelDB(float from, float to) throws IOException {
+		String pathDb;
+		String pathCsv;
+		pathCsv = UniprotConfig.get(Name.PATH_TREMBL_CSV);
+		pathDb = UniprotConfig.get(Name.PATH_TREMB_LEVELDB);
+
 		// JniDBFactory.pushMemoryPool(1024 * 512);
 		Options options = getLevelDBOptions();
 		DB db = LevelDButil.open(pathDb, options);
-		StopWatch time= new StopWatch();
+		StopWatch time = new StopWatch();
 		time.start();
 
 		DBIterator it = db.iterator();
@@ -248,11 +272,11 @@ public class A4_UniprotCsvToLevelDB {
 			}
 			it.close();
 			time.stop();
-			log.debug("Time search "+ DurationFormatUtils.formatDurationHMS(time.getTime()));
+			log.debug("Time search " + DurationFormatUtils.formatDurationHMS(time.getTime()));
 			log.debug("Found unique mass: " + c);
 		} finally {
 			// Make sure you close the iterator to avoid resource leaks.
-		
+
 			db.close();
 			// JniDBFactory.popMemoryPool();
 		}
@@ -289,14 +313,14 @@ public class A4_UniprotCsvToLevelDB {
 		options.verifyChecksums(false);
 		options.blockSize(8 * 1024);
 		options.paranoidChecks(false);
-//		options.logger(new org.iq80.leveldb.Logger() {
-//
-//			@Override
-//			public void log(String message) {
-//				System.out.println("LevelDB: " + message);
-//			}
-//			
-//		});
+		// options.logger(new org.iq80.leveldb.Logger() {
+		//
+		// @Override
+		// public void log(String message) {
+		// System.out.println("LevelDB: " + message);
+		// }
+		//
+		// });
 		return options;
 	}
 

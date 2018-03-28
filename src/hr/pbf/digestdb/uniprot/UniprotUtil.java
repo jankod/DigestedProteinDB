@@ -271,7 +271,8 @@ public class UniprotUtil {
 			return all;
 		}
 	}
-
+	
+	
 	public static ArrayList<PeptideAccTax> fromFormat1(byte[] bytes) throws IOException {
 		MyDataInputStream in = new MyDataInputStream(new FastByteArrayInputStream(bytes));
 
@@ -290,6 +291,11 @@ public class UniprotUtil {
 
 	public static byte[] compress(byte[] b) throws IOException {
 		return Snappy.compress(b);
+	}
+
+	public static void printDurration(String string, StopWatch s) {
+		s.stop();
+		log.debug(string + " "+ DurationFormatUtils.formatDurationHMS(s.getTime()));
 	}
 
 }

@@ -84,11 +84,19 @@ public class UniprotModel {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public final static class PeptideAccTaxNames{
+		private float mass;
 		private String peptide;
 		private String acc;
 		private String protName;
 		private String taxName;
 		private int tax;
+		@Override
+		public String toString() {
+			return "[mass=" + mass + ", peptide=" + peptide + ", acc=" + acc + ", protName="
+					+ protName + ", taxName=" + taxName + ", tax=" + tax + "]";
+		}
+		
+		
 	}
 	
 	
