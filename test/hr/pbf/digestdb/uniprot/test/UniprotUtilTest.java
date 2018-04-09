@@ -22,7 +22,6 @@ import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
-import junit.framework.Assert;
 
 class UniprotUtilTest {
 

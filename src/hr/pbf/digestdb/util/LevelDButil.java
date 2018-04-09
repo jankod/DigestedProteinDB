@@ -59,12 +59,6 @@ public class LevelDButil {
 		return dbComparator;
 		
 	}
-	/**
-	 * Vraca -1 ako ne nadje nista.
-	 * 
-	 * @param key
-	 * @return
-	 */
 //	public int getInt(String key) {
 //		DBIterator i = db.iterator();
 //		byte[] bk = BiteUtil.toBytes(key);

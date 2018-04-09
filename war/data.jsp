@@ -54,10 +54,10 @@
 
                     //   dataSrc: '',
                     data: function (d) {
+                        d.massFrom = $("#massFrom").val()+"";
+                        d.massTo = $("#massTo").val()+"";
                         //  return d;
                         var data = JSON.stringify(d);
-                        data.massFrom = $("#massFrom").val();
-                        data.massTo = $("#massTo").val();
                         console.log("data", data);
                         return data;
                     }

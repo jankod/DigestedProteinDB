@@ -39,14 +39,14 @@ public class DataTablesResponse<T> {
 	 * database)
 	 * 
 	 */
-	int recordsTotal;
+	long recordsTotal;
 
 	/**
 	 * Total records, after filtering (i.e. the total number of records after
 	 * filtering has been applied - not just the number of records being returned
 	 * for this page of data).
 	 */
-	int recordsFiltered;
+	long recordsFiltered;
 
 	/**
 	 * The data to be displayed in the table. This is an array of data source
@@ -77,11 +77,11 @@ public class DataTablesResponse<T> {
 		return error;
 	}
 
-	public int getRecordsFiltered() {
+	public long getRecordsFiltered() {
 		return recordsFiltered;
 	}
 
-	public int getRecordsTotal() {
+	public long getRecordsTotal() {
 		return recordsTotal;
 	}
 
@@ -97,11 +97,11 @@ public class DataTablesResponse<T> {
 		this.error = error;
 	}
 
-	public void setRecordsFiltered(int recordsFiltered) {
+	public void setRecordsFiltered(long recordsFiltered) {
 		this.recordsFiltered = recordsFiltered;
 	}
 
-	public void setRecordsTotal(int recordsTotal) {
+	public void setRecordsTotal(long recordsTotal) {
 		this.recordsTotal = recordsTotal;
 	}
 	

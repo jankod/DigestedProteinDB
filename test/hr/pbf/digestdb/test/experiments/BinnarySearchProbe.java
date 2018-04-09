@@ -1,5 +1,9 @@
 package hr.pbf.digestdb.test.experiments;
 
+import hr.pbf.digestdb.uniprot.UniprotModel;
+import org.eclipse.collections.impl.parallel.ParallelIterate;
+
+import javax.enterprise.inject.Model;
 import java.util.Arrays;
 
 public class BinnarySearchProbe {
@@ -16,11 +20,15 @@ public class BinnarySearchProbe {
 		search(300);
 		search(500);
 		search(500.1f);
+        search(500.11f);
 		search(600);
+		search(601);
 	}
 
 	private static void search(float i) {
 		int res = Arrays.binarySearch(masses, i);
 		System.out.println("For "+ i + " result "+ res);
+
+
 	}
 }

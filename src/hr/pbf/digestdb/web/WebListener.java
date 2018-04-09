@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import hr.pbf.digestdb.util.UniprotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,9 @@ public class WebListener implements ServletContextListener {
 			String levelDbPath = "F:\\tmp\\trembl.leveldb";
 			// String indexPath =
 			// "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
+
 			String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
+			ssTablePath = UniprotConfig.get(UniprotConfig.Name.PATH_TREMBL_MASS_PEPTIDES_MAP);
 			log.debug("Trembl path " + levelDbPath);
 			log.debug("Index path " + ssTablePath);
 			finder = new UniprotLevelDbFinder(levelDbPath, ssTablePath);

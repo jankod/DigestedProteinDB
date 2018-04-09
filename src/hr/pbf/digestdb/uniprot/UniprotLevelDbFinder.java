@@ -8,6 +8,7 @@ import hr.pbf.digestdb.uniprot.UniprotModel.AccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxNames;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.LevelDButil;
+import hr.pbf.digestdb.util.UniprotConfig;
 import hr.pbf.digestdb.web.ServletUtil;
 import lombok.Data;
 
@@ -41,19 +42,25 @@ public class UniprotLevelDbFinder implements Closeable {
     private DB dbProtName;
 
     public static void main(String[] args) throws IOException {
-        try (UniprotLevelDbFinder f = new UniprotLevelDbFinder("F:\\tmp\\trembl.leveldb",
-                "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact")) {
+
+        try (UniprotLevelDbFinder f = new UniprotLevelDbFinder(UniprotConfig.get(UniprotConfig.Name.PATH_TREMB_LEVELDB),
+                UniprotConfig.get(UniprotConfig.Name.PATH_TREMBL_MASS_PEPTIDES_MAP))) {
 
             float fromMass = 3731.7937F;
-            float toMass = (float) (fromMass + 0.73421);
+            fromMass = 500F;
+            float toMass = (float) (fromMass + 0.33421);
+            toMass = 500.2f;
             SearchIndexResult result = f.searchIndex(fromMass, toMass);
-            // log.debug("total mass {}, peptides: {}", result.totalMasses,
-            // result.totalPeptides);
+            log.debug("Search {} : {}", fromMass, toMass);
+
+            printIndex(result.subMap);
+
             DBIterator it = f.db.iterator();
 
             it.seek(BiteUtil.toBytes(fromMass));
             int countMass = 0;
-            int countPeptides = 0;
+            int countUniquePeptides = 0;
+
             while (it.hasNext()) {
                 Map.Entry<byte[], byte[]> entry = (Map.Entry<byte[], byte[]>) it.next();
                 float mass = BiteUtil.toFloat(entry.getKey());
@@ -62,12 +69,30 @@ public class UniprotLevelDbFinder implements Closeable {
                 }
                 countMass++;
                 TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(entry.getValue());
-                countPeptides += v.size();
+                countUniquePeptides += v.size();
+                long totalPeptides = countTotalAccTax(v);
+                log.debug(mass + "\t"+ v.size() + "\t"+ totalPeptides);
+
             }
-            log.debug("total mass {}, peptides: {}", countMass, countPeptides);
+            log.debug("total mass {}, peptides: {}", countMass, countUniquePeptides);
             it.close();
         }
 
+    }
+
+    private static void printIndex(ConcurrentNavigableMap<Float,Integer> index) {
+        for (Entry<Float, Integer> entry : index.entrySet()) {
+            log.debug(entry.getKey() + "\t"+entry.getValue());
+        }
+
+    }
+
+    private static long countTotalAccTax(TreeMap<String,List<AccTax>> v) {
+        long t = 0;
+        for (Entry<String, List<AccTax>> entry : v.entrySet()) {
+            t += entry.getValue().size();
+        }
+        return t;
     }
 
     public List<UniprotModel.PeptideAccTaxNames> findData2(HttpServletRequest req) {
@@ -256,7 +281,7 @@ public class UniprotLevelDbFinder implements Closeable {
     public SearchOneMassResult searchMassOne(float searchMass, float margin) throws IOException {
         SearchOneMassResult res = new SearchOneMassResult();
         if (margin < 0 || margin > 0.3) {
-            log.warn("Margin is not in range "+ margin );
+            log.warn("Margin is not in range " + margin);
             margin = 0.1f;
         }
         DBIterator it = db.iterator();
@@ -270,15 +295,15 @@ public class UniprotLevelDbFinder implements Closeable {
             if (foundMass > searchMass + margin) {
                 break;
             }
-          //  res.setMassesAround(getMassesAround(foundMass));
+            //  res.setMassesAround(getMassesAround(foundMass));
             TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(next.getValue());
             Set<Entry<String, List<AccTax>>> entrySet = v.entrySet();
 
-            
+
             populateResult(result, foundMass, entrySet);
         }
         it.close();
-       // log.warn("Nothig found for mass {} +- {} ", searchMass, margin);
+        // log.warn("Nothig found for mass {} +- {} ", searchMass, margin);
         return res;
     }
 
@@ -286,7 +311,7 @@ public class UniprotLevelDbFinder implements Closeable {
         for (Entry<String, List<AccTax>> entry : entrySet) {
             List<AccTax> value = entry.getValue();
             String peptide = entry.getKey();
-            System.out.println(mass2 +"\t"+peptide);
+            System.out.println(mass2 + "\t" + peptide);
             for (AccTax accTax : value) {
                 String acc = accTax.getAcc();
                 int tax = accTax.getTax();
@@ -395,7 +420,7 @@ public class UniprotLevelDbFinder implements Closeable {
             return subMap.size();
         }
 
-        public long countPeptides() {
+        public long countTotalPeptides() {
             long c = 0;
             Set<Entry<Float, Integer>> entrySet = subMap.entrySet();
             for (Entry<Float, Integer> entry : entrySet) {
@@ -406,7 +431,7 @@ public class UniprotLevelDbFinder implements Closeable {
 
         @Override
         public String toString() {
-            String res = "\nTotal mass: " + countMasses() + " Total peptides: " + countPeptides();
+            String res = "\nTotal mass: " + countMasses() + " Total peptides: " + countTotalPeptides();
 
             int c = 0;
             for (Entry<Float, Integer> set : subMap.entrySet()) {
@@ -421,7 +446,7 @@ public class UniprotLevelDbFinder implements Closeable {
         }
 
         public String toStringHTML() {
-            String res = "<br>Total mass: " + countMasses() + "<br>Total peptides: " + countPeptides();
+            String res = "<br>Total mass: " + countMasses() + "<br>Total peptides: " + countTotalPeptides();
 
             for (Entry<Float, Integer> set : subMap.entrySet()) {
                 res += "<br><a href='showMass.jsp?mass=" + set.getKey() + "'>" + set.getKey() + "</a> : "

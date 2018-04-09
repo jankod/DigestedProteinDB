@@ -1,21 +1,10 @@
 package hr.pbf.digestdb.uniprot.test;
 
-import static hr.pbf.digestdb.uniprot.UniprotParseUtil.parseFirstAccession;
-import static org.apache.commons.lang3.RandomStringUtils.randomAscii;
-import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.RandomStringUtils;
+import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
+import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
+import hr.pbf.digestdb.uniprot.UniprotParseUtil;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.commons.text.CharacterPredicate;
 import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
 import org.junit.jupiter.api.AfterAll;
@@ -24,12 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.esotericsoftware.minlog.Log;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
-import hr.pbf.digestdb.uniprot.UniprotModel;
-import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
-import hr.pbf.digestdb.uniprot.UniprotParseUtil;
+import static hr.pbf.digestdb.uniprot.UniprotParseUtil.parseFirstAccession;
+import static org.apache.commons.lang3.RandomUtils.nextInt;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class UniprotTest {
 

@@ -44,9 +44,13 @@ public class UniprotConfig {
 	}
 
 	public static enum Name {
-		PATH_TREMBL_CSV, PATH_TREMB_LEVELDB,
+		PATH_TREMBL_CSV,
+		PATH_TREMB_LEVELDB,
 		PATH_TREMB_PROT_NAMES_CSV,
-		PATH_TREMB_LEVELDB_INDEX_CSV
+		PATH_TREMB_LEVELDB_INDEX_CSV,
+		// SSTable float[mass] => int[peptides] from mapdb
+		PATH_TREMBL_MASS_PEPTIDES_MAP
+
 	}
 
 	public static UniprotConfig get() {
@@ -64,7 +68,12 @@ public class UniprotConfig {
 			if (SystemUtils.IS_OS_WINDOWS) {
 				fileName = "config_win.properties";
 			}
+
 			URL file = UniprotConfig.class.getResource("/" + fileName);
+			if(file == null) {
+				throw new RuntimeException("Not find config path ("+ fileName);
+			}
+			log.debug("Load "+ file);
 			properties = configs.properties(file);
 		} catch (Throwable e) {
 			log.error("", e);

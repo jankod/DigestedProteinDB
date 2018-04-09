@@ -60,6 +60,17 @@ public class DataTablesRequest {
 
 	private DataTablesSearch search;
 
+
+	/**
+	 * Ja dodao
+	 */
+	private Double massFrom;
+
+	/**
+	 * Ja dodao
+	 */
+	private Double massTo;
+
 	/**
 	 * Column's data source, as defined by columns.data
 	 */
@@ -117,4 +128,19 @@ public class DataTablesRequest {
 	}
 
 
+    public Double getMassFrom() {
+        return massFrom;
+    }
+
+    public void setMassFrom(Double massFrom) {
+        this.massFrom = massFrom;
+    }
+
+    public Double getMassTo() {
+        return massTo;
+    }
+
+    public void setMassTo(Double massTo) {
+        this.massTo = massTo;
+    }
 }
