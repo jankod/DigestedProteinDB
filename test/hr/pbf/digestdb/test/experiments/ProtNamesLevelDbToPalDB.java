@@ -35,7 +35,6 @@ import com.linkedin.paldb.api.PalDB;
 import com.linkedin.paldb.api.StoreReader;
 import com.linkedin.paldb.api.StoreWriter;
 
-import hr.pbf.digestdb.MyUtil;
 import hr.pbf.digestdb.uniprot.MassIndex;
 import hr.pbf.digestdb.uniprot.UniprotUtil;
 import hr.pbf.digestdb.util.LevelDButil;

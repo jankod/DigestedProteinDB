@@ -2,49 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="49ef1dea-2cda-4874-9562-6804684f3694" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_jsp_jsp_api_2_2_1_b03.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/MyStopWatch.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ReadSStableFloatInt.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/DigestedProteinDB_war_exploded.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_lowagie_itext_1_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__displaytag_displaytag_1_2.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__log4j_log4j_1_2_13.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_runtime_1_0_7.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jetbrains_kotlin_kotlin_stdlib_1_0_7.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_log4j12_1_4_2.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DigestedProteinDB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DigestedProteinDB.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/null.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config_lin.properties" beforeDir="false" afterPath="$PROJECT_DIR$/resource/config_lin.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config_win.properties" beforeDir="false" afterPath="$PROJECT_DIR$/resource/config_win.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/MyUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/nr/App_16_ParseSwisProtXml.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A8_UniprotLevelDBtoIndex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A8_UniprotLevelDBtoIndex.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/MassPeptideArrayIndex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/MassPeptideArrayIndex.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotReader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/EntrezUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/EntrezUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/LevelDButil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/LevelDButil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/WebListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/WebListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logback.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resource/logback.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/StartJetty.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/StartJetty.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/TestCompression.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/TestCompression.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/TestMassPeptideArrayIndex.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/TestMassPeptideArrayIndex.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/AccessionTaxIdDB.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/AccessionTaxIdDBTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ArrayIndex.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/BinnarySearchProbe.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/BinnarySearchProbe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotUtilTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotUtilTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/war/data.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/war/data.jsp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,7 +24,7 @@
       <file leaf-file-name="data.jsp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/war/data.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
+            <state relative-caret-position="969">
               <caret line="57" column="57" selection-start-line="56" selection-start-column="24" selection-end-line="57" selection-end-column="57" />
             </state>
           </provider>
@@ -75,8 +33,8 @@
       <file leaf-file-name="SearchAjaxServlet.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="116" lean-forward="true" selection-start-line="116" selection-end-line="116" />
+            <state relative-caret-position="187">
+              <caret line="126" column="31" selection-start-line="126" selection-start-column="31" selection-end-line="126" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -84,11 +42,9 @@
       <file leaf-file-name="DataTablesRequest.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
+            <state relative-caret-position="833">
               <caret line="71" column="24" selection-start-line="71" selection-start-column="24" selection-end-line="71" selection-end-column="24" />
               <folding>
-                <element signature="e#2771#2772#0" expanded="true" />
-                <element signature="e#2796#2797#0" expanded="true" />
                 <element signature="e#2931#2932#0" expanded="true" />
                 <element signature="e#2962#2963#0" expanded="true" />
                 <element signature="e#3010#3011#0" expanded="true" />
@@ -132,7 +88,7 @@
       <file leaf-file-name="UniprotLevelDbFinder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
+            <state relative-caret-position="969">
               <caret line="86" selection-start-line="86" selection-end-line="86" />
             </state>
           </provider>
@@ -150,7 +106,7 @@
       <file leaf-file-name="UniprotConfig.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
+            <state relative-caret-position="969">
               <caret line="75" selection-start-line="75" selection-end-line="75" />
             </state>
           </provider>
@@ -363,8 +319,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -386,6 +340,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -546,12 +502,29 @@
       <workItem from="1523017293459" duration="823000" />
       <workItem from="1523046890197" duration="453000" />
       <workItem from="1523266026271" duration="249000" />
-      <workItem from="1523275645063" duration="4086000" />
+      <workItem from="1523275645063" duration="4280000" />
+      <workItem from="1523305078583" duration="71000" />
+      <workItem from="1523344764660" duration="599000" />
     </task>
+    <task id="LOCAL-00001" summary="ertert">
+      <created>1523280436975</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1523280436975</updated>
+    </task>
+    <task id="LOCAL-00002" summary="ertert">
+      <created>1523280448590</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1523280448590</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="51254000" />
+    <option name="totallyTimeSpent" value="52118000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -566,35 +539,35 @@
     <frame x="56" y="-7" width="1487" height="878" extended-state="6" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="right" id="Maven Projects" order="3" />
-      <window_info anchor="right" id="CDI" order="3" />
-      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info id="Designer" order="2" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="JSF" order="3" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info id="UI Designer" order="2" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39892185" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32884097" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32884097" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Java Enterprise" order="7" />
-      <window_info anchor="bottom" id="Version Control" order="7" weight="0.32884097" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="3" />
+      <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
+      <window_info anchor="right" id="CDI" order="3" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32884097" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="7" visible="true" weight="0.32884097" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32884097" />
+      <window_info id="Designer" order="2" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49356914" visible="true" weight="0.27960756" />
       <window_info anchor="bottom" id="Problems" order="7" weight="0.32884097" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49356914" visible="true" weight="0.27119833" />
       <window_info anchor="right" id="Bean Validation" order="4" />
       <window_info id="Web" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32901832" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="JSF" order="3" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info id="UI Designer" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39892185" />
       <window_info id="Favorites" order="2" sideWeight="0.50643086" side_tool="true" weight="0.26135728" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32884097" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32901832" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -602,6 +575,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="ertert" />
+    <option name="LAST_COMMIT_MESSAGE" value="ertert" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -927,7 +904,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
+        <state relative-caret-position="969">
           <caret line="75" selection-start-line="75" selection-end-line="75" />
         </state>
       </provider>
@@ -941,25 +918,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
+        <state relative-caret-position="969">
           <caret line="86" selection-start-line="86" selection-end-line="86" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/war/data.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
+        <state relative-caret-position="969">
           <caret line="57" column="57" selection-start-line="56" selection-start-column="24" selection-end-line="57" selection-end-column="57" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
+        <state relative-caret-position="833">
           <caret line="71" column="24" selection-start-line="71" selection-start-column="24" selection-end-line="71" selection-end-column="24" />
           <folding>
-            <element signature="e#2771#2772#0" expanded="true" />
-            <element signature="e#2796#2797#0" expanded="true" />
             <element signature="e#2931#2932#0" expanded="true" />
             <element signature="e#2962#2963#0" expanded="true" />
             <element signature="e#3010#3011#0" expanded="true" />
@@ -974,8 +949,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="116" lean-forward="true" selection-start-line="116" selection-end-line="116" />
+        <state relative-caret-position="187">
+          <caret line="126" column="31" selection-start-line="126" selection-start-column="31" selection-end-line="126" selection-end-column="31" />
         </state>
       </provider>
     </entry>

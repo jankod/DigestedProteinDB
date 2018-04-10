@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 import hr.pbf.digestdb.GlobalMain;
-import hr.pbf.digestdb.MyUtil;
 
 class TestMyUtil {
 
