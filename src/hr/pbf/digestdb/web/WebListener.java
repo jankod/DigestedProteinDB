@@ -8,6 +8,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import hr.pbf.digestdb.util.UniprotConfig;
+import hr.pbf.digestdb.util.UniprotConfig.Name;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,6 @@ public class WebListener implements ServletContextListener {
 		}
 	}
 
-	
 	@Override
 	public void contextInitialized(ServletContextEvent cnt) {
 		try {
@@ -42,11 +43,15 @@ public class WebListener implements ServletContextListener {
 			// String indexPath =
 			// "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.leveldb.index.compact";
 
-			String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
-			ssTablePath = UniprotConfig.get(UniprotConfig.Name.PATH_TREMBL_MASS_PEPTIDES_MAP);
+			//String ssTablePath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl.index.sstable";
+			levelDbPath = UniprotConfig.get(Name.PATH_TREMB_LEVELDB);
+			String ssTablePath = UniprotConfig.get(UniprotConfig.Name.PATH_TREMBL_MASS_PEPTIDES_MAP);
+			String protNamesPath = UniprotConfig.get(Name.PATH_TREMBL_PROT_NAMES_LEVELDB);
+
 			log.debug("Trembl path " + levelDbPath);
 			log.debug("Index path " + ssTablePath);
-			finder = new UniprotLevelDbFinder(levelDbPath, ssTablePath);
+			log.debug("Prot names path: " + protNamesPath);
+			finder = new UniprotLevelDbFinder(levelDbPath, ssTablePath, protNamesPath);
 
 		} catch (IOException e) {
 			log.error("", e);

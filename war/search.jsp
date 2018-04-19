@@ -20,20 +20,20 @@
 
     <div>
         <%
-            String errMsg = null;
-            try {
-                double fromMass = Double.parseDouble(request.getParameter("fromMass"));
-                double toMass = Double.parseDouble(request.getParameter("toMass"));
+        	String errMsg = null;
+                    try {
+                        double fromMass = Double.parseDouble(request.getParameter("fromMass"));
+                        double toMass = Double.parseDouble(request.getParameter("toMass"));
 
-                UniprotLevelDbFinder finder = WebListener.getFinder();
-                UniprotLevelDbFinder.SearchIndexResult res = finder.searchIndex(fromMass, toMass);
+                        UniprotLevelDbFinder finder = WebListener.getFinder();
+                        UniprotLevelDbFinder.IndexResult res = finder.searchIndex(fromMass, toMass);
 
-                request.setAttribute("result", res.subMap);
-                // out.write(res.toString());
+                        request.setAttribute("result", res.map);
+                        // out.write(res.toString());
 
-            } catch (Throwable t) {
-                errMsg = t.getMessage();
-            }
+                    } catch (Throwable t) {
+                        errMsg = t.getMessage();
+                    }
         %>
 
         <table id="table" class="table table-striped table-bordered" style="width:100%">

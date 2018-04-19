@@ -8,7 +8,7 @@
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
+<%--<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>--%>
 <c:set var="headTitle" value="Search result"/>
 <c:set var="pageName" value="Page title"/>
 <%@ include file="pages/_header.jsp" %>
@@ -98,8 +98,8 @@
 </div>
 <script>
     $(document).ready(function () {
-        $('#table').DataTable({
-            "dom": '<"top "ip<"clear">>rt<"bottom"pil<"clear">>'
+        // $('#table').DataTable({
+           // "dom": '<"top "ip<"clear">>rt<"bottom"pil<"clear">>'
             //"dom": 'lrtip'
             //"dom": '<lf<t>ip>',
             // dom: '<"row btn-group"<"col-sm-12 col-md-6"p><"col-sm-12 col-md-6"l>><"row"rt><"row"ip>',
@@ -107,7 +107,7 @@
             //     dataSrc: 1
             // }
 
-        });
+        // });
     });
 
 </script>

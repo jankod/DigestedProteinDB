@@ -26,6 +26,7 @@ public class MassCSV {
 		try (FastBufferedReader reader = new FastBufferedReader(new FileReader(path))) {
 			while ((reader.readLine(line)) != null) {
 				if(stop) {
+					callbackMass.finish();
 					break;
 				}
 				

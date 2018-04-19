@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import hr.pbf.digestdb.web.WebListener;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -30,7 +31,6 @@ public class StartJetty {
         http.setPort(8080);
         http.setIdleTimeout(1000 * 60 * 60);
 
-        ShutdownHandler s;
 
         server.addConnector(http);
 
@@ -41,27 +41,8 @@ public class StartJetty {
 
         addJSP(bb);
 
-        //com.sun.el.ExpressionFactoryImpl expressionFactory;
-
-
-
-        // uncomment the next two lines if you want to start Jetty with WebSocket
-        // (JSR-356) support
-        // you need org.apache.wicket:wicket-native-websocket-javax in the classpath!
-        // ServerContainer serverContainer =
-        // WebSocketServerContainerInitializer.configureContext(bb);
-        // serverContainer.addEndpoint(new WicketServerEndpointConfig());
-
-        // uncomment next line if you want to test with JSESSIONID encoded in the urls
-        // ((AbstractSessionManager)
-        // bb.getSessionHandler().getSessionManager()).setUsingCookies(false);
-
         server.setHandler(bb);
 
-        // MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        // MBeanContainer mBeanContainer = new MBeanContainer(mBeanServer);
-        // server.addEventListener(mBeanContainer);
-        // server.addBean(mBeanContainer);
 
         try {
             server.start();
@@ -126,6 +107,9 @@ public class StartJetty {
                 try {
                     server.stop();
                     server.join();
+                    WebListener.getFinder().close();
+                    log.debug("Dela**+");
+                    System.out.println("Stoped je...");
                     // System.exit(1);
                     r.close();
                     return;

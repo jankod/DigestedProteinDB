@@ -22,14 +22,15 @@ import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxMass;
+import hr.pbf.digestdb.uniprot.UniprotParseUtil;
 
 class UniprotUtilTest {
 
 	@Test
 	void testRemoveLine() {
-		String res = A7_UniprotProtNamesToLevelDB
+		String res = UniprotParseUtil
 				.removeEvidenceAtributes("A0A109ZZL0      Methyl coenzyme-M reductase {ECO:0000313|EMBL:AMB19266.1} ");
-		
+
 		assertEquals("A0A109ZZL0      Methyl coenzyme-M reductase", res);
 
 	}

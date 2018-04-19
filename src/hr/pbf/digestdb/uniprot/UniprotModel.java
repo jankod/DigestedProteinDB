@@ -25,26 +25,28 @@ public class UniprotModel {
 	@Data
 	@Accessors
 	public static class Tax {
-		private int taxId;
-		private String desc;
+		private int		taxId;
+		private String	desc;
 
 	}
 
 	@Data
 	@Accessors
+	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class EntryUniprot {
-		private String accession;
-		private int tax;
-		private String protName;
-		private StringBuilder seq = new StringBuilder(200);
+		private String			accession;
+		private int				tax;
+		private String			protName;
+		private StringBuilder	seq	= new StringBuilder(200);
 	}
 
 	@Data
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public final static class AccTax {
-		public String acc;
-		public int tax;
+		public String	acc;
+		public int		tax;
 
 		public String toString() {
 			return acc + ":" + tax;
@@ -62,9 +64,9 @@ public class UniprotModel {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public final static class PeptideMassAccTaxList {
-		private String peptide;
-		private float mass;
-		private List<AccTax> accTaxs;
+		private String			peptide;
+		private float			mass;
+		private List<AccTax>	accTaxs;
 
 	}
 
@@ -72,42 +74,39 @@ public class UniprotModel {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public final static class PeptideAccTaxMass {
-		private String peptide;
-		private String acc;
-		private int tax;
-		private float mass;
+		private String	peptide;
+		private String	acc;
+		private int		tax;
+		private float	mass;
 	}
 
-	
-	
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public final static class PeptideAccTaxNames{
-		private float mass;
-		private String peptide;
-		private String acc;
-		private String protName;
-		private String taxName;
-		private int tax;
+	public final static class PeptideAccTaxNames {
+		private float	mass;
+		private String	peptide;
+		private String	acc;
+		private String	protName;
+		private String	taxName;
+		private int		tax;
+
 		@Override
 		public String toString() {
-			return "[mass=" + mass + ", peptide=" + peptide + ", acc=" + acc + ", protName="
-					+ protName + ", taxName=" + taxName + ", tax=" + tax + "]";
+			return "[mass=" + mass + ", peptide=" + peptide + ", acc=" + acc + ", protName=" + protName + ", taxName="
+					+ taxName + ", tax=" + tax + "]";
 		}
-		
-		
+
 	}
-	
-	
+
 	// @Accessors
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public final static class PeptideAccTax implements KryoSerializable {
-		private String peptide;
-		private String acc;
-		private int tax;
+		private String	peptide;
+		private String	acc;
+		private int		tax;
 
 		@Override
 		public void write(Kryo kryo, Output o) {

@@ -41,6 +41,7 @@
 
         $(document).ready(function () {
             var table =  $('#table').DataTable({
+                "dom": '<"top"iflp<"clear">>rt<"bottom"pil<"clear">>',
                 "processing": true,
                 "serverSide": true,
                 "ordering": false,
@@ -58,7 +59,7 @@
                         d.massTo = $("#massTo").val()+"";
                         //  return d;
                         var data = JSON.stringify(d);
-                        console.log("data", data);
+                       // console.log("data", data);
                         return data;
                     }
 

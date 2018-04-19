@@ -98,12 +98,12 @@ public class DataTablesRequest {
 		return search;
 	}
 
-	public long getStart() {
-		return start;
-	}
-
 	public void setColumns(List<DataTablesColumn> columns) {
 		this.columns = columns;
+	}
+
+	public long getStart() {
+		return start;
 	}
 
 	public void setDraw(int draw) {

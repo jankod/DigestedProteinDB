@@ -49,6 +49,8 @@ public class MassRangeFiles {
 		this.fileExtension = fileExtension;
 		this.dir = dir;
 		this.massRangeMap = new MassRangeMap(delta, fromMass, toMass);
+		
+		// llloookkkčččćććššš 
 	}
 
 	public int getFromMass() {

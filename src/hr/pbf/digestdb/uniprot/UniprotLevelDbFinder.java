@@ -9,13 +9,17 @@ import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTaxNames;
 import hr.pbf.digestdb.util.BiteUtil;
 import hr.pbf.digestdb.util.LevelDButil;
 import hr.pbf.digestdb.util.UniprotConfig;
+import hr.pbf.digestdb.util.UniprotConfig.Name;
 import hr.pbf.digestdb.web.ServletUtil;
 import lombok.Data;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.DBIterator;
 import org.iq80.leveldb.Options;
+import org.iq80.leveldb.table.MMapTable;
 import org.mapdb.Serializer;
 import org.mapdb.SortedTableMap;
 import org.mapdb.volume.MappedFileVol;
@@ -25,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -43,17 +48,22 @@ public class UniprotLevelDbFinder implements Closeable {
 
     public static void main(String[] args) throws IOException {
 
-        try (UniprotLevelDbFinder f = new UniprotLevelDbFinder(UniprotConfig.get(UniprotConfig.Name.PATH_TREMB_LEVELDB),
-                UniprotConfig.get(UniprotConfig.Name.PATH_TREMBL_MASS_PEPTIDES_MAP))) {
+        try (UniprotLevelDbFinder f = new UniprotLevelDbFinder(UniprotConfig.get(Name.PATH_TREMB_LEVELDB),
+                UniprotConfig.get(Name.PATH_TREMBL_MASS_PEPTIDES_MAP),
+                UniprotConfig.get(Name.PATH_TREMBL_PROT_NAMES_LEVELDB))) {
 
             float fromMass = 3731.7937F;
-            fromMass = 500F;
             float toMass = (float) (fromMass + 0.33421);
-            toMass = 500.2f;
-            SearchIndexResult result = f.searchIndex(fromMass, toMass);
+
+
+            fromMass = 400F;
+            toMass = 500.15f;
+
+
+            IndexResult result = f.searchIndex(fromMass, toMass);
             log.debug("Search {} : {}", fromMass, toMass);
 
-            printIndex(result.subMap);
+            printIndex(result.map);
 
             DBIterator it = f.db.iterator();
 
@@ -71,7 +81,7 @@ public class UniprotLevelDbFinder implements Closeable {
                 TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(entry.getValue());
                 countUniquePeptides += v.size();
                 long totalPeptides = countTotalAccTax(v);
-                log.debug(mass + "\t"+ v.size() + "\t"+ totalPeptides);
+                log.debug(mass + "\t" + v.size() + "\t" + totalPeptides);
 
             }
             log.debug("total mass {}, peptides: {}", countMass, countUniquePeptides);
@@ -80,14 +90,18 @@ public class UniprotLevelDbFinder implements Closeable {
 
     }
 
-    private static void printIndex(ConcurrentNavigableMap<Float,Integer> index) {
+    public DB getDb() {
+        return db;
+    }
+
+    private static void printIndex(SortedMap<Float, Integer> index) {
         for (Entry<Float, Integer> entry : index.entrySet()) {
-            log.debug(entry.getKey() + "\t"+entry.getValue());
+            log.debug(entry.getKey() + "\t" + entry.getValue());
         }
 
     }
 
-    private static long countTotalAccTax(TreeMap<String,List<AccTax>> v) {
+    private static long countTotalAccTax(Map<String, List<AccTax>> v) {
         long t = 0;
         for (Entry<String, List<AccTax>> entry : v.entrySet()) {
             t += entry.getValue().size();
@@ -106,27 +120,27 @@ public class UniprotLevelDbFinder implements Closeable {
                 page = Integer.parseInt(req.getParameter("page"));
             }
 
-            SearchIndexResult index = searchIndex(fromMass, toMass);
+            IndexResult index = searchIndex(fromMass, toMass);
             log.debug(index.toString());
 
             int start = (page - 1) * recordsPerPage;
             int end = start + recordsPerPage;
-            System.out.printf("\nStart:stop %s: %s", start, end);
+            log.debug("\nStart:stop %s: %s", start, end);
             ImmutableRangeMap<Integer, Float> range = index.toRangeMap(start, end);
-            System.out.println(range);
+            log.debug(range.toString());
             Float mass = range.get(start);
             int thisMassStartOf = range.getEntry(start).getKey().lowerEndpoint();
             ImmutableRangeMap<Integer, Float> subRangeMap = range.subRangeMap(Range.closedOpen(start, end));
 
             TwoMass low = getLowerUpperMass(subRangeMap);
 
-            List<PeptideAccTaxNames> masses = searchMass(low.start, low.end);
+            List<PeptideAccTaxNames> masses = searchMass(low.start, low.end, 100);
             int cc = 0;
             System.out.printf("\nthisMassStartOf %s ", thisMassStartOf);
 
-            System.out.printf("\nMass %s \n", mass);
+            log.debug("\nMass %s \n", mass);
             for (PeptideAccTaxNames peptideAccTaxNames : masses) {
-                System.out.println(cc++ + " " + peptideAccTaxNames);
+                log.debug(cc++ + " " + peptideAccTaxNames);
             }
 
             SearchOneMassResult searchMass = searchMass(mass);
@@ -138,7 +152,7 @@ public class UniprotLevelDbFinder implements Closeable {
             page++;
             req.setAttribute("page", page);
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.debug("", e);
         }
 
         return result;
@@ -161,43 +175,35 @@ public class UniprotLevelDbFinder implements Closeable {
         return t;
     }
 
-
     class TwoMass {
         public Float start, end;
 
     }
 
-    public UniprotLevelDbFinder(String levelDbPath, String indexSSTablePath) throws IOException {
+    public UniprotLevelDbFinder() throws IOException {
+        this(UniprotConfig.get(Name.PATH_TREMB_LEVELDB), UniprotConfig.get(Name.PATH_TREMBL_MASS_PEPTIDES_MAP),
+                UniprotConfig.get(Name.PATH_TREMBL_PROT_NAMES_LEVELDB));
+    }
+
+    public UniprotLevelDbFinder(String levelDbPath, String indexSSTablePath, String protNameLevelDbPath)
+            throws IOException {
         DBComparator comparator = LevelDButil.getFloatKeyComparator();
         Options opt = LevelDButil.getStandardOptions();
         opt.comparator(comparator);
+        if (!new File(levelDbPath).isDirectory()) {
+            throw new IOException("Not a  dir " + levelDbPath);
+        }
         db = LevelDButil.open(levelDbPath, opt);
+        String status = LevelDButil.getStatus(db);
+        log.info("Leveldb status: " + status);
+
 
         Volume volume = MappedFileVol.FACTORY.makeVolume(indexSSTablePath, true);
         mapIndex = SortedTableMap.open(volume, Serializer.FLOAT, Serializer.INTEGER);
 
-        String protNamePalPath = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.leveldb";
-        // "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.leveldb.paldb";
-
-        // open existing memory-mapped file in read-only mode
-
-        // read-only=true
-
+        String protNamePalPath = protNameLevelDbPath; // "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl_prot_names.leveldb";
         dbProtName = LevelDButil.open(protNamePalPath, LevelDButil.getStandardOptions());
 
-        // mapAccProtName =
-        // SortedTableMap.open(MappedFileVol.FACTORY.makeVolume(protNamePalPath, true),
-        // Serializer.STRING, Serializer.STRING);
-
-        //
-        // File file = new File(protNamePalPath);
-        // if (!file.exists()) {
-        // String errMsg = "Not find path " + file;
-        // log.error(errMsg);
-        // throw new FileNotFoundException(errMsg);
-        // }
-        // protNameReader = PalDB.createReader(file);
-        // protNameReader.getConfiguration().set("compression.enabled", "true");
     }
 
     public String getProtName(String acc) {
@@ -238,18 +244,25 @@ public class UniprotLevelDbFinder implements Closeable {
         log.debug("CLOSE regular database");
     }
 
-    public List<UniprotModel.PeptideAccTaxNames> searchMass(double mass, double to) throws IOException {
+    public List<UniprotModel.PeptideAccTaxNames> searchMass(double mass, double to, int maxEntryReturn) throws IOException {
         DBIterator it = db.iterator();
         it.seek(BiteUtil.toBytes((float) mass));
         List<PeptideAccTaxNames> result = new ArrayList<>();
+        int counter = 0;
         while (it.hasNext()) {
             Entry<byte[], byte[]> next = it.next();
             float massExact = BiteUtil.toFloat(next.getKey());
             if (massExact > to) {
                 break;
             }
+            MMapTable table;
+            if(++counter > maxEntryReturn) {
+                break;
+            }
+
             TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(next.getValue());
             Set<Entry<String, List<AccTax>>> entrySet = v.entrySet();
+            log.debug(massExact +" \t"+ countTotalAccTax(v));
 
             for (Entry<String, List<AccTax>> entry : entrySet) {
                 List<AccTax> value = entry.getValue();
@@ -277,10 +290,10 @@ public class UniprotLevelDbFinder implements Closeable {
         private ArrayList<Entry<Float, Integer>> massesAround;
     }
 
-
     public SearchOneMassResult searchMassOne(float searchMass, float margin) throws IOException {
         SearchOneMassResult res = new SearchOneMassResult();
-        if (margin < 0 || margin > 0.3) {
+
+        if (margin < 0f || margin > 0.3001f) {
             log.warn("Margin is not in range " + margin);
             margin = 0.1f;
         }
@@ -289,29 +302,34 @@ public class UniprotLevelDbFinder implements Closeable {
         List<PeptideAccTaxNames> result = new ArrayList<>();
         res.setResult(result);
 
-        while (it.hasNext()) {
-            Entry<byte[], byte[]> next = it.next();
-            float foundMass = BiteUtil.toFloat(next.getKey());
-            if (foundMass > searchMass + margin) {
-                break;
+        if (!it.hasNext()) {
+            log.warn("Find nothing for mass-margin: {} ", (searchMass - margin));
+        } else {
+            while (it.hasNext()) {
+                Entry<byte[], byte[]> next = it.next();
+                float foundMass = BiteUtil.toFloat(next.getKey());
+                if (foundMass > searchMass + margin) {
+                    break;
+                }
+                // res.setMassesAround(getMassesAround(foundMass));
+                TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(next.getValue());
+                Set<Entry<String, List<AccTax>>> entrySet = v.entrySet();
+
+                populateResult(result, foundMass, entrySet);
+                log.debug(foundMass + "");
             }
-            //  res.setMassesAround(getMassesAround(foundMass));
-            TreeMap<String, List<AccTax>> v = UniprotFormat3.uncompressPeptidesJava(next.getValue());
-            Set<Entry<String, List<AccTax>>> entrySet = v.entrySet();
-
-
-            populateResult(result, foundMass, entrySet);
         }
         it.close();
         // log.warn("Nothig found for mass {} +- {} ", searchMass, margin);
         return res;
     }
 
-    private void populateResult(List<PeptideAccTaxNames> result, float mass2, Set<Entry<String, List<AccTax>>> entrySet) {
+    private void populateResult(List<PeptideAccTaxNames> result, float mass2,
+                                Set<Entry<String, List<AccTax>>> entrySet) {
         for (Entry<String, List<AccTax>> entry : entrySet) {
             List<AccTax> value = entry.getValue();
             String peptide = entry.getKey();
-            System.out.println(mass2 + "\t" + peptide);
+            //	System.out.println(mass2 + "\t" + peptide);
             for (AccTax accTax : value) {
                 String acc = accTax.getAcc();
                 int tax = accTax.getTax();
@@ -322,12 +340,11 @@ public class UniprotLevelDbFinder implements Closeable {
                 p.setProtName(getProtName(acc));
                 p.setMass(mass2);
                 result.add(p);
-                //System.out.println(p);
+                // System.out.println(p);
                 // result.add(new PeptideAccTax(peptide, acc, tax));
             }
         }
     }
-
 
     public SearchOneMassResult searchMass(double mass) throws IOException {
         SearchOneMassResult r = new SearchOneMassResult();
@@ -369,32 +386,64 @@ public class UniprotLevelDbFinder implements Closeable {
 
         masses.add(h1);
         masses.add(h2);
-        System.out.println(masses);
+        //System.out.println(masses);
         return masses;
         // System.out.println(l2.getKey() + " | "+ l1.getKey()+" | "+ mass2 +
         // " | "+ h1.getKey() + " | "+ h2.getKey());
 
     }
 
-    public SearchIndexResult searchIndex(double from, double to) {
+    public IndexResult searchIndex(double from, double to) {
 
         ConcurrentNavigableMap<Float, Integer> subMap = mapIndex.subMap((float) from, true, (float) to, true);
 
-        // SortedMap<Float, Integer> subMap = indexMap.subMap((float) from, true,
+        // SortedMap<Float, Integer> map = indexMap.map((float) from, true,
         // (float) to, true);
-        SearchIndexResult result = new SearchIndexResult();
+        IndexResult result = new IndexResult();
 
-        result.subMap = subMap;
+        result.map = subMap;
         return result;
     }
 
-    public static class SearchIndexResult {
-        public ConcurrentNavigableMap<Float, Integer> subMap;
+    public static class IndexResult {
+
+        public SortedMap<Float, Integer> map;
+
+        public IndexResult() {
+        }
+
+        /**
+         * Return mass float and position where to start with peptides in lelveldb database
+         *
+         * @param startPeptides
+         * @return
+         */
+        public Pair<Float, Long> getStartMass(long startPeptides) {
+            // f1 => 10
+            // f2 => 10
+            // f3 => 10
+
+            // 8:24
+            long fromPos = 0;
+            Pair<Float, Long> startMass = null;
+            for (Entry<Float, Integer> en : map.entrySet()) {
+                long endPos = fromPos + en.getValue();
+
+                if (startPeptides >= fromPos && startPeptides < endPos) {
+                    long pos = startPeptides - fromPos;
+                    startMass = new ImmutablePair<>(en.getKey(), pos);
+                    return startMass;
+                }
+                fromPos += en.getValue();
+            }
+
+            return startMass;
+        }
 
         public ImmutableRangeMap<Integer, Float> toRangeMap(long from, long to) {
 
             Builder<Integer, Float> builder = ImmutableRangeMap.<Integer, Float>builder();
-            Set<Entry<Float, Integer>> entrySet = subMap.entrySet();
+            Set<Entry<Float, Integer>> entrySet = map.entrySet();
             int c = 0;
             for (Entry<Float, Integer> entry : entrySet) {
                 int start = c;
@@ -403,26 +452,25 @@ public class UniprotLevelDbFinder implements Closeable {
                     c += entry.getValue();
                     continue;
                 }
-                System.out.printf("\nRange %s:%s %s\n", start, stop, entry.getKey());
+                //System.out.printf("\nRange %s:%s %s\n", start, stop, entry.getKey());
                 builder.put(Range.open(start, stop), entry.getKey());
                 c += entry.getValue();
             }
             ImmutableRangeMap<Integer, Float> r = builder.build();
+
             return r;
-            // .put(Range.closed(0, 2), "Associate")
-            // .build();
         }
 
         public int countMasses() {
-            if (subMap == null) {
+            if (map == null) {
                 return 0;
             }
-            return subMap.size();
+            return map.size();
         }
 
         public long countTotalPeptides() {
             long c = 0;
-            Set<Entry<Float, Integer>> entrySet = subMap.entrySet();
+            Set<Entry<Float, Integer>> entrySet = map.entrySet();
             for (Entry<Float, Integer> entry : entrySet) {
                 c += entry.getValue();
             }
@@ -434,7 +482,7 @@ public class UniprotLevelDbFinder implements Closeable {
             String res = "\nTotal mass: " + countMasses() + " Total peptides: " + countTotalPeptides();
 
             int c = 0;
-            for (Entry<Float, Integer> set : subMap.entrySet()) {
+            for (Entry<Float, Integer> set : map.entrySet()) {
                 res += "\n" + set.getValue() + " " + set.getKey();
                 if (c++ > 4) {
                     res += "\n..";
@@ -448,7 +496,7 @@ public class UniprotLevelDbFinder implements Closeable {
         public String toStringHTML() {
             String res = "<br>Total mass: " + countMasses() + "<br>Total peptides: " + countTotalPeptides();
 
-            for (Entry<Float, Integer> set : subMap.entrySet()) {
+            for (Entry<Float, Integer> set : map.entrySet()) {
                 res += "<br><a href='showMass.jsp?mass=" + set.getKey() + "'>" + set.getKey() + "</a> : "
                         + set.getValue();
             }

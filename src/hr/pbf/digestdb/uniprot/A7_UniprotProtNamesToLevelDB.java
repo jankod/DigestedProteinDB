@@ -51,7 +51,7 @@ public class A7_UniprotProtNamesToLevelDB {
 					String[] split = StringUtils.split(line, "\t");
 					String acc = split[0].trim();
 
-					String desc = removeEvidenceAtributes(split[1]);
+					String desc = UniprotParseUtil. removeEvidenceAtributes(split[1]);
 					
 					batch.put(acc.getBytes(StandardCharsets.US_ASCII), desc.getBytes(StandardCharsets.US_ASCII));
 					
@@ -98,7 +98,7 @@ public class A7_UniprotProtNamesToLevelDB {
 					String[] split = StringUtils.split(line, "\t");
 					String acc = split[0].trim();
 
-					String desc = removeEvidenceAtributes(split[1]);
+					String desc = UniprotParseUtil.removeEvidenceAtributes(split[1]);
 					map.put(acc, desc);
 
 					if (c % 1000 == 0) {
@@ -117,22 +117,7 @@ public class A7_UniprotProtNamesToLevelDB {
 		}
 	}
 
-	/**
-	 * Remove string like: https://web.expasy.org/docs/userman.html 2.4. Evidence
-	 * attributions . {ECO:0000269|PubMed:10433554}
-	 * 
-	 * @param line
-	 * @return
-	 */
-	public static String removeEvidenceAtributes(String line) {
-		int ecoIndex = line.indexOf("{ECO:");
-		if (ecoIndex == -1) {
-			log.warn("Not find '{ECO:', line:  '" + line + "'");
-			return line;
-		}
-		String desc = line.substring(0, ecoIndex);
-		return desc.trim();
-	}
+	
 
 	private static Options getLevelDBOptions() {
 		Options options = new Options();

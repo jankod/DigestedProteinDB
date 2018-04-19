@@ -44,12 +44,14 @@ public class UniprotConfig {
 	}
 
 	public static enum Name {
+		BASE_DIR,
 		PATH_TREMBL_CSV,
 		PATH_TREMB_LEVELDB,
 		PATH_TREMB_PROT_NAMES_CSV,
 		PATH_TREMB_LEVELDB_INDEX_CSV,
 		// SSTable float[mass] => int[peptides] from mapdb
-		PATH_TREMBL_MASS_PEPTIDES_MAP
+		PATH_TREMBL_MASS_PEPTIDES_MAP,
+		PATH_TREMBL_PROT_NAMES_LEVELDB
 
 	}
 

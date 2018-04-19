@@ -47,7 +47,7 @@ public class ProtNamesLevelDbToPalDB {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 
 		// convertLevelDbToPalDB();
-		convertToSSTable();
+		//convertToSSTable();
 		read();
 	}
 
@@ -89,6 +89,7 @@ public class ProtNamesLevelDbToPalDB {
 		StoreReader r = PalDB.createReader(new File(pathDb));
 
 		Iterable<Entry<byte[], byte[]>> it = r.iterable();
+		
 		int c = 0;
 		for (Entry<byte[], byte[]> entry : it) {
 			// System.out.println(new String(entry.getKey()) + " " + new

@@ -26,6 +26,8 @@ import hr.pbf.digestdb.uniprot.UniprotModel.EntryUniprot;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.MassRangeMap;
 import hr.pbf.digestdb.util.TimeScheduler;
+import hr.pbf.digestdb.util.UniprotConfig;
+import hr.pbf.digestdb.util.UniprotConfig.Name;
 
 /**
  * Parse uniprot dat files and create folder of many "format1" files. Format1 is
@@ -43,24 +45,24 @@ public class A1_UniprotToFormat1 {
 
 	private static long counter = 0;
 
-	private static String pathDirMain;
-	public static String pathDirFormat1;
-	private static BufferedWriter outProt;
+	private static String			pathDirMain;
+	public static String			pathDirFormat1;
+	private static BufferedWriter	outProt;
 
 	private static MassRangeFiles massRangeFiles;
 
 	public static void main(String[] args) throws IOException {
-		long maxEntry = 1000_000; // Long.MAX_VALUE
+		long maxEntry =  Long.MAX_VALUE;
 
 		String db = "uniprot_sprot.dat";
+		db = "uniprot_trembl_part.dat";
 
-		pathDirMain = "F:\\Downloads\\uniprot";
+		pathDirMain = UniprotConfig.get(Name.BASE_DIR);
 
-		
 		// DEMO
-		pathDirMain = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne radi";
-		db = "Entry nema NAKIIFVRPLLGLFK A0A1J4YX49.txt";
-		
+		// pathDirMain = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne
+		// radi";
+
 		if (SystemUtils.IS_OS_LINUX) {
 			pathDirMain = "/home/users/tag/uniprot";
 			maxEntry = Long.MAX_VALUE;
@@ -70,10 +72,10 @@ public class A1_UniprotToFormat1 {
 
 		pathDirFormat1 = pathDirMain + File.separator + db + "_format1";
 
-//		if (SystemUtils.IS_OS_WINDOWS) {
-//			pathDirFormat1 += "_" + maxEntry;
-//		}
-		String outProtPath = pathDirMain + File.separator + db + "_prot_names.csv";
+		// if (SystemUtils.IS_OS_WINDOWS) {
+		// pathDirFormat1 += "_" + maxEntry;
+		// }
+		String outProtPath = pathDirMain + File.separator + db + "_prot_names2.csv";
 
 		massRangeFiles = new MassRangeFiles(500, 6000, 0.3f, "format1", pathDirFormat1);
 
@@ -111,11 +113,14 @@ public class A1_UniprotToFormat1 {
 		massRangeFiles.closeAll();
 
 		TimeScheduler.stopAll();
-		log.debug(pathDirFormat1 + " size: "+ UniprotUtil.getDirectorySize(pathDirFormat1));
+		log.debug(pathDirFormat1 + " size: " + UniprotUtil.getDirectorySize(pathDirFormat1));
 	}
 
 	private static void writeProteNames(EntryUniprot e) throws IOException {
-		outProt.write(e.getAccession() + "\t" + e.getProtName() + "\n");
+		// remove {ECO:0000313|EMBL:ARD89112.1} from prot name
+		String protName = UniprotParseUtil.removeEvidenceAtributes(e.getProtName());
+		int taxId = e.getTax();
+		outProt.write(e.getAccession() + "\t" + protName + "\t" + taxId + "\n");
 	}
 
 	private static void writeMass(EntryUniprot e) throws IOException {
@@ -140,7 +145,8 @@ public class A1_UniprotToFormat1 {
 		readUniprotTextLarge(path, callback, Long.MAX_VALUE);
 	}
 
-	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback, long howMany) throws IOException {
+	public static void readUniprotTextLarge(String path, CallbackUniprotReader callback, long howMany)
+			throws IOException {
 		BufferedReader reader = null;
 		try {
 
@@ -190,8 +196,8 @@ public class A1_UniprotToFormat1 {
 		}
 	}
 
-	final static String prefixRecName = "DE   RecName: Full=";
-	final static String prefixSubName = "DE   SubName: Full=";
+	final static String	prefixRecName	= "DE   RecName: Full=";
+	final static String	prefixSubName	= "DE   SubName: Full=";
 
 	private static void addProtName(String line, EntryUniprot entry) {
 		if (line.startsWith(prefixRecName)) {

@@ -8,7 +8,7 @@
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>
+<%--<%@ taglib uri="http://displaytag.sf.net" prefix="display" %>--%>
 <c:set var="headTitle" value="Search result"/>
 <c:set var="pageName" value="Page title"/>
 <%@ include file="pages/_header.jsp" %>
