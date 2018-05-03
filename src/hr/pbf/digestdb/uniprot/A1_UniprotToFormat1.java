@@ -116,10 +116,12 @@ public class A1_UniprotToFormat1 {
 		log.debug(pathDirFormat1 + " size: " + UniprotUtil.getDirectorySize(pathDirFormat1));
 	}
 
+	private static long longestProtName = 0;
 	private static void writeProteNames(EntryUniprot e) throws IOException {
 		// remove {ECO:0000313|EMBL:ARD89112.1} from prot name
 		String protName = UniprotParseUtil.removeEvidenceAtributes(e.getProtName());
 		int taxId = e.getTax();
+		longestProtName = Math.max(longestProtName, protName.length());
 		outProt.write(e.getAccession() + "\t" + protName + "\t" + taxId + "\n");
 	}
 
