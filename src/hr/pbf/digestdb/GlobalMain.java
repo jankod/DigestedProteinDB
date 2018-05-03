@@ -42,6 +42,11 @@ public class GlobalMain {
             // App_14_MaveMVstoreAccessionTaxid.main(args);
             // App_15_AddTaxIdToCSV.main(args);
 
+            if (argsFirstElementContain("uniprot-a1", args)) {
+                A1_UniprotToFormat1.main(argsMinusFirstElement(args));
+                return;
+            }
+
             if (argsFirstElementContain("uniprot-a3", args)) {
                 A3_UniprotFormat2ToOther.main(argsMinusFirstElement(args));
                 // A1_UniprotToFormat1.main(args);

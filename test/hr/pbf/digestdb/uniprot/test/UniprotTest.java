@@ -1,6 +1,8 @@
 package hr.pbf.digestdb.uniprot.test;
 
+import hr.pbf.digestdb.uniprot.A1_UniprotToFormat1;
 import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
+import hr.pbf.digestdb.uniprot.UniprotModel.EntryUniprot;
 import hr.pbf.digestdb.uniprot.UniprotModel.PeptideAccTax;
 import hr.pbf.digestdb.uniprot.UniprotParseUtil;
 import org.apache.commons.lang3.RandomUtils;
@@ -34,6 +36,16 @@ class UniprotTest {
 	}
 
 	private static final Logger log = LoggerFactory.getLogger(UniprotTest.class);
+
+	@Test
+	void testParser() {
+		EntryUniprot entry = new EntryUniprot();
+		A1_UniprotToFormat1.addProtName("DE   SubName: Full=Uncharacterized protein {ECO:0000313|EMBL:KGO68496.1};",
+				entry);
+
+		assertEquals("Uncharacterized protein {ECO:0000313|EMBL:KGO68496.1}", entry.getProtName());
+		
+	}
 
 	@Test
 	void testKryo() throws IOException {

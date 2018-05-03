@@ -33,8 +33,27 @@ public class A7_UniprotProtNamesToLevelDB {
 		pathStore = "/home/users/tag/uniprot/uniprot_trembl_prot_names.leveldb";
 		// saveToMVStore(pathCSV, pathStore);
 
-		saveToLevelDB(pathCSV, pathStore);
+		//saveToLevelDB(pathCSV, pathStore);
+		String pathCSV1 = "F:\\ProteinReader\\UniprotDBfiles\\uniprot_trembl.dat_prot_names1.csv";
+		String pathCSV2 = "F:\\ProteinReader\\UniprotDBfiles\\uniprot_trembl.dat_prot_names2.csv";
+		removeEvideceFromCSV(pathCSV1, pathCSV2);
 
+	}
+
+	private static void removeEvideceFromCSV(String pathCSV, String newPathCSV) throws IOException {
+		try (BufferedReader reader = BioUtil.newFileReader(pathCSV, "ASCII")) {
+			String line = null;
+			try {
+				while ((line = reader.readLine()) != null) {
+					String[] split = StringUtils.split(line, "\t");
+					String acc = split[0].trim();
+
+					String desc = UniprotParseUtil.removeEvidenceAtributes(split[1]);
+				}
+			}catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
 	}
 
 	private static void saveToLevelDB(String pathCSV, String pathStore) throws IOException {

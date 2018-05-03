@@ -99,7 +99,7 @@ public class A1_UniprotToFormat1 {
 
 			try {
 
-				writeMass(e);
+			//	writeMass(e);
 				writeProteNames(e);
 				counter++;
 			} catch (Throwable e1) {
@@ -199,11 +199,11 @@ public class A1_UniprotToFormat1 {
 	final static String	prefixRecName	= "DE   RecName: Full=";
 	final static String	prefixSubName	= "DE   SubName: Full=";
 
-	private static void addProtName(String line, EntryUniprot entry) {
+	public static void addProtName(String line, EntryUniprot entry) {
 		if (line.startsWith(prefixRecName)) {
 			entry.setProtName(line.substring(prefixRecName.length(), line.length() - 1));
 		} else if (line.startsWith(prefixSubName) && entry.getProtName() == null) {
-			// maybe note have RecName nego SubName, trebl ima SubName uglavnom...
+			// maybe note have RecName but SubName, trebl have SubName usually...
 			entry.setProtName(line.substring(prefixSubName.length(), line.length() - 1));
 		}
 	}

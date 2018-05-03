@@ -38,7 +38,8 @@ public class P1 {
 
 	public static void main(String[] args) throws NumberFormatException, IOException {
 		// testASCII();
-		testData();
+	//	testData();
+
 	}
 
 	private static void testData() throws NumberFormatException, IOException {

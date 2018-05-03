@@ -7,45 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49ef1dea-2cda-4874-9562-6804684f3694" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.classpath" beforeDir="false" afterPath="$PROJECT_DIR$/.classpath" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/artifacts/DigestedProteinDB_war_exploded.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/DigestedProteinDB_war_exploded.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_collections_eclipse_collections_7_1_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_collections_eclipse_collections_api_7_1_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_eclipse_collections_eclipse_collections_forkjoin_7_1_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mapdb_elsa_3_0_0_M5.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mapdb_mapdb_3_0_5.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.core.resources.prefs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.settings/org.eclipse.wst.common.component" beforeDir="false" afterPath="$PROJECT_DIR$/.settings/org.eclipse.wst.common.component" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource/config_lin.properties" beforeDir="false" afterPath="$PROJECT_DIR$/resource/config_lin.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resource/config_win.properties" beforeDir="false" afterPath="$PROJECT_DIR$/resource/config_win.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/GlobalMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/GlobalMain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A1_UniprotToFormat1.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A1_UniprotToFormat1.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A7_UniprotProtNamesToLevelDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/A7_UniprotProtNamesToLevelDB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/MassRangeFiles.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/MassRangeFiles.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotParseUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotParseUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/LevelDButil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/LevelDButil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/MassCSV.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/MassCSV.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/util/UniprotConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/DataTablesRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/SearchAjaxServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/WebListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/hr/pbf/digestdb/web/WebListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/StartJetty.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/StartJetty.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/compact/Probe1.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/NotWorkProbe.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ProtNamesLevelDbToPalDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ProtNamesLevelDbToPalDB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ReadSStableFloatInt.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/ReadSStableFloatInt.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotUtilTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/uniprot/test/UniprotUtilTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/war/data.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/war/data.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/war/search.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/war/search.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/war/searchOneMass.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/war/searchOneMass.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/war/showMass.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/war/showMass.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -72,7 +35,7 @@
       <file leaf-file-name="UniprotLevelDbFinder.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="3842">
               <caret line="264" column="61" selection-start-line="264" selection-start-column="61" selection-end-line="264" selection-end-column="61" />
             </state>
           </provider>
@@ -90,8 +53,8 @@
       <file leaf-file-name="P1.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="35" column="13" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
+            <state relative-caret-position="170">
+              <caret line="41" selection-start-line="41" selection-end-line="41" />
             </state>
           </provider>
         </entry>
@@ -99,7 +62,7 @@
       <file leaf-file-name="CheckIndexLeveldDBBug1.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/CheckIndexLeveldDBBug1.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="428">
+            <state relative-caret-position="782">
               <caret line="59" column="48" selection-start-line="59" selection-start-column="48" selection-end-line="59" selection-end-column="48" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -111,8 +74,17 @@
       <file leaf-file-name="PrepareProteinNames.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareProteinNames.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+            <state relative-caret-position="85">
+              <caret line="5" column="8" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PrepareTaxonomy.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareTaxonomy.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="289">
+              <caret line="51" column="56" lean-forward="true" selection-start-line="51" selection-start-column="56" selection-end-line="51" selection-end-column="56" />
             </state>
           </provider>
         </entry>
@@ -126,11 +98,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UngroupCsv.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UngroupCsv.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/UngroupCsv.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="31" column="36" lean-forward="true" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
+            <state relative-caret-position="85">
+              <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -141,8 +113,8 @@
       <file leaf-file-name="GlobalMain.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/GlobalMain.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="82" column="28" selection-start-line="82" selection-start-column="28" selection-end-line="82" selection-end-column="28" />
+            <state relative-caret-position="119">
+              <caret line="35" column="38" selection-start-line="35" selection-start-column="38" selection-end-line="35" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -152,15 +124,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="34">
               <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UniprotModel.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1173">
-              <caret line="85" column="30" selection-start-line="85" selection-start-column="30" selection-end-line="85" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -220,6 +183,8 @@
         <option value="$PROJECT_DIR$/src/hr/pbf/digestdb/util/MassCSV.java" />
         <option value="$PROJECT_DIR$/src/hr/pbf/digestdb/GlobalMain.java" />
         <option value="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/UngroupCsv.java" />
+        <option value="$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java" />
+        <option value="$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareTaxonomy.java" />
       </list>
     </option>
   </component>
@@ -382,45 +347,13 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
               <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="digestdb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="digestdb" type="462c0819:PsiDirectoryNode" />
-              <item name="uniprot" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="digestdb" type="462c0819:PsiDirectoryNode" />
-              <item name="uniprot" type="462c0819:PsiDirectoryNode" />
-              <item name="sprot" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
-              <item name="DigestedProteinDB" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="digestdb" type="462c0819:PsiDirectoryNode" />
-              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="DigestedProteinDB" type="b2602c69:ProjectViewProjectNode" />
@@ -432,14 +365,13 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="Downloaded.Files.Path.Enabled" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
-    <property name="SearchEverywhereHistoryKey" value="Glo&#9;PSI&#9;JAVA://hr.pbf.digestdb.GlobalMain&#10;Start&#9;FILE&#9;file://C:/Eclipse/OxygenWorkspace/DigestedProteinDB/test/hr/pbf/digestdb/StartJetty.java&#10;showMass&#9;FILE&#9;file://C:/Eclipse/OxygenWorkspace/DigestedProteinDB/war/showMass.jsp&#10;MakeSStable&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.experiments.MakeSStable&#10;ReadSStableFloatInt&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.experiments.ReadSStableFloatInt&#10;TestIn&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.TestIndex" />
+    <property name="SearchEverywhereHistoryKey" value="P&#9;FILE&#9;file://C:/Eclipse/OxygenWorkspace/DigestedProteinDB/src/hr/pbf/digestdb/uniprot/sprot/UngroupCsv.java&#10;Glo&#9;PSI&#9;JAVA://hr.pbf.digestdb.GlobalMain&#10;Start&#9;FILE&#9;file://C:/Eclipse/OxygenWorkspace/DigestedProteinDB/test/hr/pbf/digestdb/StartJetty.java&#10;showMass&#9;FILE&#9;file://C:/Eclipse/OxygenWorkspace/DigestedProteinDB/war/showMass.jsp&#10;MakeSStable&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.experiments.MakeSStable&#10;ReadSStableFloatInt&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.experiments.ReadSStableFloatInt&#10;TestIn&#9;PSI&#9;JAVA://hr.pbf.digestdb.test.TestIndex" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="private" />
@@ -467,7 +399,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.UngroupCsv">
+  <component name="RunManager" selected="Application.PrepareTaxonomy">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
@@ -482,16 +414,24 @@
         </pattern>
       </extension>
     </configuration>
-    <configuration name="StartJetty" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="ALTERNATIVE_JRE_PATH" value="9.0" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
-      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
-      <option name="MAIN_CLASS_NAME" value="hr.pbf.digestdb.StartJetty" />
+    <configuration name="P1" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="hr.pbf.digestdb.test.experiments.P1" />
       <module name="DigestedProteinDB" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="hr.pbf.digestdb.*" />
+          <option name="PATTERN" value="hr.pbf.digestdb.test.experiments.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+    </configuration>
+    <configuration name="PrepareTaxonomy" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="hr.pbf.digestdb.uniprot.sprot.PrepareTaxonomy" />
+      <module name="DigestedProteinDB" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="hr.pbf.digestdb.uniprot.sprot.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -520,29 +460,6 @@
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    </configuration>
-    <configuration name="TestIndex.testIndexPosotion" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="DigestedProteinDB" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="hr.pbf.digestdb.test.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="hr.pbf.digestdb.test" />
-      <option name="MAIN_CLASS_NAME" value="hr.pbf.digestdb.test.TestIndex" />
-      <option name="METHOD_NAME" value="testIndexPosotion" />
-      <option name="TEST_OBJECT" value="method" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -602,19 +519,19 @@
     </configuration>
     <list>
       <item itemvalue="Maven.Maven -clean" />
-      <item itemvalue="Application.StartJetty" />
-      <item itemvalue="JUnit.TestIndex.testIndexPosotion" />
       <item itemvalue="Application.UniprotLevelDbFinder" />
       <item itemvalue="Application.CheckIndexLeveldDBBug1" />
       <item itemvalue="Application.UngroupCsv" />
+      <item itemvalue="Application.P1" />
+      <item itemvalue="Application.PrepareTaxonomy" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.PrepareTaxonomy" />
+        <item itemvalue="Application.P1" />
         <item itemvalue="Application.UngroupCsv" />
         <item itemvalue="Application.CheckIndexLeveldDBBug1" />
         <item itemvalue="Application.UniprotLevelDbFinder" />
-        <item itemvalue="Application.StartJetty" />
-        <item itemvalue="JUnit.TestIndex.testIndexPosotion" />
       </list>
     </recent_temporary>
   </component>
@@ -658,7 +575,10 @@
       <workItem from="1523954309891" duration="4670000" />
       <workItem from="1524040016083" duration="8713000" />
       <workItem from="1524127389573" duration="7374000" />
-      <workItem from="1524140908618" duration="2921000" />
+      <workItem from="1524140908618" duration="5003000" />
+      <workItem from="1524225971936" duration="3238000" />
+      <workItem from="1524474006486" duration="1961000" />
+      <workItem from="1524562090908" duration="53000" />
     </task>
     <task id="LOCAL-00001" summary="ertert">
       <created>1523280436975</created>
@@ -674,7 +594,14 @@
       <option name="project" value="LOCAL" />
       <updated>1523280448590</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="new staf....">
+      <created>1524144901652</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1524144901652</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -692,7 +619,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="96672000" />
+    <option name="totallyTimeSpent" value="104006000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -709,7 +636,6 @@
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32884097" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32884097" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Java Enterprise" order="7" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
@@ -717,10 +643,10 @@
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
       <window_info anchor="right" id="CDI" order="3" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.1981132" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.36792454" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.36792454" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32884097" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49595687" visible="true" weight="0.23405746" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49595687" visible="true" weight="0.19060966" />
       <window_info anchor="bottom" id="Problems" order="7" weight="0.32884097" />
       <window_info anchor="right" id="Bean Validation" order="4" />
       <window_info id="Web" order="2" side_tool="true" />
@@ -731,6 +657,7 @@
       <window_info id="UI Designer" order="2" />
       <window_info id="Favorites" order="2" sideWeight="0.50643086" side_tool="true" weight="0.26135728" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.32614556" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32884097" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="right" x="0" y="0" width="321" height="678" id="Documentation" order="4" side_tool="true" weight="0.3293623" />
@@ -749,7 +676,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="ertert" />
-    <option name="LAST_COMMIT_MESSAGE" value="ertert" />
+    <MESSAGE value="new staf...." />
+    <option name="LAST_COMMIT_MESSAGE" value="new staf...." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -766,7 +694,7 @@
           <option name="timeStamp" value="22" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="23" />
+      <option name="time" value="27" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -775,13 +703,6 @@
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/Program Files/Java/jdk1.8/src.zip!/java/lang/Class.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="596">
-          <caret line="1821" column="26" selection-start-line="1821" selection-start-column="26" selection-end-line="1821" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8/src.zip!/java/nio/ByteBuffer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="239">
@@ -991,12 +912,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="14" column="1" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
-          <folding>
-            <element signature="e#229#230#0" expanded="true" />
-            <element signature="e#267#268#0" expanded="true" />
-            <element signature="e#317#318#0" expanded="true" />
-            <element signature="e#372#373#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1018,13 +933,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="174">
           <caret line="644" selection-start-line="644" selection-end-line="644" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="35" column="13" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -1072,25 +980,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/UniprotLevelDbFinder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
+        <state relative-caret-position="3842">
           <caret line="264" column="61" selection-start-line="264" selection-start-column="61" selection-end-line="264" selection-end-column="61" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/CheckIndexLeveldDBBug1.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="428">
+        <state relative-caret-position="782">
           <caret line="59" column="48" selection-start-line="59" selection-start-column="48" selection-end-line="59" selection-end-column="48" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareProteinNames.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
         </state>
       </provider>
     </entry>
@@ -1112,27 +1013,44 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="40" column="9" lean-forward="true" selection-start-line="24" selection-start-column="8" selection-end-line="40" selection-end-column="9" />
-          <folding>
-            <element signature="e#1036#1037#0" expanded="true" />
-            <element signature="e#1054#1055#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/GlobalMain.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="82" column="28" selection-start-line="82" selection-start-column="28" selection-end-line="82" selection-end-column="28" />
+        <state relative-caret-position="119">
+          <caret line="35" column="38" selection-start-line="35" selection-start-column="38" selection-end-line="35" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/UngroupCsv.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="31" column="36" lean-forward="true" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
+        <state relative-caret-position="85">
+          <caret line="18" column="14" selection-start-line="18" selection-start-column="14" selection-end-line="18" selection-end-column="14" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/hr/pbf/digestdb/test/experiments/P1.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareProteinNames.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="8" selection-start-line="5" selection-start-column="8" selection-end-line="5" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/hr/pbf/digestdb/uniprot/sprot/PrepareTaxonomy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="51" column="56" lean-forward="true" selection-start-line="51" selection-start-column="56" selection-end-line="51" selection-end-column="56" />
         </state>
       </provider>
     </entry>
