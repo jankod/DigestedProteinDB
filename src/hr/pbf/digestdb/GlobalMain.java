@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import hr.pbf.digestdb.uniprot.sprot.A10_UniprotFormat1toCSV;
 import hr.pbf.digestdb.uniprot.sprot.UngroupCsv;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -24,6 +25,7 @@ import hr.pbf.digestdb.uniprot.A4_UniprotCsvToLevelDB;
 import hr.pbf.digestdb.uniprot.A6_UniprotStatistic;
 import hr.pbf.digestdb.uniprot.A7_UniprotProtNamesToLevelDB;
 import hr.pbf.digestdb.uniprot.A8_UniprotLevelDBtoIndex;
+import hr.pbf.digestdb.uniprot.A9_CountLongestValueInCSVColumn;
 import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
 import hr.pbf.digestdb.uniprot.UniprotSearchFormat2;
 import hr.pbf.digestdb.util.TimeScheduler;
@@ -41,6 +43,11 @@ public class GlobalMain {
             // App_11_MakeLevelDbStore_TEST.main(args);
             // App_14_MaveMVstoreAccessionTaxid.main(args);
             // App_15_AddTaxIdToCSV.main(args);
+
+            if (argsFirstElementContain("format1_to_csv_a10", args)) {
+                A10_UniprotFormat1toCSV.main(argsMinusFirstElement(args));
+                return;
+            }
 
             if (argsFirstElementContain("uniprot-a1", args)) {
                 A1_UniprotToFormat1.main(argsMinusFirstElement(args));
@@ -89,8 +96,14 @@ public class GlobalMain {
                 return;
 
             }
+            
+            if(argsFirstElementContain("count-longest", args)) {
+            	A9_CountLongestValueInCSVColumn c = new A9_CountLongestValueInCSVColumn();
+            	c.start();
+            	return;
+            }
 
-            // System.out.println("Not find parameter?");
+             System.out.println("Not find parameter?");
         } catch (Throwable e) {
             e.printStackTrace();
         } finally {

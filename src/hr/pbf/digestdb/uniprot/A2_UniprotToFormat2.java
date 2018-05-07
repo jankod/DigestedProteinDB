@@ -18,6 +18,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import hr.pbf.digestdb.util.UniprotConfig;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -60,13 +61,10 @@ public class A2_UniprotToFormat2 {
 		String format1Dir = "F:\\Downloads\\uniprot\\uniprot_sprot.dat_format1";
 		String format2Dir = "F:\\Downloads\\uniprot\\format2s-ponovo";
 
-		// format1Dir =
-		// "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl\\demo-format1";
-		// format2Dir =
-		// "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\trembl\\demo-format2";
-
+		String baseDir = UniprotConfig.get(UniprotConfig.Name.BASE_DIR);
 		if (SystemUtils.IS_OS_LINUX) {
-			format1Dir = "/home/users/tag/uniprot/trembl_format1";
+
+			format1Dir = baseDir +"/trembl_format1";
 			format2Dir = "/home/users/tag/uniprot/trembl_format2s";
 		}
 

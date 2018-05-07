@@ -51,55 +51,39 @@ public class A1_UniprotToFormat1 {
 
 	private static MassRangeFiles massRangeFiles;
 
+	private static long	longestProtName	= 0;
+	private static long	longestAcc		= 0;
+
 	public static void main(String[] args) throws IOException {
-		long maxEntry =  Long.MAX_VALUE;
+		long maxEntry = Long.MAX_VALUE;
 
-		String db = "uniprot_sprot.dat";
-		db = "uniprot_trembl_part.dat";
-
+		String uniprotFileName = "uniprot_sprot.dat";
+		uniprotFileName = "uniprot_trembl_part.dat";
+		uniprotFileName = "uniprot_trembl_archaea.dat";
+		uniprotFileName = "uniprot_trembl_bacteria.dat";
+		
 		pathDirMain = UniprotConfig.get(Name.BASE_DIR);
-
-		// DEMO
-		// pathDirMain = "C:\\Eclipse\\OxygenWorkspace\\DigestedProteinDB\\misc\\ne
-		// radi";
-
-		if (SystemUtils.IS_OS_LINUX) {
-			pathDirMain = "/home/users/tag/uniprot";
-			maxEntry = Long.MAX_VALUE;
-			db = "uniprot_trembl.dat";
-			// db = "uniprot_sprot.dat";
-		}
-
-		pathDirFormat1 = pathDirMain + File.separator + db + "_format1";
-
-		// if (SystemUtils.IS_OS_WINDOWS) {
-		// pathDirFormat1 += "_" + maxEntry;
-		// }
-		String outProtPath = pathDirMain + File.separator + db + "_prot_names2.csv";
+		pathDirFormat1 = pathDirMain + File.separator + uniprotFileName + "_format1";
+		String outProtPath = pathDirMain + File.separator + uniprotFileName + "_prot_names2.csv";
 
 		massRangeFiles = new MassRangeFiles(500, 6000, 0.3f, "format1", pathDirFormat1);
 
 		File d = new File(pathDirFormat1);
 		FileUtils.deleteDirectory(d);
 		d.mkdirs();
-		TimeScheduler.runEvery10Minutes(new Runnable() {
+		TimeScheduler.runEvery10Minutes(
+				() -> log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(counter)));
 
-			@Override
-			public void run() {
-				log.debug("Working progress: " + NumberFormat.getIntegerInstance().format(counter));
-			}
-		});
-
-		// log.debug(outProtPath);
+		log.debug(outProtPath);
 		outProt = BioUtil.newFileWiter(outProtPath, "ASCII");
 
-		log.debug("db " + db);
+		log.debug("db: " + uniprotFileName);
 
-		readUniprotTextLarge(pathDirMain + File.separator + db, e -> {
+		readUniprotTextLarge(pathDirMain + File.separator + uniprotFileName, e -> {
 
 			try {
 
-			//	writeMass(e);
+				writeMass(e);
 				writeProteNames(e);
 				counter++;
 			} catch (Throwable e1) {
@@ -114,14 +98,16 @@ public class A1_UniprotToFormat1 {
 
 		TimeScheduler.stopAll();
 		log.debug(pathDirFormat1 + " size: " + UniprotUtil.getDirectorySize(pathDirFormat1));
+		log.debug("longest acc: " + longestAcc);
+		log.debug("longest prot name: " + longestProtName);
 	}
 
-	private static long longestProtName = 0;
 	private static void writeProteNames(EntryUniprot e) throws IOException {
 		// remove {ECO:0000313|EMBL:ARD89112.1} from prot name
 		String protName = UniprotParseUtil.removeEvidenceAtributes(e.getProtName());
 		int taxId = e.getTax();
 		longestProtName = Math.max(longestProtName, protName.length());
+		longestAcc = Math.max(longestAcc, e.getAccession().length());
 		outProt.write(e.getAccession() + "\t" + protName + "\t" + taxId + "\n");
 	}
 
