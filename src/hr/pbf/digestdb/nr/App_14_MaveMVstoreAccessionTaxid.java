@@ -25,7 +25,7 @@ public class App_14_MaveMVstoreAccessionTaxid {
 
 		addToDB("/home/users/tag/nr_db/accession2taxid/dead_prot.accession2taxid", map, true);
 
-		s.compactRewriteFully();
+	//	s.compact()
 		s.close();
 	}
 

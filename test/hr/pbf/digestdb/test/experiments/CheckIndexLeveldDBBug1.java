@@ -4,8 +4,6 @@ import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder;
 import hr.pbf.digestdb.uniprot.UniprotModel;
 import hr.pbf.digestdb.uniprot.UniprotUtil;
 import hr.pbf.digestdb.util.BioUtil;
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +19,6 @@ public class CheckIndexLeveldDBBug1 {
     public static void main(String[] args) throws IOException {
         UniprotLevelDbFinder finder = new UniprotLevelDbFinder();
         UniprotLevelDbFinder.IndexResult index = finder.searchIndex(400, 501);
-        long size = ObjectSizeCalculator.getObjectSize(index);
-        log.debug(FileUtils.byteCountToDisplaySize(size));
         printFirst(index);
         log.debug("index min: {} max: {}", index.map.firstKey(), index.map.lastKey());
 

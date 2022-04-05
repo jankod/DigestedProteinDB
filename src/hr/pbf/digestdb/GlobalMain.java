@@ -1,36 +1,17 @@
 package hr.pbf.digestdb;
 
-import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
-
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
+import hr.pbf.digestdb.uniprot.*;
 import hr.pbf.digestdb.uniprot.sprot.A10_UniprotFormat1toCSV;
 import hr.pbf.digestdb.uniprot.sprot.UngroupCsv;
-import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.commons.lang3.time.StopWatch;
-
-import hr.pbf.digestdb.nr.App_11_MakeLevelDbStore;
-import hr.pbf.digestdb.nr.App_11_MakeLevelDbStore_TEST;
-import hr.pbf.digestdb.nr.App_12_CreateTaxIDAccessionDB;
-import hr.pbf.digestdb.nr.App_14_MaveMVstoreAccessionTaxid;
-import hr.pbf.digestdb.nr.App_15_AddTaxIdToCSV;
-import hr.pbf.digestdb.uniprot.A1_UniprotToFormat1;
-import hr.pbf.digestdb.uniprot.A2_UniprotToFormat2;
-import hr.pbf.digestdb.uniprot.A3_UniprotFormat2ToOther;
-import hr.pbf.digestdb.uniprot.A4_UniprotCsvToLevelDB;
-import hr.pbf.digestdb.uniprot.A6_UniprotStatistic;
-import hr.pbf.digestdb.uniprot.A7_UniprotProtNamesToLevelDB;
-import hr.pbf.digestdb.uniprot.A8_UniprotLevelDBtoIndex;
-import hr.pbf.digestdb.uniprot.A9_CountLongestValueInCSVColumn;
-import hr.pbf.digestdb.uniprot.A_X2_UniprotCompressSmallFilesLevelDb;
-import hr.pbf.digestdb.uniprot.UniprotSearchFormat2;
 import hr.pbf.digestdb.util.TimeScheduler;
 import hr.pbf.digestdb.util.UniprotConfig;
 import hr.pbf.digestdb.util.UniprotConfig.Name;
+import org.apache.commons.lang3.time.StopWatch;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 
 public class GlobalMain {
 
@@ -97,11 +78,11 @@ public class GlobalMain {
 
             }
             
-            if(argsFirstElementContain("count-longest", args)) {
-            	A9_CountLongestValueInCSVColumn c = new A9_CountLongestValueInCSVColumn();
-            	c.start();
-            	return;
-            }
+//            if(argsFirstElementContain("count-longest", args)) {
+//            	A9_CountLongestValueInCSVColumn c = new A9_CountLongestValueInCSVColumn();
+//            	c.start();
+//            	return;
+//            }
 
              System.out.println("Not find parameter?");
         } catch (Throwable e) {
