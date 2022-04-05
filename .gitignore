@@ -4,3 +4,5 @@
 /.apt_generated/
 /out/
 .idea
+.settings
+war/node_modules
