@@ -167,6 +167,8 @@ public class App_1_PrepareNr {
 
 			accession = BioUtil.removeVersionFromAccession(accession);
 
+
+
 			Connection conn = mysql.getConnection();
 
 			String sql = "SELECT accession_num FROM accession_taxid_gi WHERE accession = '"

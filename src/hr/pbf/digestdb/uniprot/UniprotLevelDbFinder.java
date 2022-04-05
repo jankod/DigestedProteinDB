@@ -39,11 +39,8 @@ import java.util.concurrent.ConcurrentNavigableMap;
 public class UniprotLevelDbFinder implements Closeable {
 
     private DB db;
-    // private TreeMap<Float, Integer> indexMap;
     private static final Logger log = LoggerFactory.getLogger(UniprotLevelDbFinder.class);
     private SortedTableMap<Float, Integer> mapIndex;
-    // private StoreReader protNameReader;
-    // private SortedTableMap<String, String> mapAccProtName;
     private DB dbProtName;
 
     public static void main(String[] args) throws IOException {

@@ -20,7 +20,7 @@ public class MassRangeFiles {
 	private static HashMap<String, DataOutput> massStreamMap = new HashMap<>();
 
 	private String fileExtension;
-	private String dir;
+	private String directory;
 
 	/**
 	 * Round float mass before and after save peptide mass
@@ -39,15 +39,15 @@ public class MassRangeFiles {
 	 *            delta mass
 	 * @param fileExtension
 	 *            file postfix creatate
-	 * @param dir
+	 * @param directory
 	 *            directory created for store files
 	 */
-	public MassRangeFiles(int from, int to, float delta, String fileExtension, String dir) {
+	public MassRangeFiles(int from, int to, float delta, String fileExtension, String directory) {
 		this.fromMass = from;
 		this.toMass = to;
 		this.delta = delta;
 		this.fileExtension = fileExtension;
-		this.dir = dir;
+		this.directory = directory;
 		this.massRangeMap = new MassRangeMap(delta, fromMass, toMass);
 		
 		// llloookkkčččćććššš 
@@ -80,7 +80,7 @@ public class MassRangeFiles {
 		if (massStreamMap.containsKey(fileName)) {
 			out = massStreamMap.get(fileName);
 		} else {
-			out = BioUtil.newDataOutputStream(dir + File.separator + fileName + "." + this.fileExtension, 8192);
+			out = BioUtil.newDataOutputStream(directory + File.separator + fileName + "." + this.fileExtension, 8192);
 			massStreamMap.put(fileName, out);
 		}
 		return out;

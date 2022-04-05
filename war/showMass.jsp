@@ -18,13 +18,13 @@
     <%
         UniprotLevelDbFinder finder = WebListener.getFinder();
         float mass = 1000f;
-        if(request.getParameter("margin") != null) {
+        if (request.getParameter("margin") != null) {
             mass = Float.parseFloat(request.getParameter("mass"));
         }
         float margin = 0.1f;
-        if(request.getParameter("margin") != null) {
+        if (request.getParameter("margin") != null) {
             margin = Float.parseFloat(request.getParameter("margin"));
-        }else{
+        } else {
 
         }
         UniprotLevelDbFinder.SearchOneMassResult result = finder.searchMassOne(mass, margin);
@@ -58,12 +58,12 @@
             </c:forEach>
         </ul>
         <div class="col-10">
-            <form action="<c:url value="showMass.jsp" />" method="get" style=""
-                  novalidate class="form-inline">
+            <form action="<c:url value="showMass.jsp" />" method="get" novalidate class="form-inline">
 
                 <div class="mx-sm-3 mb-2">
                     <input class="form-control" placeholder="Mass Da" name="mass" id="mass" value="${param.mass}">
-                    &plusmn; <input class="form-control" style="width: 6em" type="number" step="0.02" max="0.30" min="0" name="margin" value="0.01">
+                    &plusmn; <input class="form-control" style="width: 6em" type="number" step="0.02" max="0.30" min="0"
+                                    name="margin" value="0.01">
 
                 </div>
                 <button type="submit" id="btnSubmit" class="btn btn-primary mb-2">Search</button>
@@ -99,13 +99,13 @@
 <script>
     $(document).ready(function () {
         // $('#table').DataTable({
-           // "dom": '<"top "ip<"clear">>rt<"bottom"pil<"clear">>'
-            //"dom": 'lrtip'
-            //"dom": '<lf<t>ip>',
-            // dom: '<"row btn-group"<"col-sm-12 col-md-6"p><"col-sm-12 col-md-6"l>><"row"rt><"row"ip>',
-            // rowGroup: {
-            //     dataSrc: 1
-            // }
+        // "dom": '<"top "ip<"clear">>rt<"bottom"pil<"clear">>'
+        //"dom": 'lrtip'
+        //"dom": '<lf<t>ip>',
+        // dom: '<"row btn-group"<"col-sm-12 col-md-6"p><"col-sm-12 col-md-6"l>><"row"rt><"row"ip>',
+        // rowGroup: {
+        //     dataSrc: 1
+        // }
 
         // });
     });

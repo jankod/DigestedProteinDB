@@ -6,3 +6,5 @@
 .idea
 .settings
 war/node_modules
+.classpath
+.project

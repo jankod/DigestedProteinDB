@@ -20,10 +20,6 @@ public class EntrezUtil {
         String xml = org.apache.commons.io.IOUtils.toString(new URL(url), Charsets.UTF_8);
         String taxid;
         try {
-//			if (xml.contains("<TSeqSet>\r\n</TSeqSet>")) {
-//				return "0";
-//			}
-
             taxid = xml.substring(xml.indexOf("<TSeq_taxid>") + 12, xml.indexOf("</TSeq_taxid>"));
 
             return taxid;
