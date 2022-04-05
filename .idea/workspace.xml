@@ -10,7 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49ef1dea-2cda-4874-9562-6804684f3694" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/DigestedProteinDB.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/DigestedProteinDB_war_exploded.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/artifacts/DigestedProteinDB_war_exploded.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -479,7 +482,7 @@
       <workItem from="1524474006486" duration="1961000" />
       <workItem from="1524562090908" duration="53000" />
       <workItem from="1649143543419" duration="1534000" />
-      <workItem from="1649163463541" duration="1015000" />
+      <workItem from="1649163463541" duration="1204000" />
     </task>
     <task id="LOCAL-00001" summary="ertert">
       <created>1523280436975</created>
@@ -509,7 +512,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649165888675</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fix library version">
+      <created>1649165930491</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1649165930491</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TestHistory">

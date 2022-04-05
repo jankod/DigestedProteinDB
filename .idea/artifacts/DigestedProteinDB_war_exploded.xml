@@ -43,7 +43,7 @@
           <element id="library" level="project" name="Maven: org.objenesis:objenesis:2.1" />
           <element id="library" level="project" name="Maven: commons-io:commons-io:2.11.0" />
           <element id="library" level="project" name="Maven: org.opentest4j:opentest4j:1.2.0" />
-          <element id="library" level="project" name="Maven: com.h2database:h2-mvstore:1.4.200" />
+          <element id="library" level="project" name="Maven: com.h2database:h2-mvstore:2.1.210" />
           <element id="library" level="project" name="Maven: it.unimi.dsi:dsiutils:2.4.2" />
           <element id="library" level="project" name="Maven: it.unimi.dsi:fastutil:8.1.0" />
           <element id="library" level="project" name="Maven: com.martiansoftware:jsap:2.1" />
@@ -108,7 +108,7 @@
           <element id="library" level="project" name="Maven: org.eclipse.jetty:apache-jstl:9.4.8.v20171121" />
           <element id="library" level="project" name="Maven: org.apache.taglibs:taglibs-standard-spec:1.2.5" />
           <element id="library" level="project" name="Maven: org.apache.taglibs:taglibs-standard-impl:1.2.5" />
-          <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.3" />
+          <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.4" />
           <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.6.20" />
           <element id="library" level="project" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.6.20" />
           <element id="library" level="project" name="Maven: org.jetbrains:annotations:13.0" />

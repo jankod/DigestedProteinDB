@@ -75,8 +75,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-runner:1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-suite-api:1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.8.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.h2database:h2:1.4.200" level="project" />
-    <orderEntry type="library" name="Maven: com.h2database:h2-mvstore:1.4.200" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.h2database:h2:2.1.210" level="project" />
+    <orderEntry type="library" name="Maven: com.h2database:h2-mvstore:2.1.210" level="project" />
     <orderEntry type="library" name="Maven: it.unimi.dsi:dsiutils:2.4.2" level="project" />
     <orderEntry type="library" name="Maven: it.unimi.dsi:fastutil:8.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.martiansoftware:jsap:2.1" level="project" />
@@ -143,7 +143,7 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:apache-jstl:9.4.8.v20171121" level="project" />
     <orderEntry type="library" name="Maven: org.apache.taglibs:taglibs-standard-spec:1.2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.taglibs:taglibs-standard-impl:1.2.5" level="project" />
-    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.4" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib:1.6.20" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains.kotlin:kotlin-stdlib-common:1.6.20" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations:13.0" level="project" />
