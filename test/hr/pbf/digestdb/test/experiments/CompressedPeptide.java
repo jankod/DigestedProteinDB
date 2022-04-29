@@ -3,10 +3,10 @@ package hr.pbf.digestdb.test.experiments;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-import org.iq80.snappy.Snappy;
 
 import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
+import org.iq80.leveldb.util.Snappy;
 
 public class CompressedPeptide {
 
@@ -23,13 +23,7 @@ public class CompressedPeptide {
 
 	}
 	
-	public static void main223(String[] args) {
-		String orig = "AWPLIRDVQRLIDWDKRI";
-		byte[] c = Snappy.compress(orig.getBytes(Charsets.US_ASCII));
-		System.out.println(orig.length() + " vs "+ c.length);
-		
-	}
-	
+
 	public static void main(String[] args) {
 		// u 5 bit stane 32
 		int i = 23335;

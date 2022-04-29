@@ -48,12 +48,7 @@
                 "searching": false,
                 "ajax": {
                     url: "/search",
-                    // url: window.location.href,
                     type: "POST",
-                    //  contentType: 'application/json;',
-                    //contentType: 'application/json; charset=utf-8',
-
-                    //   dataSrc: '',
                     data: function (d) {
                         d.massFrom = $("#massFrom").val()+"";
                         d.massTo = $("#massTo").val()+"";
@@ -62,8 +57,6 @@
                        // console.log("data", data);
                         return data;
                     }
-
-                    // }
                 },
                 "columns": [
                     {"data": "num"},

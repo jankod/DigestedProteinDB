@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
 import hr.pbf.digestdb.uniprot.UniprotFormat3;
 import hr.pbf.digestdb.uniprot.UniprotModel;
 import hr.pbf.digestdb.util.BiteUtil;
@@ -18,7 +19,6 @@ import org.iq80.leveldb.DBIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 
 import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder;
 import hr.pbf.digestdb.uniprot.UniprotLevelDbFinder.IndexResult;

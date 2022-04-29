@@ -23,7 +23,7 @@ import org.apache.commons.collections.FastArrayList;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.iq80.snappy.SnappyFramedInputStream;
+//import org.iq80.snappy.SnappyFramedInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xerial.snappy.Snappy;
