@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.eclipse.jetty.webapp.Configuration;
+import org.eclipse.jetty.webapp.WebAppConfiguration;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,8 @@ public class StartJetty {
         // This webapp will use jsps and jstl. We need to enable the
         // AnnotationConfiguration in order to correctly
         // set up the jsp container
+
+        WebAppConfiguration webAppConfiguration = new WebAppConfiguration();
         Configuration classlist = Configuration.setServerDefault(server);
         classlist.addBefore("org.eclipse.jetty.webapp.JettyWebXmlConfiguration",
                 "org.eclipse.jetty.annotations.AnnotationConfiguration");
