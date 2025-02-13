@@ -464,7 +464,7 @@ public class BioUtil {
         float h = 0;
         try {
             for (int i = 0; i < peptide.length(); i++) {
-                h += getMassFromAAfast(peptide.charAt(i));
+                h += (float) getMassFromAAfast(peptide.charAt(i));
             }
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage() + " peptide: " + peptide, e);
@@ -473,59 +473,30 @@ public class BioUtil {
     }
 
     public static double getMassFromAAfast(final char aa) {
-        switch (aa) {
-            case 'G':
-                return 57.021463724D;
-            // return 57;
-            case 'A':
-                return 71.03711379D;
-            case 'S':
-                return 87.03202841D;
-            case 'P':
-                return 97.05276385D;
-            case 'V':
-                return 99.06841392D;
-            case 'T':
-                return 101.04767847D;
-            case 'C':
-                return 103.00918448D;
-            case 'I':
-                return 113.08406398D;
-            case 'J':
-                return 113.08406398D;
-            case 'L':
-                return 113.08406398D;
-            case 'N':
-                return 114.04292745D;
-            case 'D':
-                return 115.02694303D;
-            case 'Q':
-                return 128.05857751D;
-            case 'K':
-                return 128.09496302D;
-            case 'E':
-                return 129.0425931D;
-            case 'M':
-                return 131.04048461D;
-            case 'H':
-                return 137.05891186D;
-            case 'F':
-                return 147.0684139162D;
-            case 'R':
-                return 156.10111103D;
-            case 'Y':
-                return 163.06332854D;
-            case 'W':
-                return 186.07931295D;
-            case 'U':
-                return 150.95363559D;
-            case 'O':
-                return 114.0793129535D;
-            default:
-                // log.error("Koji je ovo aa: '{}'", aa);
-                throw new RuntimeException("Wrong AA '" + aa + "' ");
-                // return '?';
-        }
+        return switch (aa) {
+            case 'G' -> 57.021463724D;
+            case 'A' -> 71.03711379D;
+            case 'S' -> 87.03202841D;
+            case 'P' -> 97.05276385D;
+            case 'V' -> 99.06841392D;
+            case 'T' -> 101.04767847D;
+            case 'C' -> 103.00918448D;
+            case 'I', 'J', 'L' -> 113.08406398D;
+            case 'N' -> 114.04292745D;
+            case 'D' -> 115.02694303D;
+            case 'Q' -> 128.05857751D;
+            case 'K' -> 128.09496302D;
+            case 'E' -> 129.0425931D;
+            case 'M' -> 131.04048461D;
+            case 'H' -> 137.05891186D;
+            case 'F' -> 147.0684139162D;
+            case 'R' -> 156.10111103D;
+            case 'Y' -> 163.06332854D;
+            case 'W' -> 186.07931295D;
+            case 'U' -> 150.95363559D;
+            case 'O' -> 114.0793129535D;
+            default -> throw new RuntimeException("Wrong AA '" + aa + "' ");
+        };
     }
 
     public static void printMemoryUsage(String msg) {
@@ -539,7 +510,7 @@ public class BioUtil {
         System.out.println("Time duration: " + DurationFormatUtils.formatDurationHMS(stopWatch.getTime()));
     }
 
-    public final static String[] fastSplit(String string, char delimiter) {
+    public static String[] fastSplit(String string, char delimiter) {
         /*
          * fastpath of String.split()
          *

@@ -26,7 +26,6 @@ public class UniprotModel {
     }
 
     @Data
-    @Accessors
     public static class Tax {
         private int taxId;
         private String desc;

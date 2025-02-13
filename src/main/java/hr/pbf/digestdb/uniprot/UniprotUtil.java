@@ -117,13 +117,13 @@ public class UniprotUtil {
         return byteOut.array;
     }
 
-    public final static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass)
+    public static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass)
             throws IOException {
         return fromFormat2(format2, sortByMass, 0, 1000000);
     }
 
-    public final static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass,
-                                                                         float fromMass, float toMass) throws IOException {
+    public static Map<String, List<PeptideAccTaxMass>> fromFormat2(byte[] format2, boolean sortByMass,
+                                                                   float fromMass, float toMass) throws IOException {
 
         try (FastInput in = new FastInput(new FastByteArrayInputStream(format2))) {
 
