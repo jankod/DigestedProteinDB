@@ -1,19 +1,17 @@
 package hr.pbf.digestdb.rocksdb;
 
-import com.google.common.base.Ascii;
 import lombok.Data;
+import lombok.Getter;
 import lombok.ToString;
-import org.rocksdb.RocksDBException;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class SwisprotXMLParser {
+@Getter
+public class UniprotXMLParser {
 
 
     @Data
@@ -26,6 +24,7 @@ public class SwisprotXMLParser {
         abstract void gotProtein(ProteinInfo p);
     }
 
+    private int totalCount = 0;
 
     public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
         ProteinInfo proteinInfo = null;
@@ -80,6 +79,7 @@ public class SwisprotXMLParser {
                         if ("entry".equals(reader.getLocalName()) && proteinInfo != null) {
 //                            proteinList.add(proteinInfo);
                             proteinHandler.counter++;
+                            totalCount++;
                             proteinHandler.gotProtein(proteinInfo);
                         }
                         break;
