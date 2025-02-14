@@ -10,10 +10,6 @@ import java.util.Properties;
 @Slf4j
 public class MainExportSortedDackDb {
     public static void main(String[] args) throws ClassNotFoundException {
-
-
-        String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted.csv";
-
         Class.forName("org.duckdb.DuckDBDriver"); // Load the driver
 
         Properties readOnlyProperty = new Properties();
@@ -32,7 +28,7 @@ public class MainExportSortedDackDb {
                   COPY (SELECT * FROM peptides ORDER BY mass, "sequence")
                   TO '/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted.parquet' (FORMAT 'parquet');
                   """;
-            statement.execute(sqlExportParquet);
+            statement.execute(sqlExportCsv);
             log.debug("Copy done");
 
 

@@ -2,7 +2,6 @@ package hr.pbf.digestdb.rocksdb;
 
 import hr.pbf.digestdb.util.BioUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationUtils;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
@@ -40,7 +39,7 @@ public class RocksDbMass {
         for (String peptide : peptides) {
             float mass = (float) BioUtil.calculateMassWidthH2O(peptide);
             // mass to byte[]
-            byte[] massAsKey = RocksUtil.floatToByteArray(mass);
+            byte[] massAsKey = RocksDbUtil.floatToByteArray(mass);
 
             // ako vec postoji taj kljuc u bazi, onda dodajemo jos jedan peptide
 
