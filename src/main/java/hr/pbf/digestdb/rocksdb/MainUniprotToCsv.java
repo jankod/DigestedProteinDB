@@ -2,10 +2,10 @@ package hr.pbf.digestdb.rocksdb;
 
 import hr.pbf.digestdb.rocksdb.UniprotXMLParser.ProteinHandler;
 import hr.pbf.digestdb.util.BioUtil;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,19 +13,19 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class MainUniprotToCsv {
+    public static String swisprotPath = "/Users/tag/DevProject/blast-ncbi/uniprot_sprot.xml";
+    public static String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass.csv";
+    public static int maxCount = Integer.MAX_VALUE - 1;
 
     public static void main(String[] args) throws RocksDBException, IOException {
-        String swisprotPath = "/Users/tag/DevProject/blast-ncbi/uniprot_sprot.xml";
-        String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass.csv";
-        final int maxCount = Integer.MAX_VALUE - 1;
 
 
         UniprotXMLParser parser = new UniprotXMLParser();
 
         Charset standardCharset = StandardCharsets.UTF_8;
 
-        try (FastBufferedOutputStream out = new FastBufferedOutputStream(new FileOutputStream(csvPath), 8 * 1024 * 4)) {
-         //   out.write(getCsvHeader().getBytes(standardCharset));
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(csvPath), 8 * 1024 * 4)) {
+            //   out.write(getCsvHeader().getBytes(standardCharset));
 
             parser.parseProteinsFromXMLstream(swisprotPath, new ProteinHandler() {
                 @Override
@@ -61,6 +61,8 @@ public class MainUniprotToCsv {
         } finally {
             log.debug("Finish, protein count: {}", parser.getTotalCount());
         }
+
+        log.info("Finish to "+ csvPath);
 
 
     }

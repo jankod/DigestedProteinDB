@@ -1,6 +1,5 @@
 package hr.pbf.digestdb.rocksdb;
 
-import com.google.common.primitives.Doubles;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
@@ -10,7 +9,6 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,10 +24,15 @@ public class MainSortedCsvToDb {
 
     public static void main(String[] args) throws RocksDBException, IOException {
         StopWatch watch = StopWatch.createStarted();
-      //  mainInsert(args);
+      //mainInsertToDackDb(args);
+        mainInsertToPaldb(args);
        mainSearch(args);
        // watch.stop();
         log.info("Durration in: {}", watch);
+    }
+
+    private static void mainInsertToPaldb(String[] args) {
+
     }
 
     public static void mainSearch(String[] args) throws RocksDBException {
@@ -79,7 +82,7 @@ public class MainSortedCsvToDb {
     }
 
 
-    public static void mainInsert(String[] args) throws IOException, RocksDBException {
+    public static void mainInsertToDackDb(String[] args) throws IOException, RocksDBException {
 
         try (RocksDB db = RocksDbUtil.openDB(dbPath)) {
 

@@ -30,22 +30,10 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
-//import org.iq80.snappy.SnappyFramedInputStream;
-//import org.iq80.snappy.SnappyFramedOutputStream;
 
-import com.esotericsoftware.kryo.io.FastInput;
-import com.esotericsoftware.kryo.io.FastOutput;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.minlog.Log;
-
-import ch.qos.logback.core.UnsynchronizedAppenderBase;
-import hr.pbf.digestdb.uniprot.MyDataOutputStream;
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
-import net.jpountz.util.UnsafeUtils;
 
 public class BioUtil {
 
@@ -174,28 +162,8 @@ public class BioUtil {
         return out;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////// 77
 
-    public static MyDataOutputStream newDataOutputStream(String path) throws FileNotFoundException {
 
-        MyDataOutputStream out = new MyDataOutputStream(
-                new FastBufferedOutputStream(new FileOutputStream(new File(path))));
-        return out;
-    }
-
-    /**
-     * @param path
-     * @param bufSize default je 8192
-     * @return
-     * @throws FileNotFoundException
-     */
-    public static MyDataOutputStream newDataOutputStream(String path, int bufSize) throws FileNotFoundException {
-        new File(path).getParentFile().mkdirs();
-
-        MyDataOutputStream out = new MyDataOutputStream(
-                new FastBufferedOutputStream(new FileOutputStream(new File(path)), bufSize));
-        return out;
-    }
 
     public static DataInputStream newDataInputStream(String path) throws FileNotFoundException {
         DataInputStream out = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
@@ -211,12 +179,12 @@ public class BioUtil {
     }
 
     public static Map<String, Double> getMassesDigest(String seq) {
-        final List<String> cepanice = tripsyn(seq, 5, 110); // 110 znakova je najvise jer ESI radi do 6000Da, a 6000 /
+        final List<String> peptides = tripsyn(seq, 5, 110); // 110 znakova je najvise jer ESI radi do 6000Da, a 6000 /
         // 57 ~ 110 aminoki kis.
 
-        Map<String, Double> cepaniceMasa = new HashMap<String, Double>(cepanice.size());
-        for (String cepa : cepanice) {
-            // maknuti cepanice sa 'X', 'B', 'Z', 'J', 'U', 'O'
+        Map<String, Double> cepaniceMasa = new HashMap<String, Double>(peptides.size());
+        for (String cepa : peptides) {
+            // maknuti peptides sa 'X', 'B', 'Z', 'J', 'U', 'O'
             if (StringUtils.containsAny(cepa, 'X', 'B', 'Z', 'J', 'U', 'O')) {
                 continue;
             }
@@ -225,7 +193,7 @@ public class BioUtil {
             // // Maknut cu sve B i Z
             //
             // // PeptideUtils.getCombinationStringWithX_B_Z(c, peptidi);
-            // } // inace ignoriraj cepanice sa X-evima
+            // } // inace ignoriraj peptides sa X-evima
 
             final double mass = calculateMassWidthH2O(cepa);
             if (mass < 6000) // ESI ide do 6000Da
@@ -589,14 +557,5 @@ public class BioUtil {
         return result;
     }
 
-    public static String intToAccession(int accession, ArrayList<String> prefixList) {
-
-        throw new NotImplementedException("");
-
-    }
-
-    public static Input newFastDataInput(String path) throws FileNotFoundException {
-        return new FastInput(new FileInputStream(new File(path)));
-    }
 
 }
