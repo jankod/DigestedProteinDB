@@ -13,7 +13,8 @@ public class App {
         log.info("DigestDB app");
 
 
-        MainUniprotToCsv.main(new String[] { "uniprot_sprot.dat", "uniprot_sprot.dat.csv" });
+        MainUniprotToCsv app = new MainUniprotToCsv();
+        app.main(args);
 
     }
 }
