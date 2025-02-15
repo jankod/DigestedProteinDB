@@ -4,7 +4,7 @@ import groovy.lang.GroovyClassLoader
 String jarFilePath = "/Users/tag/IdeaProjects/DigestedProteinDB/target/digestdb-1.0-SNAPSHOT-jar-with-dependencies.jar"  // **VAŽNO: Promijenite ovu putanju!**
 
 // Ime klase koju želite koristiti iz JAR fajla (puni paketni put)
-String javaClassName = "hr.pbf.digestdb.rocksdb.MainUniprotToCsv" // **VAŽNO: Promijenite ovo ime klase!**
+String javaClassName = "hr.pbf.digestdb.rocksdb.MainUniprotToCsv"
 
 try {
     // 1. Stvaranje GroovyClassLoader-a
@@ -19,7 +19,9 @@ try {
     // 4. Stvaranje instance Java klase (ako je potrebno)
     // Pretpostavka: Java klasa ima defaultni konstruktor (bez argumenata)
     def javaObject = javaClass.getDeclaredConstructor().newInstance()
-    println javaObject
+   // hr.pbf.digestdb.rocksdb.MainUniprotToCsv c = new hr.pbf.digestdb.rocksdb.MainUniprotToCsv()
+
+    println javaObject.swisprotPath
 
 } catch (Exception e) {
     println "Greška prilikom pozivanja Java aplikacije: ${e.getMessage()}"
