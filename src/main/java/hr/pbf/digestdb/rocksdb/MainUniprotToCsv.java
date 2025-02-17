@@ -3,9 +3,9 @@ package hr.pbf.digestdb.rocksdb;
 import hr.pbf.digestdb.rocksdb.UniprotXMLParser.ProteinHandler;
 import hr.pbf.digestdb.util.BioUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.rocksdb.RocksDBException;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,30 +13,41 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class MainUniprotToCsv {
-    public static String swisprotPath = "/Users/tag/DevProject/blast-ncbi/uniprot_sprot.xml";
-    public static String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass.csv";
-    public static int maxCount = Integer.MAX_VALUE - 1;
+    public String fromSwisprotPath = "";
 
-    public static void main(String[] args) throws RocksDBException, IOException {
+    public String toCsvPath = "";
+    public int maxProteinCount = Integer.MAX_VALUE - 1;
 
+    public int minPeptideLength = 5;
+    public int maxPeptideLength = 30;
+
+    public void start() throws IOException {
 
         UniprotXMLParser parser = new UniprotXMLParser();
 
         Charset standardCharset = StandardCharsets.UTF_8;
 
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(csvPath), 8 * 1024 * 4)) {
+        if (!new File(fromSwisprotPath).exists()) {
+            throw new RuntimeException("File not found: " + fromSwisprotPath);
+        }
+        if (new File(toCsvPath).exists()) {
+            throw new RuntimeException("File already exists: " + toCsvPath);
+        }
+
+        // Default DEFAULT_MAX_BUFFER_SIZE = 8192
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(toCsvPath), 8 * 1024 * 8)) {
             //   out.write(getCsvHeader().getBytes(standardCharset));
 
-            parser.parseProteinsFromXMLstream(swisprotPath, new ProteinHandler() {
+            parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
                 public void gotProtein(ProteinInfo p) {
-                    if (counter > maxCount) {
+                    if (counter > maxProteinCount) {
                         stopped = true;
-                        log.info("Max count reached: {}", maxCount);
+                        log.info("Max protein count reached: {}", maxProteinCount);
                         return;
                     }
 
-                    BioUtil.tripsyn(p.getSequence(), 5, 30).forEach(peptide -> {
+                    BioUtil.tripsyn(p.getSequence(), minPeptideLength, maxPeptideLength).forEach(peptide -> {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
                             return;
                         }
@@ -46,8 +57,8 @@ public class MainUniprotToCsv {
                             out.write(row.getBytes(standardCharset));
                             counter++;
 
-                            if (counter % 100_000 == 0) {
-                                log.debug("Protein count: {}", counter);
+                            if (counter % 1_000_000 == 0) {
+                                log.debug("Current protein count: {}", counter);
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -62,17 +73,17 @@ public class MainUniprotToCsv {
             log.debug("Finish, protein count: {}", parser.getTotalCount());
         }
 
-        log.info("Finish to "+ csvPath);
+        log.info("Finish uniprot to csv: " + toCsvPath);
 
 
     }
 
-    private static String getCsvHeader() {
+    private String getCsvHeader() {
         return "#mass,peptide,accession,taxonomyId\n";
     }
 
 
-    private static String getCsvRow(ProteinInfo p, double mass, String peptide) {
+    private String getCsvRow(ProteinInfo p, double mass, String peptide) {
         return mass + "," + peptide + "," + p.getAccession() + "," + p.taxonomyId + "\n";
     }
 }

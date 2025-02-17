@@ -3,7 +3,6 @@ package hr.pbf.digestdb.rocksdb;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -19,31 +18,19 @@ import java.util.Set;
 @Slf4j
 public class MainSortedCsvToDb {
 
-    static String dbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/rocks_db/mass_db_compact";
+    public String fromCsvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted.csv";
+    public String toDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/rocks_db/mass_db_compact";
+
+    public double startMass = 2467.1;
+    public double endMass = 2467.4;
 
 
-    public static void main(String[] args) throws RocksDBException, IOException {
-        StopWatch watch = StopWatch.createStarted();
-      //mainInsertToDackDb(args);
-        mainInsertToPaldb(args);
-       mainSearch(args);
-       // watch.stop();
-        log.info("Durration in: {}", watch);
-    }
+    public void mainSearch() throws RocksDBException {
 
-    private static void mainInsertToPaldb(String[] args) {
-
-    }
-
-    public static void mainSearch(String[] args) throws RocksDBException {
-        // search rocksdb
-
-        double startMass = 2467.1;
-        double endMass = 2467.4;
 
         List<RockDbValue> rows = new ArrayList<>();
 
-        try (RocksDB db = RocksDbUtil.openDB(dbPath);
+        try (RocksDB db = RocksDbUtil.openDB(toDbPath);
              RocksIterator iterator = db.newIterator()) { // Dobijemo iterator
 
             byte[] startKeyBytes = RocksDbUtil.doubleToByteArray(startMass);
@@ -63,7 +50,7 @@ public class MainSortedCsvToDb {
                 if (valueBytes != null) {
                     RockDbValue row = SerializationUtils.deserialize(valueBytes);
                     rows.add(row);
-                   // log.debug("Found key: {}, value: {}", currentKeyDouble, row);
+                    // log.debug("Found key: {}, value: {}", currentKeyDouble, row);
                 }
 
                 iterator.next(); // Pomaknemo iterator na sljedeći unos
@@ -81,10 +68,10 @@ public class MainSortedCsvToDb {
 
     }
 
+    public void startInsertToDackDb() throws IOException, RocksDBException {
 
-    public static void mainInsertToDackDb(String[] args) throws IOException, RocksDBException {
 
-        try (RocksDB db = RocksDbUtil.openDB(dbPath)) {
+        try (RocksDB db = RocksDbUtil.openDB(toDbPath)) {
 
             String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted.csv";
             try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(Path.of(csvPath)))) {
@@ -132,6 +119,10 @@ public class MainSortedCsvToDb {
             accessions.add(accession);
         }
 
+    }
+
+    public void startInsertToRocksDb() {
+        throw new UnsupportedOperationException("Not implemented");
     }
 
 

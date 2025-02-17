@@ -10,3 +10,4 @@ war/node_modules
 .project
 .DS_Store
 git clean -fd
+/src/main/java/hr/pbf/digestdb/App.java

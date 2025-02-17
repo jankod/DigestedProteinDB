@@ -9,6 +9,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 @Getter
 public class UniprotXMLParser {
@@ -31,8 +32,15 @@ public class UniprotXMLParser {
 
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory.createXMLStreamReader(new FileInputStream(filePath));
+            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+            XMLStreamReader reader;
 
+            if (filePath.endsWith(".gz")) {
+                GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(filePath), 65536);
+                reader = factory.createXMLStreamReader(gzipInputStream);
+            }else {
+                reader = factory.createXMLStreamReader(new FileInputStream(filePath));
+            }
             while (reader.hasNext()) {
                 int event = reader.next();
 
@@ -85,9 +93,14 @@ public class UniprotXMLParser {
                         break;
                 }
             }
-        } catch (FileNotFoundException | XMLStreamException e) {
+
+            reader.close();
+
+        } catch (XMLStreamException | IOException e) {
             throw new RuntimeException(e);
         }
+
+
     }
 
 
