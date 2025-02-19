@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.rocksdb;
+package hr.pbf.digestdb.workflow;
 
 import lombok.Data;
 import lombok.Getter;
@@ -20,12 +20,12 @@ public class UniprotXMLParser {
 
         boolean stopped = false;
 
-        int counter = 0;
+        long counter = 0;
 
-        abstract void gotProtein(ProteinInfo p);
+        abstract void gotProtein(ProteinInfo p) throws IOException;
     }
 
-    private int totalCount = 0;
+    private long totalCount = 0;
 
     public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
         ProteinInfo proteinInfo = null;

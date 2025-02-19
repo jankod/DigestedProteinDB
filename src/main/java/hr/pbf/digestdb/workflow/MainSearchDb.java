@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.rocksdb;
+package hr.pbf.digestdb.workflow;
 
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -12,7 +12,7 @@ public class MainSearchDb {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
 
-        String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted.csv";
+        String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted_orig.csv";
 
         Class.forName("org.duckdb.DuckDBDriver"); // Load the driver
 

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeScheduler {
 
-	private static ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
+	private static final ScheduledExecutorService ses = Executors.newSingleThreadScheduledExecutor();
 
 	public static void runEveryHour(Runnable r) {
 		ses.scheduleAtFixedRate(r, 0, 1, TimeUnit.HOURS);
@@ -21,7 +21,7 @@ public class TimeScheduler {
 	}
 
 	public static void runEvery1Minutes(Runnable r) {
-		ses.scheduleAtFixedRate(r, 0, 1, TimeUnit.MINUTES);		
+		ses.scheduleAtFixedRate(r, 0, 1, TimeUnit.MINUTES);
 	}
 
 }

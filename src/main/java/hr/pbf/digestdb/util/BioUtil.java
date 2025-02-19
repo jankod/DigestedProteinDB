@@ -260,8 +260,8 @@ public class BioUtil {
 
     }
 
-    public static interface Callback {
-        public void readFasta(FastaSeq seq) throws IOException;
+    public interface Callback {
+        void readFasta(FastaSeq seq) throws IOException;
     }
 
     public static Set<FastaSeq> readFasta(String path, int num) throws IOException {
@@ -500,7 +500,7 @@ public class BioUtil {
             return new String[]{string};
 
         // Add remaining segment
-        list.add(string.substring(off, string.length()));
+        list.add(string.substring(off));
 
         // Construct result
         int resultSize = list.size();
@@ -553,7 +553,7 @@ public class BioUtil {
             prefixList.add(prefixPartString);
         }
         int positionInList = prefixPart.length() - 1;
-        int result = Integer.parseInt(String.valueOf(positionInList) + String.valueOf(numPart));
+        int result = Integer.parseInt(positionInList + numPart);
         return result;
     }
 

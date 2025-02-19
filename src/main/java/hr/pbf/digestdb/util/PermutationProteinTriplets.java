@@ -1,20 +1,19 @@
 package hr.pbf.digestdb.util;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * Permutacija s ponavljanjem jer se pojedina aminokiselina moze pojavljivati
  * vise puta.
  * https://www.mathsisfun.com/combinatorics/combinations-permutations-calculator.html<br>
  * n<sup>r</sup>
- * 
+ *
  * @author tag
  *
  */
 public class PermutationProteinTriplets {
 
-	private int size;
+	private final int size;
 
 	public static void main(String[] args) {
 

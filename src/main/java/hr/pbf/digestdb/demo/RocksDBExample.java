@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.rocksdb;
+package hr.pbf.digestdb.demo;
 
 import lombok.Data;
 import org.rocksdb.Options;

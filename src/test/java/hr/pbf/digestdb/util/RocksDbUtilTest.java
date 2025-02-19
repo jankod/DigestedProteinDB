@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.rocksdb;
+package hr.pbf.digestdb.util;
 
 import org.junit.jupiter.api.Test;
 
@@ -9,9 +9,9 @@ class RocksDbUtilTest {
 
     @Test
     void doubleToByteArrayAndBack() {
-        byte[] bytes = RocksDbUtil.doubleToByteArray(123.45634567d);
+        byte[] bytes = MyUtil.doubleToByteArray(123.45634567d);
 
-        double v = RocksDbUtil.byteArrayToDouble(bytes);
+        double v = MyUtil.byteArrayToDouble(bytes);
         assertEquals(123.45634567d, v);
 
     }

@@ -14,9 +14,9 @@ public class MyStopWatch {
         stopWatch.start();
     }
 
-    public void printDuration(String name) {
+    public String getCurrentDuration() {
         stopWatch.split();
-        System.out.println(name + " " + DurationFormatUtils.formatDurationHMS(stopWatch.getSplitTime()));
+        return DurationFormatUtils.formatDurationHMS(stopWatch.getSplitTime());
     }
 
     public StopWatch getStopWatch() {

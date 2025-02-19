@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.duckdb;
+package hr.pbf.digestdb.demo;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

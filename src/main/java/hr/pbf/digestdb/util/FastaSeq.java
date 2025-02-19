@@ -1,11 +1,13 @@
 package hr.pbf.digestdb.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FastaSeq implements Serializable {
 
+	@Serial
 	private static final long serialVersionUID = 1L;
 
 	private DigestInformation digestInformation;
@@ -18,7 +20,7 @@ public class FastaSeq implements Serializable {
 
 	public String header;
 	public String seq;
-	
+
 	public FastaSeq(String header, String seq) {
 		this.header = header;
 		this.seq = seq;
@@ -33,7 +35,7 @@ public class FastaSeq implements Serializable {
 		result = prime * result + ((seq == null) ? 0 : seq.hashCode());
 		return result;
 	}
-	
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -50,12 +52,9 @@ public class FastaSeq implements Serializable {
 		} else if (!header.equals(other.header))
 			return false;
 		if (seq == null) {
-			if (other.seq != null)
-				return false;
-		} else if (!seq.equals(other.seq))
-			return false;
-		return true;
-	}
+            return other.seq == null;
+		} else return seq.equals(other.seq);
+    }
 
 	public FastaSeq() {
 	}
@@ -72,7 +71,7 @@ public class FastaSeq implements Serializable {
 
 	/**
 	 * Na svakih 40 znakova dodaje novi red
-	 * 
+	 *
 	 * @param seq2
 	 * @return
 	 */
@@ -97,9 +96,9 @@ public class FastaSeq implements Serializable {
 
 	/**
 	 * Informacije o fitanju peptida sa masom prekursora
-	 * 
+	 *
 	 * @author ja
-	 * 
+	 *
 	 */
 	public static class DigestInformation {
 		/**

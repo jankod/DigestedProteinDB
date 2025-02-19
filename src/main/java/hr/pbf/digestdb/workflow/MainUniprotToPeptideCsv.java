@@ -1,6 +1,6 @@
-package hr.pbf.digestdb.rocksdb;
+package hr.pbf.digestdb.workflow;
 
-import hr.pbf.digestdb.rocksdb.UniprotXMLParser.ProteinHandler;
+import hr.pbf.digestdb.workflow.UniprotXMLParser.ProteinHandler;
 import hr.pbf.digestdb.util.BioUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,13 +12,14 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-public class MainUniprotToCsv {
+//https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/README
+public class MainUniprotToPeptideCsv {
     public String fromSwisprotPath = "";
 
     public String toCsvPath = "";
     public int maxProteinCount = Integer.MAX_VALUE - 1;
 
-    public int minPeptideLength = 5;
+    public int minPeptideLength = 7; // 7
     public int maxPeptideLength = 30;
 
     public void start() throws IOException {
