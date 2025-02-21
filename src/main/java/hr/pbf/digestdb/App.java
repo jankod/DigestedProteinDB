@@ -1,5 +1,6 @@
 package hr.pbf.digestdb;
 
+import hr.pbf.digestdb.workflow.MainCsvPeptideMassGrouper;
 import hr.pbf.digestdb.workflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -7,6 +8,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.io.File;
+import java.util.List;
 
 @Slf4j
 public class App {
@@ -17,7 +19,7 @@ public class App {
         SORTED_CSV_TO_ROCKS_DB_4,
         SORTED_CSV_TO_DACK_DB_5,
         CREATE_ACCESSIONS_DB_CSV_TO_ROCKS_DB_6,
-        SEARCH_ACCESSION_DB_7
+        SEARCH_DB_ROCKS_BY_MASS_4, CSV_GROUP, GROUP_WITH_ACC_ID, SEARCH_ACCESSION_DB_7
     }
 
     enum Location {
@@ -27,13 +29,13 @@ public class App {
 
     public static void main(String[] args) throws Throwable {
 
-        Mode mode = Mode.CREATE_ACCESSIONS_DB_CSV_TO_ROCKS_DB_6;
+        Mode mode = Mode.UNIPROT_TO_CSV_1;
         Location location = Location.REMOTE;
         int minPeptideLength = 7;
         int maxPeptideLength = 30;
 
 
-        String REMOTE_DIR = "/disk3/janko/digested_db/generated";
+        String REMOTE_DIR = "/disk3/janko/digested_db/generated_bacteria";
         String LOCAL_DIR = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated";
 
         String DIR_GENERATED = location == Location.LOCAL ? LOCAL_DIR : REMOTE_DIR;
@@ -48,8 +50,10 @@ public class App {
 
             if (location == Location.LOCAL) {
                 app.fromSwisprotPath = DIR_GENERATED + "/../csv/uniprot_sprot.xml.gz";
+
             } else {
-                app.fromSwisprotPath = DIR_GENERATED + "/../uniprot_trembl.xml.gz";
+                //app.fromSwisprotPath = DIR_GENERATED + "/../uniprot_trembl.xml.gz";
+                app.fromSwisprotPath = DIR_GENERATED + "/../uniprot_trembl_bacteria.xml.gz";
             }
             app.toCsvPath = DIR_GENERATED + "/peptide_mass.csv";
 
@@ -66,26 +70,49 @@ public class App {
             app.toCsvPath = DIR_GENERATED + "/peptide_mass_sorted.csv";
             app.start();
         } else if (mode == Mode.SORTED_CSV_TO_ROCKS_DB_4) {
-            MainSortedCsvToRocksDb app = new MainSortedCsvToRocksDb();
-            app.fromCsvPath = DIR_GENERATED + "/peptide_mass_sorted.csv";
+            MainMassRocksDb app = new MainMassRocksDb();
+            app.fromCsvPath = DIR_GENERATED + "/peptide_mass_sorted_console.csv";
             app.toDbPath = DIR_GENERATED + "/rocks_mass.db";
+            app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
             app.startInsertToRocksDb();
+        } else if (mode == Mode.SEARCH_DB_ROCKS_BY_MASS_4) {
+            MainMassRocksDb app = new MainMassRocksDb();
+            app.toDbPath = DIR_GENERATED + "/rocks_mass.db";
+            app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
+
+            List<MainMassRocksDb.SearchResult> searchResults = app.searchByMass(400, 1.3);
+            log.debug("Search results: {}", searchResults.size());
+
+
         } else if (mode == Mode.SORTED_CSV_TO_DACK_DB_5) {
             MainSortedCsvToDackDb app = new MainSortedCsvToDackDb();
             app.fromCsvPath = DIR_GENERATED + "/peptide_mass_sorted.csv";
             app.toDbPath = DIR_GENERATED + "/dack_mass.db";
             app.startInsertToDackDb();
 
-        }else if (mode == Mode.CREATE_ACCESSIONS_DB_CSV_TO_ROCKS_DB_6) {
+        } else if (mode == Mode.CREATE_ACCESSIONS_DB_CSV_TO_ROCKS_DB_6) {
             MainAccessionDb app = new MainAccessionDb();
-            app.setFromCsvPath(  DIR_GENERATED + "/peptide_mass_sorted_console.csv");
-            app.setToRocksDbPath( DIR_GENERATED + "/rocks_accessions.db");
+            app.setFromCsvPath(DIR_GENERATED + "/peptide_mass_sorted_console.csv");
+            app.setToRocksDbPath(DIR_GENERATED + "/rocks_accessions.db");
             app.startCreateDB();
-        }else if (mode == Mode.SEARCH_ACCESSION_DB_7) {
+        } else if (mode == Mode.SEARCH_ACCESSION_DB_7) {
             MainAccessionDb app = new MainAccessionDb();
-            app.setToRocksDbPath( DIR_GENERATED + "/rocks_accessions.db");
-            long id = app.searchAccessionDb("Q82DM9");
-            log.info("ID: {}", id);
+            app.setToRocksDbPath(DIR_GENERATED + "/rocks_accessions.db");
+            String accc = app.searchAccessionDb(1L);
+            log.info("ID: {}", accc);
+        } else if (mode == Mode.CSV_GROUP) {
+            MainCsvPeptideMassGrouper app = new MainCsvPeptideMassGrouper();
+            app.inputCsv = DIR_GENERATED + "/peptide_mass_sorted_console.csv";
+            app.outputCsv = DIR_GENERATED + "/peptide_mass_sorted_console_grouped.csv";
+            app.start();
+        } else if (mode == Mode.GROUP_WITH_ACC_ID) {
+            MainCsvGrouperWithIds app = new MainCsvGrouperWithIds();
+            //int bufferSize = 16 * 1024 * 1024; // 16MB buffer
+            app.setInputCsv(DIR_GENERATED + "/peptide_mass_sorted_console.csv");
+            app.setOutputGroupedCsv(DIR_GENERATED + "/grouped_with_ids.csv");
+            app.setOutputAccessionMapCsv(DIR_GENERATED + "/accession_map.csv");
+            app.start();
+
         }
 
         watch.stop();

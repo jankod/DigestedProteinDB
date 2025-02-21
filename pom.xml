@@ -24,6 +24,13 @@
             <version>8.5.15</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>4.29.3</version>
+        </dependency>
+
 
         <dependency>
             <groupId>me.lemire.integercompression</groupId>

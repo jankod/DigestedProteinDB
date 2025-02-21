@@ -1,5 +1,7 @@
 package hr.pbf.digestdb.util;
 
+import hr.pbf.digestdb.exception.UnknownAminoacidException;
+
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,9 @@ public class AminoAcidCoder {
         aminoAcidEncoding.put("V", 0x11);
         aminoAcidEncoding.put("W", 0x12);
         aminoAcidEncoding.put("Y", 0x13);
+        aminoAcidEncoding.put("U", 0x14); // Selenocistein
+        aminoAcidEncoding.put("O", 0x15); // Piroglutamat
+
 
         // Obrnuto mapiranje za dekodiranje
         for (Map.Entry<String, Integer> entry : aminoAcidEncoding.entrySet()) {
@@ -38,7 +43,7 @@ public class AminoAcidCoder {
         }
     }
 
-    public static byte[] encodePeptideByteBuffer(String sequence) {
+    public static byte[] encodePeptideByteBuffer(String sequence) throws UnknownAminoacidException {
         ByteBuffer buffer = ByteBuffer.allocate((int) Math.ceil(sequence.length() * 5.0 / 8.0)); // Izračunaj veličinu byte arraya
         int bitBuffer = 0;
         int bitCount = 0;
@@ -47,7 +52,7 @@ public class AminoAcidCoder {
             String aminoAcid = String.valueOf(sequence.charAt(i)).toUpperCase(); // Pretvori u uppercase radi robusnosti
             Integer code = aminoAcidEncoding.get(aminoAcid);
             if (code == null) {
-                throw new IllegalArgumentException("Nepoznata aminokiselina: " + aminoAcid);
+                throw new UnknownAminoacidException(aminoAcid, sequence);
             }
 
             bitBuffer = (bitBuffer << 5) | code;
@@ -97,11 +102,12 @@ public class AminoAcidCoder {
     }
 
 
-    public static void main(String[] args) {
-        String peptideSequence = "AYVKK";
+    public static void main(String[] args) throws UnknownAminoacidException {
+        String peptideSequence = "ASELTGEKDLANSSLR";
         byte[] encodedPeptideBytes = encodePeptideByteBuffer(peptideSequence);
 
-        System.out.println("Originalni peptid: " + peptideSequence);
+        System.out.println("Originalni peptid: " + peptideSequence.getBytes().length);
+        System.out.println("Encoded: " + encodedPeptideBytes.length);
         System.out.println("Kodirani peptid (ByteBuffer - byte array): " + byteArrayToHexString(encodedPeptideBytes)); // Ispis u heksadecimalnom formatu za čitljivost
         System.out.println("Dekodirani peptid: " + decodePeptideByteBuffer(encodedPeptideBytes, peptideSequence.length()));
 
@@ -167,6 +173,15 @@ public class AminoAcidCoder {
             sb.append(String.format("%02X", b));
         }
         return sb.toString();
+    }
+
+    public static boolean isInvalidPeptide(String sequence) {
+        for (int i = 0; i < sequence.length(); i++) {
+            if (!aminoAcidEncoding.containsKey(String.valueOf(sequence.charAt(i)))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

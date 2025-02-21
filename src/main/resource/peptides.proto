@@ -1,0 +1,15 @@
+syntax = "proto3";
+package hr.pbf.digested.proto;
+
+message SeqAccessions {
+  string seq = 1;              // e.g. 20 different amino-acid letters
+  repeated uint32 accessions = 2; // Handles values up to 252,064,061 (varint)
+}
+
+message SeqAccessionList {
+  repeated SeqAccessions sequences = 1;
+}
+
+// export SRC_DIR=/Users/tag/IdeaProjects/DigestedProteinDB/src/main/resource
+// export DST_DIR=/Users/tag/IdeaProjects/DigestedProteinDB/src/main/java
+//protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/peptides.proto

@@ -59,4 +59,8 @@ public class MyUtil {
     public static long byteArrayToLong(byte[] accessionValue) {
         return Longs.fromByteArray(accessionValue);
     }
+
+    public static byte[] longToByteArray(Long longNum) {
+        return Longs.toByteArray(longNum);
+    }
 }

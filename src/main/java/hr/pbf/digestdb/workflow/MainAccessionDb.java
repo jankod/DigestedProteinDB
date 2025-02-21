@@ -14,6 +14,11 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 
+/**
+ * Create RocksDB with accessions.
+ * Key: long id of accession
+ * Value: String accession
+ */
 @Slf4j
 @Data
 public class MainAccessionDb {
@@ -33,11 +38,12 @@ public class MainAccessionDb {
                     // double mass = Double.parseDouble(splited[0]);
                     //String sequence = splited[1];
                     String accession = splited[2];
-                    byte[] key = accession.getBytes(StandardCharsets.UTF_8);
+                    byte[] value = accession.getBytes(StandardCharsets.UTF_8);
 
                     try {
-                        if (db.get(key) == null) {
-                            db.put(key, Longs.toByteArray(currentAccessionIdCounter));
+                        byte[] keyAccessionId = Longs.toByteArray(currentAccessionIdCounter);
+                        if (db.get(keyAccessionId) == null) {
+                            db.put(keyAccessionId, value);
                         }
                     } catch (RocksDBException e) {
                         throw new RuntimeException(e);
@@ -60,17 +66,18 @@ public class MainAccessionDb {
 
     /**
      * Search accession in db. If not found return -1.
-     * @param accession Accession
-     * @return id or -1
+     *
+     * @param accessionId to search
+     * @return id or null{}
      */
-    public long searchAccessionDb(String accession) {
+    public String searchAccessionDb(Long accessionId) {
         try (RocksDB db = MyUtil.openDB(toRocksDbPath)) {
-            byte[] key = accession.getBytes(StandardCharsets.UTF_8);
+            byte[] key = MyUtil.longToByteArray(accessionId);
             byte[] value = db.get(key);
             if (value != null) {
-                return Longs.fromByteArray(value);
+                return new String(value, StandardCharsets.UTF_8);
             }
-            return -1;
+            return null;
 
         } catch (RocksDBException e) {
             throw new RuntimeException(e);

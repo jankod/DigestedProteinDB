@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.util;
 
+import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import java.util.*;
 @Slf4j
 public class PeptideValueSerialization {
 
-    public static byte[] toByteArray(Map<String, Set<Long>> map) throws IOException {
+    public static byte[] toByteArray(Map<String, Set<Long>> map) throws IOException, UnknownAminoacidException {
         try (FastByteArrayOutputStream bos = new FastByteArrayOutputStream();
              DataOutputStream dos = new DataOutputStream(bos)) {
 
@@ -70,7 +71,7 @@ public class PeptideValueSerialization {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnknownAminoacidException {
         Map<String, Set<Long>> currentPeptides = new HashMap<>();
         currentPeptides.put("IGGAA", new HashSet<>(Arrays.asList(1L, 2L, 3L)));
         currentPeptides.put("LLENAPGGTYFITENMTNELIMIAKDPVDK", new HashSet<>(Arrays.asList(4L, 5L)));

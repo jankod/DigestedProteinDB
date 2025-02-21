@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.model;
 
+import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import hr.pbf.digestdb.util.AminoAcidCoder;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ public class RockdbKeyValue {
         peptidesAndIdsAsValue.computeIfAbsent(sequence, k -> new HashSet<>()).add(Integer.parseInt(accession));
     }
 
-    public static byte[] encodeMapToByteBuffer(Map<String, Set<Integer>> peptidesAndIds) {
+    public static byte[] encodeMapToByteBuffer(Map<String, Set<Integer>> peptidesAndIds) throws UnknownAminoacidException {
         // 1. Izračunajte ukupnu veličinu potrebnog ByteBuffer-a
         int size = Integer.BYTES; // Za broj entries u map-i
 
@@ -28,7 +29,8 @@ public class RockdbKeyValue {
             String peptide = entry.getKey();
             Set<Integer> ids = entry.getValue();
 
-            byte[] peptide5Bytes = AminoAcidCoder.encodePeptideByteBuffer(peptide);
+            byte[] peptide5Bytes = null;
+            peptide5Bytes = AminoAcidCoder.encodePeptideByteBuffer(peptide);
 
             size += Integer.BYTES; // Za duljinu peptid stringa
             //size += peptide.getBytes(StandardCharsets.UTF_8).length; // Za byte-ove peptid stringa
@@ -91,7 +93,7 @@ public class RockdbKeyValue {
         return decodedMap;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, UnknownAminoacidException {
         RockdbKeyValue keyValue = new RockdbKeyValue();
         keyValue.setMassAsKey(123.456);
         HashMap<String, Set<Integer>> v1 = new HashMap<>();

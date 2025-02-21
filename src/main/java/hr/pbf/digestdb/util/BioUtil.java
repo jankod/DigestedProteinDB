@@ -89,7 +89,7 @@ public class BioUtil {
     /**
      * Amino kis koje ne zelimo u bazi, ima ih malo.
      */
-    public static final char[] NEVALJALE_AA = new char[]{'X', 'B', 'Z', 'J', 'U', 'O'};
+    public static final char[] NEVALJALE_AA = new char[]{'X', 'B', 'Z', 'J', 'O'};
 
     public static BufferedReader newFileReader(String path) throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, null);
@@ -184,8 +184,8 @@ public class BioUtil {
 
         Map<String, Double> cepaniceMasa = new HashMap<String, Double>(peptides.size());
         for (String cepa : peptides) {
-            // maknuti peptides sa 'X', 'B', 'Z', 'J', 'U', 'O'
-            if (StringUtils.containsAny(cepa, 'X', 'B', 'Z', 'J', 'U', 'O')) {
+            // maknuti peptides sa 'X', 'B', 'Z', 'J', 'O'
+            if (StringUtils.containsAny(cepa, 'X', 'B', 'Z', 'J', 'O')) {
                 continue;
             }
 
@@ -463,6 +463,7 @@ public class BioUtil {
             case 'W' -> 186.07931295D;
             case 'U' -> 150.95363559D;
             case 'O' -> 114.0793129535D;
+
             default -> throw new RuntimeException("Wrong AA '" + aa + "' ");
         };
     }

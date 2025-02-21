@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+
+/**
+ * Create CSV file with peptide mass, peptide sequence, protein accession [and taxonomy id].
+ * Read uniprot xml file and create csv file with peptide mass, peptide sequence, protein accession and taxonomy id.
+ */
 @Slf4j
 //https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/README
 public class MainUniprotToPeptideCsv {
@@ -58,7 +63,7 @@ public class MainUniprotToPeptideCsv {
                             out.write(row.getBytes(standardCharset));
                             counter++;
 
-                            if (counter % 1_000_000 == 0) {
+                            if (counter % 5_000_000 == 0) {
                                 log.debug("Current protein count: {}", counter);
                             }
                         } catch (IOException e) {
@@ -85,6 +90,7 @@ public class MainUniprotToPeptideCsv {
 
 
     private String getCsvRow(ProteinInfo p, double mass, String peptide) {
-        return mass + "," + peptide + "," + p.getAccession() + "," + p.taxonomyId + "\n";
+        //return mass + "," + peptide + "," + p.getAccession() + "," + p.taxonomyId + "\n";
+        return mass + "," + peptide + "," + p.getAccession()+ "\n";
     }
 }
