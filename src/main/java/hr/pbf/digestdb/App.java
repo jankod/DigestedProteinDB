@@ -1,9 +1,10 @@
 package hr.pbf.digestdb;
 
-import hr.pbf.digestdb.workflow.MainCsvPeptideMassGrouper;
+import hr.pbf.digestdb.workflow.MainCsvMassGrouper;
 import hr.pbf.digestdb.workflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -29,19 +30,27 @@ public class App {
 
     public static void main(String[] args) throws Throwable {
 
-        Mode mode = Mode.UNIPROT_TO_CSV_1;
-        Location location = Location.REMOTE;
+        Mode mode = Mode.GROUP_WITH_ACC_ID;
+        Location location;
+        // if mac then is local, otherwise remote
+        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            location = Location.LOCAL;
+        } else {
+            location = Location.REMOTE;
+        }
         int minPeptideLength = 7;
         int maxPeptideLength = 30;
 
 
         String REMOTE_DIR = "/disk3/janko/digested_db/generated_bacteria";
-        String LOCAL_DIR = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated";
+        String LOCAL_DIR = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human";
 
         String DIR_GENERATED = location == Location.LOCAL ? LOCAL_DIR : REMOTE_DIR;
 
         FileUtils.forceMkdir(new File(DIR_GENERATED));
 
+
+        log.info("START MODE={} DIR= {} " ,mode, DIR_GENERATED);
         StopWatch watch = StopWatch.createStarted();
         if (mode == Mode.UNIPROT_TO_CSV_1) {
             MainUniprotToPeptideCsv app = new MainUniprotToPeptideCsv();
@@ -101,12 +110,12 @@ public class App {
             String accc = app.searchAccessionDb(1L);
             log.info("ID: {}", accc);
         } else if (mode == Mode.CSV_GROUP) {
-            MainCsvPeptideMassGrouper app = new MainCsvPeptideMassGrouper();
+            MainCsvMassGrouper app = new MainCsvMassGrouper();
             app.inputCsv = DIR_GENERATED + "/peptide_mass_sorted_console.csv";
             app.outputCsv = DIR_GENERATED + "/peptide_mass_sorted_console_grouped.csv";
             app.start();
         } else if (mode == Mode.GROUP_WITH_ACC_ID) {
-            MainCsvGrouperWithIds app = new MainCsvGrouperWithIds();
+            MainCsvMassGrouperWithAccIds app = new MainCsvMassGrouperWithAccIds();
             //int bufferSize = 16 * 1024 * 1024; // 16MB buffer
             app.setInputCsv(DIR_GENERATED + "/peptide_mass_sorted_console.csv");
             app.setOutputGroupedCsv(DIR_GENERATED + "/grouped_with_ids.csv");

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.google.common.base.Charsets;
+import hr.pbf.digestdb.model.FastaSeq;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -104,22 +107,22 @@ public class BioUtil {
      * @throws UnsupportedEncodingException
      */
     public static BufferedReader newFileReader(String path, String charset, int bufSize)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
         if (charset == null) {
             charset = "ASCII";
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset),
-                bufSize);
+              bufSize);
         return reader;
     }
 
     public static BufferedReader newFileReader(String path, String charset)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, charset, 8192);
     }
 
     public static BufferedWriter newFileWiter(String path, String charset)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
 
         if (charset == null) {
             charset = "ASCII";
@@ -130,18 +133,19 @@ public class BioUtil {
         // FileOutputStream(new File(path)), charset));
 
         BufferedWriter w = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
-                BUFFER);
+              BUFFER);
         return w;
     }
 
     ////////////////////////////////////////////////////////////
     // COMPRESS
-    ////////////////////////////////////////////////////////////
+
+    /// /////////////////////////////////////////////////////////
 
     public static DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
         DataOutputStream out = new DataOutputStream(
-                new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
+              new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
         return out;
     }
 
@@ -161,8 +165,6 @@ public class BioUtil {
 
         return out;
     }
-
-
 
 
     public static DataInputStream newDataInputStream(String path) throws FileNotFoundException {
@@ -558,5 +560,29 @@ public class BioUtil {
         return result;
     }
 
+
+    public static byte[] toBytes(int value) {
+        return ByteBuffer.allocate(4).putInt(value).array();
+    }
+
+    public static int toInt(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getInt();
+    }
+
+    public static String toStringFromByte(byte[] b) {
+        return new String(b, Charsets.US_ASCII);
+    }
+
+    public static byte[] toBytes(String s) {
+        return s.getBytes(Charsets.US_ASCII);
+    }
+
+    public static byte[] toBytes(float f) {
+        return ByteBuffer.allocate(4).putFloat(f).array();
+    }
+
+    public static float toFloat(byte[] bytes) {
+        return ByteBuffer.wrap(bytes).getFloat();
+    }
 
 }

@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.util;
+package hr.pbf.digestdb.model;
 
 import java.io.Serial;
 import java.io.Serializable;

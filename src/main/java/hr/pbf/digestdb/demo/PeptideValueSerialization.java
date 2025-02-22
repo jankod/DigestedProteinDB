@@ -1,6 +1,7 @@
-package hr.pbf.digestdb.util;
+package hr.pbf.digestdb.demo;
 
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
+import hr.pbf.digestdb.util.AminoAcidCoder;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import lombok.extern.slf4j.Slf4j;

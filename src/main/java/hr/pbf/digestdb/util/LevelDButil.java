@@ -1,12 +1,7 @@
 package hr.pbf.digestdb.util;
 
-import static hr.pbf.digestdb.util.BiteUtil.toStringFromByte;
-//import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
-//import static org.fusesource.leveldbjni.JniDBFactory.*;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Map.Entry;
 
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
@@ -29,12 +24,13 @@ public class LevelDButil {
 
 
     public static DBComparator getFloatKeyComparator() {
-        DBComparator dbComparator = new DBComparator() {
+        // return Ints.compare(BiteUtil.toInt(key1), BiteUtil.toInt(key2));
+        return new DBComparator() {
 
             @Override
             public int compare(byte[] key1, byte[] key2) {
                 // return Ints.compare(BiteUtil.toInt(key1), BiteUtil.toInt(key2));
-                return Float.compare(BiteUtil.toFloat(key1), BiteUtil.toFloat(key2));
+                return Float.compare(BioUtil.toFloat(key1), BioUtil.toFloat(key2));
             }
 
             @Override
@@ -52,7 +48,6 @@ public class LevelDButil {
                 return key;
             }
         };
-        return dbComparator;
 
     }
 //	public int getInt(String key) {

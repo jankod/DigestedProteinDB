@@ -1,6 +1,7 @@
 package hr.pbf.digestdb.workflow;
 
-import hr.pbf.digestdb.workflow.UniprotXMLParser.ProteinHandler;
+import hr.pbf.digestdb.util.UniprotXMLParser;
+import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedOutputStream;
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 
 /**
- * Converts a Uniprot XML file to a CSV file containing protein sequences, accessions, and taxonomy IDs.
+ * Converts a Uniprot XML file to a CSV file containing: protein sequences, accessions, and taxonomy IDs.
  */
 @Slf4j
 public class MainUniprotToProteinCsv {
@@ -41,8 +42,8 @@ public class MainUniprotToProteinCsv {
 
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
-                public void gotProtein(ProteinInfo p) throws IOException {
-                    if (counter > maxProteinCount) {
+                public void gotProtein(UniprotXMLParser.ProteinInfo p) throws IOException {
+                    if (super.counter > maxProteinCount) {
                         stopped = true;
                         log.info("Max protein count reached: {}", maxProteinCount);
                         return;
@@ -75,7 +76,7 @@ public class MainUniprotToProteinCsv {
     }
 
 
-    private String getCsvRow(ProteinInfo p) {
-        return p.getSequence() + "," + p.getAccession() + "," + p.taxonomyId + "\n";
+    private String getCsvRow(UniprotXMLParser.ProteinInfo p) {
+        return p.getSequence() + "," + p.getAccession() + "," + p.getTaxonomyId() + "\n";
     }
 }

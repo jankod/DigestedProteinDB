@@ -1,24 +1,30 @@
 package hr.pbf.digestdb.util;
 
+import gnu.trove.list.TDoubleList;
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import lombok.extern.slf4j.Slf4j;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-
-public class BinaryPeptideDatabase {
+@Slf4j
+public class BinaryPeptideDb {
 
     private double[] masses;
     private long[] offsets;
     private TIntObjectHashMap<String> accessionMap;
-    private File sequenceFile;
+    private final File sequenceFile;
 
 
-    public BinaryPeptideDatabase(String accessionMapCsv, String binaryFilePath, String massesOffsetsFilePath) {
+    public BinaryPeptideDb(String accessionMapCsv, String binaryFilePath, String massesOffsetsFilePath) {
         sequenceFile = new File(binaryFilePath);
         //  loadAccessionMap(accessionMapCsv);
         // loadMassesAndOffsets(massesOffsetsFilePath);
@@ -26,9 +32,15 @@ public class BinaryPeptideDatabase {
     }
 
 
-    private void loadAccessionMap(String accessionMapCsv) {
-        accessionMap = new TIntObjectHashMap<>(70_000);
-        try (BufferedReader reader = new BufferedReader(new FileReader(accessionMapCsv))) {
+    /**
+     * Read csv file accNum, accession and load it into map.
+     *
+     * @param accessionMapCsvPath Path to csv file with accNum, accession
+     * @return Map with accNum as key and accession as value
+     */
+    public static TIntObjectHashMap<String> loadAccessionMapFromCsv(String accessionMapCsvPath) {
+        TIntObjectHashMap<String> map = new TIntObjectHashMap<>(70_000);
+        try (BufferedReader reader = new BufferedReader(new FileReader(accessionMapCsvPath))) {
             reader.readLine(); // Preskoči header
             String line;
             while ((line = reader.readLine()) != null) {
@@ -36,12 +48,12 @@ public class BinaryPeptideDatabase {
                 if (parts.length < 2) continue;
                 int id = Integer.parseInt(parts[0]);
                 String accession = parts[1];
-                accessionMap.put(id, accession);
+                map.put(id, accession);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error reading accession map", e);
         }
-        System.out.println("Loaded " + accessionMap.size() + " accession mappings.");
+        return map;
     }
 
     private void loadMassesAndOffsets(String massesOffsetsFilePath) {
@@ -54,65 +66,56 @@ public class BinaryPeptideDatabase {
                 offsets[i] = dis.readLong();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error reading masses and offsets", e);
         }
-        System.out.println("Loaded " + masses.length + " masses and offsets.");
+        log.debug("Loaded " + masses.length + " masses and offsets.");
     }
 
 
-    public void buildDatabase(String groupedCsv, String accessionMapCsv, String binaryFilePath, String massesOffsetsFilePath) {
+    public void buildDatabase(String groupedCsv, String binaryDbPath, String binaryMassesOffsetsPath) {
         //  TIntObjectHashMap<String> accessionMap = new TIntObjectHashMap<>();
-        List<Double> massList = new ArrayList<>();
-        List<Long> offsetList = new ArrayList<>();
-
-        loadAccessionMap(accessionMapCsv);
-        System.out.println("Loaded " + accessionMap.size() + " accession mappings.");
-
-        // Inicijalizacija LZ4 kompresora
-        LZ4Factory factory = LZ4Factory.nativeInstance();
-        LZ4Compressor compressor = factory.highCompressor();
+        TDoubleList massList = new TDoubleArrayList();
+        TLongList offsetList = new TLongArrayList();
 
         // Izgradi binarnu datoteku s kompresijom
         try (BufferedReader reader = new BufferedReader(new FileReader(groupedCsv));
-             RandomAccessFile raf = new RandomAccessFile(binaryFilePath, "rw")) {
+             RandomAccessFile raf = new RandomAccessFile(binaryDbPath, "rw")) {
             long currentOffset = 0;
 
             String line;
             while ((line = reader.readLine()) != null) {
+                // 503.234,SGAGAAA:15-SAAGGAA:14-TGAAAGG:16
                 String[] parts = line.split(",", 2);
                 if (parts.length < 2) continue;
 
                 double mass = Double.parseDouble(parts[0]);
-                String sequences = parts[1];
+                String seqAccs = parts[1];
 
                 massList.add(mass);
                 offsetList.add(currentOffset);
 
-                byte[] seqBytes = sequences.getBytes(StandardCharsets.UTF_8);
-                int maxCompressedLength = compressor.maxCompressedLength(seqBytes.length);
-                byte[] compressed = new byte[maxCompressedLength];
-                int compressedLength = compressor.compress(seqBytes, 0, seqBytes.length, compressed, 0, maxCompressedLength);
+                byte[] seqAccBytes = seqAccs.getBytes(StandardCharsets.UTF_8);
 
-                raf.writeInt(compressedLength);
-                raf.write(compressed, 0, compressedLength);
+                raf.writeShort(seqAccBytes.length);
+                raf.write(seqAccBytes);
                 currentOffset = raf.getFilePointer();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error building database", e);
         }
 
         // Spremi masses i offsets u zasebnu datoteku
-        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(massesOffsetsFilePath))) {
+        try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(binaryMassesOffsetsPath))) {
             dos.writeInt(massList.size()); // Broj zapisa
             for (int i = 0; i < massList.size(); i++) {
                 dos.writeDouble(massList.get(i)); // Masa
                 dos.writeLong(offsetList.get(i)); // Offset
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.debug("Error writing masses and offsets", e);
         }
 
-        System.out.println("Built database with " + massList.size() + " entries.");
+        log.debug("Built database with " + massList.size() + " entries.");
     }
 
 
@@ -160,8 +163,6 @@ public class BinaryPeptideDatabase {
         }
 
         List<String> results = new ArrayList<>();
-        LZ4Factory factory = LZ4Factory.fastestInstance();
-        LZ4FastDecompressor decompressor = factory.fastDecompressor();
 
         try (RandomAccessFile raf = new RandomAccessFile(sequenceFile, "r")) {
             for (int i = lower; i <= upper; i++) {
@@ -170,10 +171,7 @@ public class BinaryPeptideDatabase {
                 byte[] compressed = new byte[compressedLength];
                 raf.readFully(compressed);
 
-                int maxDecompressedLength = 1024 * 1024; // Prilagodi prema potrebi
-                byte[] restored = new byte[maxDecompressedLength];
-                int decompressedLength = decompressor.decompress(compressed, 0, restored, 0, maxDecompressedLength);
-                String sequences = new String(restored, 0, decompressedLength, "UTF-8");
+                String sequences = new String(compressed, StandardCharsets.UTF_8);
 
                 StringBuilder translated = new StringBuilder();
                 translated.append("Mass: ").append(masses[i]).append(", ");
@@ -193,23 +191,24 @@ public class BinaryPeptideDatabase {
                 results.add(translated.toString());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error reading sequence file", e);
         }
         return results;
     }
 
     public static void main(String[] args) {
-        String groupedCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/grouped_with_ids.csv";
-        String accessionMapCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/accession_map.csv";
-        String binaryFilePath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/sequences.bin";
-        String massesOffsetsFilePath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/masses_offsets.bin";
+        String DIR = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human";
+        String groupedCsv = DIR + "/grouped_with_ids.csv";
+        String accessionMapCsv = DIR + "/accession_map.csv";
+        String binaryFilePath = DIR + "/sequences.bin";
+        String massesOffsetsFilePath = DIR + "/masses_offsets.bin";
 
-        BinaryPeptideDatabase db = new BinaryPeptideDatabase(groupedCsv, accessionMapCsv, binaryFilePath);
-        db.buildDatabase(groupedCsv, accessionMapCsv, binaryFilePath, massesOffsetsFilePath);
+        BinaryPeptideDb db = new BinaryPeptideDb(groupedCsv, accessionMapCsv, binaryFilePath);
+        db.buildDatabase(groupedCsv, binaryFilePath, massesOffsetsFilePath);
         // Primjer range upita
         double massFrom = 447.23;
         double margin = 0.76;
-        db.loadAccessionMap(accessionMapCsv);
+        db.loadAccessionMapFromCsv(accessionMapCsv);
         db.loadMassesAndOffsets(massesOffsetsFilePath);
         List<String> results = db.searchWithMargin(massFrom, margin);
 

@@ -1,24 +1,27 @@
 package hr.pbf.digestdb.util;
 
+import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.InvalidProtocolBufferException;
 import hr.pbf.digested.proto.Peptides;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.PipedWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Slf4j
-public class MyBinaryPeptideMassDB {
+@UtilityClass
+public class BinaryPeptideDbUtil {
 
     private final ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024); // 1MB, prilagodite po potrebi
 
-    private void writeVarint(ByteBuffer buffer, int value) {
+    public void writeVarint(ByteBuffer buffer, int value) {
         while (value >= 128) {
             buffer.put((byte) ((value & 0x7F) | 0x80));
             value >>>= 7;
@@ -26,7 +29,13 @@ public class MyBinaryPeptideMassDB {
         buffer.put((byte) value);
     }
 
-    private int readVarint(ByteBuffer buffer) {
+    public static int readVarint2(ByteBuffer buffer) throws IOException {
+        CodedInputStream cis = CodedInputStream.newInstance(buffer);
+        return cis.readRawVarint32(); // Za 32-bitni Varint
+        // Ili koristite cis.readRawVarint64() za 64-bitni Varint ako je potrebno
+    }
+
+    public int readVarint(ByteBuffer buffer) {
         int result = 0;
         int shift = 0;
         while (buffer.hasRemaining()) {
@@ -37,13 +46,13 @@ public class MyBinaryPeptideMassDB {
                 return result;
             }
             if (shift >= 32) {
-                throw new IllegalStateException("Varint preveliki za int!");
+                throw new IllegalStateException("Varint to large!");
             }
         }
-        throw new IllegalStateException("Nepotpuni varint u bufferu!");
+        throw new IllegalStateException("Incomplete varint in buffer!");
     }
 
-    public Set<PeptideAcc> readValueOptimized(byte[] value) {
+    public Set<PeptideAcc> readGroupedRow(byte[] value) {
         ByteBuffer buffer = ByteBuffer.wrap(value);
         Set<PeptideAcc> peptides = new HashSet<>();
 
@@ -76,7 +85,7 @@ public class MyBinaryPeptideMassDB {
         return peptides;
     }
 
-    public byte[] writeOptimized(String value) {
+    public byte[] writeGroupedRow(String value) {
         buffer.clear();
         int start = 0;
         while (start < value.length()) {
@@ -120,11 +129,11 @@ public class MyBinaryPeptideMassDB {
         LZ4Factory factory = LZ4Factory.fastestInstance();
         LZ4Compressor compressor = factory.fastCompressor();
 
-        MyBinaryPeptideMassDB db = new MyBinaryPeptideMassDB();
+        BinaryPeptideDbUtil db = new BinaryPeptideDbUtil();
         String s = "ASELTGEKDLANSSLR:1292347-ASSSLSGGADTLEALGVR:1402905;1402906-LTVTDNNGGINTESKK:209275-NTVISTGGGIVETEASR:107327-KLSDTEINEQISGTR:221885-NGATSGLTSEEELRVK:274454-TIETRNGEVVTESQK:725806-TAEIEGISAAGATKESR:1557621-STANSVKSELEQELR:1198065-EREEELASSTATVIR:574058-DNDVLLASSSRDATVK:276611-TNELAGDGTTTATVLAR:283725-NGDGTITGKELSETLR:2346334-DDVTGATKALLTGASDR:58722-DIATSLSQASGEKIDR:257619-EVSVNTGATDGAITSIR:212964-VAVSSGEDGSDTVLKAR:361048-ASASASVIVPSNQGTSSK:535175-DSSIIGKNNVNSDLSK:233125-NATQAIDEAISSTLTR:1291643;1291594-LVTTDSESIREDIGR:99998";
         StopWatch watch = new StopWatch();
         watch.start();
-        byte[] bytes = db.writeOptimized(s);
+        byte[] bytes = db.writeGroupedRow(s);
         watch.stop();
         log.debug("write Optimized Time: " + watch.getNanoTime());
 
@@ -140,8 +149,9 @@ public class MyBinaryPeptideMassDB {
         byte[] compressString = compressor.compress(s.getBytes(StandardCharsets.UTF_8));
         log.debug("Compressed string length: " + compressString.length);
 
-        watch.reset();watch.start();
-        Set<PeptideAcc> result = db.readValueOptimized(bytes);
+        watch.reset();
+        watch.start();
+        Set<PeptideAcc> result = db.readGroupedRow(bytes);
         watch.stop();
         log.debug("Read Optimized Time: " + watch.getNanoTime());
 
@@ -159,7 +169,8 @@ public class MyBinaryPeptideMassDB {
             builder.addSequences(seqAccession);
 
         }
-        watch.reset();watch.start();
+        watch.reset();
+        watch.start();
         byte[] byteArray = builder.build().toByteArray();
         watch.stop();
         log.debug("Protobuf Time: " + watch.getNanoTime());

@@ -3,7 +3,7 @@ package hr.pbf.digestdb.workflow;
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import hr.pbf.digestdb.util.AminoAcidCoder;
 import hr.pbf.digestdb.util.MyUtil;
-import hr.pbf.digestdb.util.PeptideValueSerialization;
+import hr.pbf.digestdb.demo.PeptideValueSerialization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.RocksDB;
@@ -18,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 public class MainMassRocksDb {

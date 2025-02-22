@@ -1,8 +1,9 @@
-package hr.pbf.digestdb.util;
+package hr.pbf.digestdb.demo;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.*;
-import java.io.*;
-
+@Slf4j
 public class DuckDBPeptideLoader {
     public static void main(String[] args) {
         String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/grouped_with_ids.csv";
@@ -35,7 +36,7 @@ public class DuckDBPeptideLoader {
 
             System.out.println("CSV successfully loaded into DuckDB.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error loading CSV into DuckDB", e);
         }
     }
 
@@ -54,7 +55,7 @@ public class DuckDBPeptideLoader {
                 System.out.printf("Mass: %.4f, Peptides: %s%n", mass, peptides);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Error querying DuckDB", e);
         }
     }
 }

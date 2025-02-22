@@ -14,7 +14,7 @@ import java.util.*;
  */
 @Slf4j
 @Data
-public class MainCsvPeptideMassGrouper {
+public class MainCsvMassGrouper {
 
 
     public String inputCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/peptide_mass_sorted_console.csv";
@@ -97,7 +97,7 @@ public class MainCsvPeptideMassGrouper {
         // Ukloni zadnji zarez
         if (sb.length() > 0) sb.setLength(sb.length() - 1);
 
-        writer.write(mass + "," + sb.toString());
+        writer.write(mass + "," + sb);
         writer.newLine();
     }
 }

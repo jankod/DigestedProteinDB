@@ -1,6 +1,8 @@
 package hr.pbf.digestdb.workflow;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +12,7 @@ import java.util.*;
 
 @Slf4j
 @Data
-public class MainCsvGrouperWithIds {
+public class MainCsvMassGrouperWithAccIds {
 
 
     private final StringBuilder sb = new StringBuilder(1024);
@@ -21,7 +23,7 @@ public class MainCsvGrouperWithIds {
     int bufferSize = 16 * 1024 * 1024; // 16MB buffer
 
     public static void main(String[] args) {
-        MainCsvGrouperWithIds app = new MainCsvGrouperWithIds();
+        MainCsvMassGrouperWithAccIds app = new MainCsvMassGrouperWithAccIds();
         app.start();
     }
 
@@ -34,11 +36,11 @@ public class MainCsvGrouperWithIds {
         groupDataWithIds(inputCsv, outputGroupedCsv, accessionToIdMap, bufferSize);
     }
 
-    private TObjectIntHashMap<String> buildAccessionMap(String inputCsv, String outputMapCsv, int bufferSize) {
+    private TObjectIntHashMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
         TObjectIntHashMap<String> accessionToIdMap = new TObjectIntHashMap<>();
-        int nextId = 1;
+        int nextAccNumId = 1;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv), bufferSize)) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputCsvPath), bufferSize)) {
             // reader.readLine(); // Preskoči header
 
             String line;
@@ -47,7 +49,10 @@ public class MainCsvGrouperWithIds {
                 if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format " + line);
                 String accession = parts[2];
                 if (!accessionToIdMap.containsKey(accession)) {
-                    accessionToIdMap.put(accession, nextId++);
+                    if (nextAccNumId == Integer.MAX_VALUE) {
+                        throw new IllegalStateException("Counter reached maximum int value.");
+                    }
+                    accessionToIdMap.put(accession, nextAccNumId++);
                 }
 
             }
@@ -57,9 +62,9 @@ public class MainCsvGrouperWithIds {
         }
 
         // Spremi mapiranje u CSV
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputMapCsv), bufferSize)) {
-            writer.write("id,accession");
-            writer.newLine();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsvPath), bufferSize)) {
+            //writer.write("id,accession");
+            //writer.newLine();
 
             accessionToIdMap.forEachEntry((accession, id) -> {
                 try {
@@ -76,7 +81,7 @@ public class MainCsvGrouperWithIds {
         } catch (IOException e) {
             log.error("Error writing accession map", e);
         }
-        log.info("Max acc Id = " + nextId);
+        log.info("Max acc Id = " + nextAccNumId);
         return accessionToIdMap;
     }
 
@@ -85,25 +90,27 @@ public class MainCsvGrouperWithIds {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv), bufferSize);
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsv), bufferSize)) {
 
-            reader.readLine(); // Preskoči header
+            //  reader.readLine(); // Preskoči header
 
             String line = reader.readLine();
-            if (line == null) return;
+            if (line == null || line.isBlank()) return;
 
             String[] parts = line.split(",");
-            if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format " + line);
+            if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format: " + line);
 
             double prevMass = Double.parseDouble(parts[0]);
-            String prevMass4 = MyUtil.discretizedToFour(prevMass); // Pretpostavljam da ovo postoji
-            Map<String, Set<Integer>> seqIdsMap = new HashMap<>();
+            String prevMass4 = MyUtil.discretizedToFour(prevMass);
+            //Map<String, Set<Integer>> seqIdsMap = new HashMap<>();
+
+            Map<String, TIntHashSet> seqIdsMap = new HashMap<>();
 
             String sequence = parts[1];
             int id = accessionToIdMap.get(parts[2]);
-            seqIdsMap.computeIfAbsent(sequence, k -> new HashSet<>()).add(id);
+            seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
 
             while ((line = reader.readLine()) != null) {
                 parts = line.split(",");
-                if (parts.length < 3) continue;
+                if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format: " + line);
 
                 double mass = Double.parseDouble(parts[0]);
                 String mass4 = MyUtil.discretizedToFour(mass);
@@ -111,14 +118,14 @@ public class MainCsvGrouperWithIds {
                 if (mass4.equals(prevMass4)) {
                     sequence = parts[1];
                     id = accessionToIdMap.get(parts[2]);
-                    seqIdsMap.computeIfAbsent(sequence, k -> new HashSet<>()).add(id);
+                    seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
                 } else {
                     writeMassToCsv(writer, prevMass4, seqIdsMap);
                     prevMass4 = mass4;
                     seqIdsMap.clear();
                     sequence = parts[1];
                     id = accessionToIdMap.get(parts[2]);
-                    seqIdsMap.computeIfAbsent(sequence, k -> new HashSet<>()).add(id);
+                    seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
                 }
             }
             writeMassToCsv(writer, prevMass4, seqIdsMap);
@@ -129,17 +136,32 @@ public class MainCsvGrouperWithIds {
         }
     }
 
-    private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, Set<Integer>> sequenceMap)
+    private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, TIntHashSet> sequenceMap)
           throws IOException {
         sb.setLength(0);
-        for (Map.Entry<String, Set<Integer>> entry : sequenceMap.entrySet()) {
+        Set<Map.Entry<String, TIntHashSet>> entries = sequenceMap.entrySet();
+        for (Map.Entry<String, TIntHashSet> entry : entries) {
             String sequence = entry.getKey();
-            Set<Integer> ids = entry.getValue();
-            String idsStr = String.join(";", ids.stream().map(String::valueOf).toArray(String[]::new));
+            TIntHashSet ids = entry.getValue();
+
+            StringBuilder idsStr = new StringBuilder(ids.size() * 6);
+            for (TIntIterator it = ids.iterator(); it.hasNext(); ) {
+                idsStr.append(it.next()).append(";");
+            }
+            if (!idsStr.isEmpty()) idsStr.setLength(idsStr.length() - 1);
+
+            //String idsStr = String.join(";", ids.stream().mapToObj(String::valueOf).toArray(String[]::new));
             sb.append(sequence).append(":").append(idsStr).append("-");
         }
-        if (sb.length() > 0) sb.setLength(sb.length() - 1);
-        writer.write(mass + "," + sb.toString());
+//        for (Set<Map.Entry<String, TIntHashSet>> entry : sequenceMap.entrySet()) {
+//            String sequence = entry.ge
+//            Set<Integer> ids = entry.getValue();
+//            String idsStr = String.join(";", ids.stream().map(String::valueOf).toArray(String[]::new));
+//            sb.append(sequence).append(":").append(idsStr).append("-");
+//        }
+        if (!sb.isEmpty()) sb.setLength(sb.length() - 1);
+
+        writer.write(mass + "," + sb);
         writer.newLine();
     }
 }

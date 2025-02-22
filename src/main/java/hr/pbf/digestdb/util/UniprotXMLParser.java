@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.workflow;
+package hr.pbf.digestdb.util;
 
 import lombok.Data;
 import lombok.Getter;
@@ -18,11 +18,11 @@ public class UniprotXMLParser {
     @Data
     public abstract static class ProteinHandler {
 
-        boolean stopped = false;
+        public boolean stopped = false;
 
-        long counter = 0;
+        public long counter = 0;
 
-        abstract void gotProtein(ProteinInfo p) throws IOException;
+        public abstract void gotProtein(ProteinInfo p) throws IOException;
     }
 
     private long totalCount = 0;
@@ -38,7 +38,7 @@ public class UniprotXMLParser {
             if (filePath.endsWith(".gz")) {
                 GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(filePath), 65536);
                 reader = factory.createXMLStreamReader(gzipInputStream);
-            }else {
+            } else {
                 reader = factory.createXMLStreamReader(new FileInputStream(filePath));
             }
             while (reader.hasNext()) {
@@ -103,16 +103,17 @@ public class UniprotXMLParser {
 
     }
 
+    static @Data
+    public class ProteinInfo {
+        String accession;
+        String proteinName;
+        int taxonomyId;
+        String taxonomyName;
+
+        @ToString.Exclude
+        String sequence;
+    }
+
 
 }
 
-@Data
-class ProteinInfo {
-    String accession;
-    String proteinName;
-    int taxonomyId;
-    String taxonomyName;
-
-    @ToString.Exclude
-    String sequence;
-}

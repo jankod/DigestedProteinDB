@@ -1,6 +1,8 @@
 package hr.pbf.digestdb.workflow;
 
-import hr.pbf.digestdb.workflow.UniprotXMLParser.ProteinHandler;
+import hr.pbf.digestdb.util.MyUtil;
+import hr.pbf.digestdb.util.UniprotXMLParser;
+import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import hr.pbf.digestdb.util.BioUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,12 +43,12 @@ public class MainUniprotToPeptideCsv {
         }
 
         // Default DEFAULT_MAX_BUFFER_SIZE = 8192
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(toCsvPath), 8 * 1024 * 8)) {
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(toCsvPath), 8 * 1024 * 16)) {
             //   out.write(getCsvHeader().getBytes(standardCharset));
 
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
-                public void gotProtein(ProteinInfo p) {
+                public void gotProtein(UniprotXMLParser.ProteinInfo p) {
                     if (counter > maxProteinCount) {
                         stopped = true;
                         log.info("Max protein count reached: {}", maxProteinCount);
@@ -58,7 +60,8 @@ public class MainUniprotToPeptideCsv {
                             return;
                         }
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
-                        String row = getCsvRow(p, mass, peptide);
+                        double mass4 = MyUtil.roundToFour(mass);
+                        String row = mass4 + "," + peptide + "," + p.getAccession()+ "\n";
                         try {
                             out.write(row.getBytes(standardCharset));
                             counter++;
@@ -84,13 +87,4 @@ public class MainUniprotToPeptideCsv {
 
     }
 
-    private String getCsvHeader() {
-        return "#mass,peptide,accession,taxonomyId\n";
-    }
-
-
-    private String getCsvRow(ProteinInfo p, double mass, String peptide) {
-        //return mass + "," + peptide + "," + p.getAccession() + "," + p.taxonomyId + "\n";
-        return mass + "," + peptide + "," + p.getAccession()+ "\n";
-    }
 }
