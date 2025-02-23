@@ -1,12 +1,17 @@
 package hr.pbf.digestdb.util;
 
 import com.google.common.primitives.Longs;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.rocksdb.*;
 
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MyUtil {
     public static double roundToFour(double value) {
@@ -32,14 +37,6 @@ public class MyUtil {
     }
 
 
-    public static RocksDB openDB(String path) throws RocksDBException {
-        RocksDB.loadLibrary();
-        Options options = new Options().setCreateIfMissing(true);
-        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
-        return RocksDB.open(options, path);
-
-    }
-
     public static byte[] doubleToByteArray(double mass) {
         return ByteBuffer.allocate(Double.BYTES).putDouble(mass).rewind().array();
     }
@@ -49,12 +46,69 @@ public class MyUtil {
     }
 
 
-    public static RocksDB openReadDB(String dbPath) throws RocksDBException {
+    /**
+     * Optimized for point read
+     *
+     * @param dbPath
+     * @return
+     * @throws RocksDBException
+     */
+    public static RocksDB openPointReadDB(String dbPath) throws RocksDBException {
         RocksDB.loadLibrary();
         Options options = new Options();
+        BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+        Cache cache = new LRUCache(32L * 1024L * 1024L * 1024L);
+        tableConfig.setBlockCache(cache);
+        tableConfig.setCacheIndexAndFilterBlocks(true);
+        tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
+
+        // Optimizacija za točkasto čitanje
+        options.optimizeForPointLookup(32 * 1024 * 1024);
+
+        options.setTableFormatConfig(tableConfig);
+        options.setAllowMmapReads(true);
+
         options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
         return RocksDB.openReadOnly(options, dbPath);
     }
+
+    public static RocksDB openReadDB(String dbPath) throws RocksDBException {
+        RocksDB.loadLibrary();
+        Options options = new Options();
+        BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+        Cache cache = new LRUCache(64L * 1024L * 1024L * 1024L); // 64GB cache
+        tableConfig.setBlockCache(cache);
+        tableConfig.setCacheIndexAndFilterBlocks(true);
+        tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
+
+        // Optimizacija za točkasto čitanje
+        // options.optimizeForPointLookup(32  * 1024 * 1024); // 512 MB block cache
+
+        options.setTableFormatConfig(tableConfig);
+        options.setAllowMmapReads(true);
+
+        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
+        return RocksDB.openReadOnly(options, dbPath);
+    }
+
+    public static RocksDB openWriteDB(String path) throws RocksDBException {
+        RocksDB.loadLibrary();
+        Options options = new Options().setCreateIfMissing(true);
+        options.setAllowMmapReads(true);
+
+        options.setStrictBytesPerSync(false);
+        options.setAllow2pc(false);
+        options.setAllowMmapWrites(true);
+
+
+        options.setCompactionStyle(CompactionStyle.UNIVERSAL);
+        options.setWriteBufferSize(256 * 1024 * 1024); // 256 MB
+        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
+
+        return RocksDB.open(options, path);
+
+    }
+
 
     public static long byteArrayToLong(byte[] accessionValue) {
         return Longs.fromByteArray(accessionValue);
@@ -62,5 +116,28 @@ public class MyUtil {
 
     public static byte[] longToByteArray(Long longNum) {
         return Longs.toByteArray(longNum);
+    }
+
+    public static byte[] intToByteArray(int someInt) {
+        return ByteBuffer.allocate(4).putInt(someInt).array();
+    }
+
+    public static int byteArrayToInt(byte[] key) {
+        return ByteBuffer.wrap(key).getInt();
+    }
+
+    public static List<byte[]> intListToByteList(List<Integer> accs) {
+        ArrayList<byte[]> list = new ArrayList<>(accs.size());
+        for (Integer acc : accs) {
+            list.add(intToByteArray(acc));
+        }
+        return list;
+    }
+
+    public static void printMiliSec(StopWatch watch, String msg) {
+        long nanoTime = watch.getNanoTime();
+        long millis = TimeUnit.NANOSECONDS.toMillis(nanoTime);
+        System.out.println(msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
+
     }
 }

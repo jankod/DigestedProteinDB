@@ -18,7 +18,7 @@ public class MainSortedCsvToDackDb {
 
     public void startInsertToDackDb() throws IOException, RocksDBException {
 
-        try (RocksDB db = MyUtil.openDB(toDbPath)) {
+        try (RocksDB db = MyUtil.openWriteDB(toDbPath)) {
 
             String csvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/csv/peptide_mass_sorted_orig.csv";
             try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(Path.of(csvPath)))) {

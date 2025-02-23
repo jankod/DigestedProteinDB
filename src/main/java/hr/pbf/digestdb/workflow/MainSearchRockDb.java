@@ -8,7 +8,6 @@ import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
-import java.io.Serial;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +23,7 @@ public class MainSearchRockDb {
 
         List<RockDbValue> rows = new ArrayList<>();
 
-        try (RocksDB db = MyUtil.openDB(toDbPath);
+        try (RocksDB db = MyUtil.openWriteDB(toDbPath);
              RocksIterator iterator = db.newIterator()) { // Dobijemo iterator
 
             byte[] startKeyBytes = MyUtil.doubleToByteArray(startMass);

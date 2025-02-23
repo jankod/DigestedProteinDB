@@ -1,5 +1,7 @@
 package hr.pbf.digestdb;
 
+import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
+import hr.pbf.digestdb.util.MapdbPeptideDatabase;
 import hr.pbf.digestdb.workflow.MainCsvMassGrouper;
 import hr.pbf.digestdb.workflow.*;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +9,12 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.rocksdb.RocksDB;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class App {
@@ -20,7 +25,7 @@ public class App {
         SORTED_CSV_TO_ROCKS_DB_4,
         SORTED_CSV_TO_DACK_DB_5,
         CREATE_ACCESSIONS_DB_CSV_TO_ROCKS_DB_6,
-        SEARCH_DB_ROCKS_BY_MASS_4, CSV_GROUP, GROUP_WITH_ACC_ID, SEARCH_ACCESSION_DB_7
+        SEARCH_DB_ROCKS_BY_MASS_4, CSV_GROUP, GROUP_WITH_ACC_ID, CREATE_MAPDB, SEARCH_MAPDB, SEARCH_ACCESSION_DB_7
     }
 
     enum Location {
@@ -30,7 +35,7 @@ public class App {
 
     public static void main(String[] args) throws Throwable {
 
-        Mode mode = Mode.GROUP_WITH_ACC_ID;
+        Mode mode = Mode.CREATE_MAPDB;
         Location location;
         // if mac then is local, otherwise remote
         if (System.getProperty("os.name").toLowerCase().contains("mac")) {
@@ -50,7 +55,7 @@ public class App {
         FileUtils.forceMkdir(new File(DIR_GENERATED));
 
 
-        log.info("START MODE={} DIR= {} " ,mode, DIR_GENERATED);
+        log.info("START MODE={} DIR= {} ", mode, DIR_GENERATED);
         StopWatch watch = StopWatch.createStarted();
         if (mode == Mode.UNIPROT_TO_CSV_1) {
             MainUniprotToPeptideCsv app = new MainUniprotToPeptideCsv();
@@ -82,14 +87,15 @@ public class App {
             MainMassRocksDb app = new MainMassRocksDb();
             app.fromCsvPath = DIR_GENERATED + "/peptide_mass_sorted_console.csv";
             app.toDbPath = DIR_GENERATED + "/rocks_mass.db";
-            app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
-            app.startInsertToRocksDb();
+            //  app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
+            app.startCreateToRocksDb();
         } else if (mode == Mode.SEARCH_DB_ROCKS_BY_MASS_4) {
             MainMassRocksDb app = new MainMassRocksDb();
             app.toDbPath = DIR_GENERATED + "/rocks_mass.db";
-            app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
+            //   app.dbAccessionPath = DIR_GENERATED + "/rocks_accessions.db";
 
-            List<MainMassRocksDb.SearchResult> searchResults = app.searchByMass(400, 1.3);
+            RocksDB db = app.openReadDB();
+            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchResults = app.searchByMass(db, 700, 700.3);
             log.debug("Search results: {}", searchResults.size());
 
 
@@ -122,6 +128,15 @@ public class App {
             app.setOutputAccessionMapCsv(DIR_GENERATED + "/accession_map.csv");
             app.start();
 
+        } else if (mode == Mode.CREATE_MAPDB) {
+            MapdbPeptideDatabase app = new MapdbPeptideDatabase();
+            app.setGroupedCsvPath(DIR_GENERATED + "/grouped_with_ids.csv");
+            app.setDbPath(DIR_GENERATED + "/mapdb_sstable.db");
+            app.startBuild();
+        } else if (mode == Mode.SEARCH_MAPDB) {
+            MapdbPeptideDatabase app = new MapdbPeptideDatabase();
+            app.setDbPath(DIR_GENERATED + "/mapdb_sstable.db");
+            app.startSearchMain(args);
         }
 
         watch.stop();

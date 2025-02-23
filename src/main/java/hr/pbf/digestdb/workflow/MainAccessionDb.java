@@ -30,7 +30,7 @@ public class MainAccessionDb {
     public void startCreateDB() {
         currentAccessionIdCounter = 1;
 
-        try (RocksDB db = MyUtil.openDB(toRocksDbPath)) {
+        try (RocksDB db = MyUtil.openWriteDB(toRocksDbPath)) {
             try (BufferedReader reader = new BufferedReader(new FileReader(fromCsvPath))) {
 
                 reader.lines().forEach(line -> {
@@ -71,7 +71,7 @@ public class MainAccessionDb {
      * @return id or null{}
      */
     public String searchAccessionDb(Long accessionId) {
-        try (RocksDB db = MyUtil.openDB(toRocksDbPath)) {
+        try (RocksDB db = MyUtil.openWriteDB(toRocksDbPath)) {
             byte[] key = MyUtil.longToByteArray(accessionId);
             byte[] value = db.get(key);
             if (value != null) {
