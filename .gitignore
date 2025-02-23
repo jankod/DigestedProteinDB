@@ -9,5 +9,4 @@ war/node_modules
 .classpath
 .project
 .DS_Store
-git clean -fd
 /src/main/java/hr/pbf/digestdb/App.java

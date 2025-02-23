@@ -1,6 +1,7 @@
 package hr.pbf.digestdb.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.mapdb.Serializer;
@@ -8,13 +9,8 @@ import org.mapdb.SortedTableMap;
 import org.mapdb.volume.MappedFileVol;
 import org.mapdb.volume.Volume;
 
-import java.io.BufferedReader;
-import java.io.Console;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 @Slf4j
 public class MapdbPeptideDatabase {
@@ -27,21 +23,24 @@ public class MapdbPeptideDatabase {
     public static void main(String[] args) {
         // read from console two number and perfom search
         MapdbPeptideDatabase db = new MapdbPeptideDatabase();
-        SortedTableMap<Double, String> maps = db.openForSearch();
+        SortedTableMap<Long, String> maps = db.openForSearch();
         System.out.println("Enter two numbers separated by space. Enter 'stop' to stop");
         Console console = System.console();
         while (true) {
             String line = console.readLine();
-            if("stop".equals(line)) {
+            if ("stop".equals(line)) {
                 log.info("Stoping");
                 break;
             }
             String[] parts = line.split(" ");
             double mass1 = Double.parseDouble(parts[0]);
             double mass2 = Double.parseDouble(parts[1]);
+            StopWatch watch = StopWatch.createStarted();
             List<Map.Entry<Double, String>> result = db.search(mass1, mass2, maps);
+            log.info("Search time milisec " + watch.getTime());
+            log.info("Results time: " + result.size());
             for (Map.Entry<Double, String> entry : result) {
-                System.out.println( entry.getKey() + ": " + entry.getValue());
+                  System.out.println( entry.getKey() + ": " + entry.getValue());
 //                log.info("mass: " + entry.getKey() + " seqAccs: " + entry.getValue());
             }
         }
@@ -51,57 +50,45 @@ public class MapdbPeptideDatabase {
 
     }
 
-    public static void main1(String[] args) throws Exception {
-
+    public void startBuild() throws Exception {
+        if (new File(dbPath).exists()) {
+            log.info("DB already exists: " + dbPath);
+            return;
+        }
+        if (!new File(groupedCsvPath).exists()) {
+            throw new RuntimeException("File not found: " + groupedCsvPath);
+        }
         MapdbPeptideDatabase db = new MapdbPeptideDatabase();
-        //List<Map.Entry<Double, String>> result = db.search(1705.1, 1705.8);
-
-//         for (Map.Entry<Double, String> entry : results) {
-//            log.info("mass: " + entry.getKey() + " seqAccs: " + entry.getValue());
-//        }
-
-
-//        FileUtils.delete(new java.io.File(db.dbPath));
-//        db.buildDb();
+        db.buildDb();
 
     }
 
-    public SortedTableMap<Double, String> openForSearch() {
+    public SortedTableMap<Long, String> openForSearch() {
         Volume volume = MappedFileVol.FACTORY.makeVolume(dbPath, true);
 
-        SortedTableMap<Double, String> map =
+        SortedTableMap<Long, String> map =
               SortedTableMap.open(
                     volume,
-                    Serializer.DOUBLE,
+                    Serializer.LONG,
                     Serializer.STRING
               );
         return map;
     }
 
-    public List<Map.Entry<Double, String>> search(double mass1, double mass2, SortedTableMap<Double, String> map) {
+    public List<Map.Entry<Double, String>> search(double mass1, double mass2, SortedTableMap<Long, String> map) {
 
-        // Binary search
-        StopWatch watch = StopWatch.createStarted();
-        List<Map.Entry<Double, String>> results = searchRange(map, mass1, mass2);
-        log.info("Search time milisec " + watch.getTime());
-        log.info("Results: " + results.size());
-
-     //   map.close();
-
-        return results;
+        return searchRange(map, mass1, mass2);
 
 
     }
 
-    public List<Map.Entry<Double, String>> searchRange(SortedTableMap<Double, String> map, double mass1, double mass2) {
+    public List<Map.Entry<Double, String>> searchRange(SortedTableMap<Long, String> map, double mass1, double mass2) {
+        long mass1long = Double.doubleToLongBits(mass1);
+        long mass2long = Double.doubleToLongBits(mass2);
+        SortedMap<Long, String> submap = map.subMap(mass1long, true, mass2long, true);
         List<Map.Entry<Double, String>> results = new ArrayList<>();
-        // Počni s ključem koji je >= mass1
-        Map.Entry<Double, String> entry = map.findHigher(mass1, true);
-        // Iteriraj dok je ključ manji ili jednak mass2
-        while (entry != null && entry.getKey() <= mass2) {
-            results.add(entry);
-            // Dohvati sljedeći viši ključ (isključivo) od trenutnog
-            entry = map.findHigher(entry.getKey(), false);
+        for (Map.Entry<Long, String> entry : submap.entrySet()) {
+            results.add(new AbstractMap.SimpleEntry<>(Double.longBitsToDouble(entry.getKey()), entry.getValue()));
         }
         return results;
     }
@@ -110,12 +97,16 @@ public class MapdbPeptideDatabase {
 
         Volume volume = MappedFileVol.FACTORY.makeVolume(dbPath, false);
 
-        SortedTableMap.Sink<Double, String> sink =
+        SortedTableMap.Sink<Long, String> sink =
               SortedTableMap.create(
-                    volume,
-                    Serializer.DOUBLE,
-                    Serializer.STRING
-              ).createFromSink();
+                          volume,
+                          Serializer.LONG,
+                          Serializer.STRING
+                    )
+                    //.pageSize(1024 * 1024)  // 1MB default 1,048,576 bytes
+                    .nodeSize(128)  // 32 default
+
+                    .createFromSink();
 
 
         BufferedReader reader = new BufferedReader(new FileReader(groupedCsvPath));
@@ -127,25 +118,14 @@ public class MapdbPeptideDatabase {
             if (parts.length < 2) throw new IllegalArgumentException("Invalid input CSV format " + line);
 
             double mass = Double.parseDouble(parts[0]);
+            long massLong = Double.doubleToLongBits(mass);
             String seqAccs = parts[1];
 
-            sink.put(mass, seqAccs);
+            sink.put(massLong, seqAccs);
         }
-        SortedTableMap<Double, String> map = sink.create();
+        SortedTableMap<Long, String> map = sink.create();
         log.info("Created map with size: " + map.size());
         map.close();
-
-
-//            //feed content into consumer
-//            int key = 0;
-//            key< 100000;key++)
-//
-//            {
-//                sink.put(key, "value" + key);
-//            }
-//
-//            // finally open created map
-//            SortedTableMap<Integer, String> map = sink.create();
 
 
     }
