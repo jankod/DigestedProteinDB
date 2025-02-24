@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Data
+@Deprecated
 public class MainAccessionRocksDb {
 
     private String fromCsvPath = "";

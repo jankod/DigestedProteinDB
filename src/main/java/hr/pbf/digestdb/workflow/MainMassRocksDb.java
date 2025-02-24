@@ -2,6 +2,7 @@ package hr.pbf.digestdb.workflow;
 
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
+import hr.pbf.digestdb.util.CustomAccessionDb;
 import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class MainMassRocksDb {
 
     public String fromCsvPath = "";
     public String toDbPath = "";
-    public String accDbPath = "";
+   // public String accDbPath = "";
 
 //    public String dbAccessionPath = "";
 
@@ -38,7 +39,7 @@ public class MainMassRocksDb {
 
         db.fromCsvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/grouped_with_ids.csv";
         db.toDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db";
-        db.setAccDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_accession.db");
+     //   db.setAccDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_accession.db");
         //  db.startCreateToRocksDb();
         db.searchByMassInConsole();
     }
@@ -47,10 +48,10 @@ public class MainMassRocksDb {
         System.out.println("Enter two numbers separated by space. Enter 'stop' to stop");
         Console console = System.console();
         RocksDB massDb = openReadDB();
-        MainAccessionRocksDb accessionDb = new MainAccessionRocksDb();
-        accessionDb.setToDbPath(getAccDbPath());
-        RocksDB rocksDbAcc = accessionDb.openReadDB();
 
+        CustomAccessionDb accDb = new CustomAccessionDb();
+        accDb.setToDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db");
+        accDb.loadDb();
         while (true) {
             String line = console.readLine();
             if ("stop".equals(line)) {
@@ -69,7 +70,6 @@ public class MainMassRocksDb {
 
 
             StopWatch watchAcc = StopWatch.createStarted();
-            Map<Integer, String> accNumList = accessionDb.searchAccs(rocksDbAcc, result);
             watchAcc.stop();
             long millisAcc = TimeUnit.NANOSECONDS.toMillis(watchAcc.getNanoTime());
             log.info("Search acc time " + DurationFormatUtils.formatDuration(millisAcc, "HH:mm:ss,SSS"));
@@ -88,16 +88,15 @@ public class MainMassRocksDb {
                     int[] accessions = acc.getAccessions();
                     String seq = acc.getSeq();
                     sb.append(seq).append(": ");
-                    for (int i : accessions) {
-                        String accStr = accNumList.get(i);
+                    for (int accNum : accessions) {
+                        String accStr = accDb.getAcc(accNum);
                         sb.append(accStr).append(" ");
                     }
                 });
-                //  log.info(mass + ": " + sb);
+                log.info(mass + ": " + sb);
             }
 
         }
-        rocksDbAcc.close();
         massDb.close();
 
     }

@@ -69,6 +69,9 @@ public class CustomAccessionDb {
     }
 
     public String[] loadDb() {
+        if (!new File(toDbPath).exists()) {
+            throw new RuntimeException("File not found: " + toDbPath);
+        }
         String[] accList;
         try (DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(toDbPath)))) {
             int size = in.readInt();
@@ -79,11 +82,18 @@ public class CustomAccessionDb {
                 byte[] accBytes = new byte[len];
                 in.readFully(accBytes);
                 String acc = new String(accBytes, StandardCharsets.UTF_8);
+                if(i == 1) {
+                    log.debug("First acc: {}", acc);
+                }
+                if (i == 2) {
+                    log.debug("2 acc: {}", acc);
+                }
                 accList[i] = acc;
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        this.accList = accList;
 
         return accList;
     }
