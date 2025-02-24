@@ -57,9 +57,9 @@ public class MainSortedCsvToDackDb {
         double p3 = 347.144109521875;
 
 
-        System.out.println(MyUtil.roundToFour(p1));
-        System.out.println(MyUtil.roundToFour(p2));
-        System.out.println(MyUtil.roundToFour(p3));
+        System.out.println(MyUtil.roundTo4(p1));
+        System.out.println(MyUtil.roundTo4(p2));
+        System.out.println(MyUtil.roundTo4(p3));
 
     }
 

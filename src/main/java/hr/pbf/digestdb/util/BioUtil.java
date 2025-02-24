@@ -31,6 +31,7 @@ import java.util.zip.GZIPOutputStream;
 
 import com.google.common.base.Charsets;
 import hr.pbf.digestdb.model.FastaSeq;
+import lombok.experimental.UtilityClass;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 
+@UtilityClass
 public class BioUtil {
 
     public static final double PROTON_MASS = 1.007825;
@@ -83,7 +85,7 @@ public class BioUtil {
 
     public static final double Hplus = 1.007825;
 
-    public static void readLargeFasta(String path, Callback callback) throws IOException {
+    public void readLargeFasta(String path, Callback callback) throws IOException {
         readLargeFasta(path, callback, Long.MAX_VALUE);
     }
 
@@ -94,7 +96,7 @@ public class BioUtil {
      */
     public static final char[] NEVALJALE_AA = new char[]{'X', 'B', 'Z', 'J', 'O'};
 
-    public static BufferedReader newFileReader(String path) throws UnsupportedEncodingException, FileNotFoundException {
+    public BufferedReader newFileReader(String path) throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, null);
     }
 
@@ -106,7 +108,7 @@ public class BioUtil {
      * @throws FileNotFoundException
      * @throws UnsupportedEncodingException
      */
-    public static BufferedReader newFileReader(String path, String charset, int bufSize)
+    public BufferedReader newFileReader(String path, String charset, int bufSize)
           throws UnsupportedEncodingException, FileNotFoundException {
         if (charset == null) {
             charset = "ASCII";
@@ -116,12 +118,12 @@ public class BioUtil {
         return reader;
     }
 
-    public static BufferedReader newFileReader(String path, String charset)
+    public BufferedReader newFileReader(String path, String charset)
           throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, charset, 8192);
     }
 
-    public static BufferedWriter newFileWiter(String path, String charset)
+    public BufferedWriter newFileWiter(String path, String charset)
           throws UnsupportedEncodingException, FileNotFoundException {
 
         if (charset == null) {
@@ -142,7 +144,7 @@ public class BioUtil {
 
     /// /////////////////////////////////////////////////////////
 
-    public static DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
+    public DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
         DataOutputStream out = new DataOutputStream(
               new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
@@ -156,7 +158,7 @@ public class BioUtil {
      * @return
      * @throws IOException
      */
-    public static DataInputStream newDataInputStreamCompressed(String path) throws IOException {
+    public DataInputStream newDataInputStreamCompressed(String path) throws IOException {
 
         GZIPInputStream in = new GZIPInputStream(new FileInputStream(new File(path)));
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -167,20 +169,20 @@ public class BioUtil {
     }
 
 
-    public static DataInputStream newDataInputStream(String path) throws FileNotFoundException {
+    public DataInputStream newDataInputStream(String path) throws FileNotFoundException {
         DataInputStream out = new DataInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
         return out;
     }
 
-    public static double roundToDecimals(double num, int dec) {
+    public double roundToDecimals(double num, int dec) {
         return Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
     }
 
-    public static float roundToDecimals(float num, int dec) {
+    public float roundToDecimals(float num, int dec) {
         return (float) (Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec));
     }
 
-    public static Map<String, Double> getMassesDigest(String seq) {
+    public Map<String, Double> getMassesDigest(String seq) {
         final List<String> peptides = tripsyn(seq, 5, 110); // 110 znakova je najvise jer ESI radi do 6000Da, a 6000 /
         // 57 ~ 110 aminoki kis.
 
@@ -212,7 +214,7 @@ public class BioUtil {
      * @param koliko
      * @throws IOException
      */
-    public static void readLargeFasta(String path, Callback callback, long koliko) throws IOException {
+    public void readLargeFasta(String path, Callback callback, long koliko) throws IOException {
         // FileReader f = new FileReader(new File(path));
         // reader = new BufferedReader(new InputStreamReader(new
         // FileInputStream(csvFile), "Cp1252"));
@@ -266,7 +268,7 @@ public class BioUtil {
         void readFasta(FastaSeq seq) throws IOException;
     }
 
-    public static Set<FastaSeq> readFasta(String path, int num) throws IOException {
+    public Set<FastaSeq> readFasta(String path, int num) throws IOException {
         int count = 0;
         FileInputStream in = new FileInputStream(new File(path));
         Set<FastaSeq> res = new HashSet<FastaSeq>();
@@ -304,7 +306,7 @@ public class BioUtil {
         }
     }
 
-    private static final Pattern pattternGI = Pattern.compile(">GI\\|([0-9]*)\\|", Pattern.CASE_INSENSITIVE);
+    private final Pattern pattternGI = Pattern.compile(">GI\\|([0-9]*)\\|", Pattern.CASE_INSENSITIVE);
 
     /**
      * Vraca samo jedan GI, iako mozda ima ih vise
@@ -312,7 +314,7 @@ public class BioUtil {
      * @param line
      * @return
      */
-    public static int findOneGI(String line) {
+    public int findOneGI(String line) {
         Matcher res = pattternGI.matcher(line.toUpperCase());
         int gi = 0;
         while (res.find()) {
@@ -323,7 +325,7 @@ public class BioUtil {
         return gi;
     }
 
-    public static ArrayList<Integer> findGIasList(String line) {
+    public ArrayList<Integer> findGIasList(String line) {
         ArrayList<Integer> intList = new ArrayList<Integer>();
 
         Matcher res = pattternGI.matcher(line);
@@ -335,7 +337,7 @@ public class BioUtil {
 
     }
 
-    public static String removeVersionFromAccession(String accession) {
+    public String removeVersionFromAccession(String accession) {
         int i = accession.indexOf('.');
         if (i > 0) {
             return accession.substring(0, i);
@@ -352,7 +354,7 @@ public class BioUtil {
      * @param max
      * @return
      */
-    public static List<String> tripsyn(String prot, int min, int max) {
+    public List<String> tripsyn(String prot, int min, int max) {
         final int numberOfRandK = StringUtils.countMatches(prot, "R") + StringUtils.countMatches(prot, "K");
         if (numberOfRandK == 0) {
             List<String> result = new ArrayList<String>(1);
@@ -430,7 +432,7 @@ public class BioUtil {
      * @param peptide
      * @return
      */
-    public static double calculateMassWidthH2O(final String peptide) {
+    public double calculateMassWidthH2O(final String peptide) {
         float h = 0;
         try {
             for (int i = 0; i < peptide.length(); i++) {
@@ -442,7 +444,7 @@ public class BioUtil {
         return h + H2O;
     }
 
-    public static double getMassFromAAfast(final char aa) {
+    public double getMassFromAAfast(final char aa) {
         return switch (aa) {
             case 'G' -> 57.021463724D;
             case 'A' -> 71.03711379D;
@@ -470,18 +472,18 @@ public class BioUtil {
         };
     }
 
-    public static void printMemoryUsage(String msg) {
+    public void printMemoryUsage(String msg) {
         int gb = 1024 * 1024 * 1024;
         long mem = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / gb;
 
         System.out.println(msg + ". Memory:  " + mem + " GB");
     }
 
-    public static void printTimeDurration(StopWatch stopWatch) {
+    public void printTimeDurration(StopWatch stopWatch) {
         System.out.println("Time duration: " + DurationFormatUtils.formatDurationHMS(stopWatch.getTime()));
     }
 
-    public static String[] fastSplit(String string, char delimiter) {
+    public String[] fastSplit(String string, char delimiter) {
         /*
          * fastpath of String.split()
          *
@@ -513,7 +515,7 @@ public class BioUtil {
         return list.subList(0, resultSize).toArray(result);
     }
 
-    public static final String extractAccessionPrefix(String accessionNumber) {
+    public String extractAccessionPrefix(String accessionNumber) {
         int length = accessionNumber.length();
         for (int i = 0; i < length; i++) {
 
@@ -532,7 +534,7 @@ public class BioUtil {
         return null;
     }
 
-    public static int accessionToInt(String acc, ArrayList<String> prefixList) {
+    public int accessionToInt(String acc, ArrayList<String> prefixList) {
         int length = acc.length();
         StringBuilder prefixPart = new StringBuilder(5);
         for (int i = 0; i < length; i++) {
@@ -556,32 +558,31 @@ public class BioUtil {
             prefixList.add(prefixPartString);
         }
         int positionInList = prefixPart.length() - 1;
-        int result = Integer.parseInt(positionInList + numPart);
-        return result;
+        return Integer.parseInt(positionInList + numPart);
     }
 
 
-    public static byte[] toBytes(int value) {
+    public byte[] toBytes(int value) {
         return ByteBuffer.allocate(4).putInt(value).array();
     }
 
-    public static int toInt(byte[] bytes) {
+    public int toInt(byte[] bytes) {
         return ByteBuffer.wrap(bytes).getInt();
     }
 
-    public static String toStringFromByte(byte[] b) {
+    public String toStringFromByte(byte[] b) {
         return new String(b, Charsets.US_ASCII);
     }
 
-    public static byte[] toBytes(String s) {
+    public byte[] toBytes(String s) {
         return s.getBytes(Charsets.US_ASCII);
     }
 
-    public static byte[] toBytes(float f) {
+    public byte[] toBytes(float f) {
         return ByteBuffer.allocate(4).putFloat(f).array();
     }
 
-    public static float toFloat(byte[] bytes) {
+    public float toFloat(byte[] bytes) {
         return ByteBuffer.wrap(bytes).getFloat();
     }
 

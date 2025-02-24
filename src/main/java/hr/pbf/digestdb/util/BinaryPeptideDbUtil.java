@@ -11,6 +11,8 @@ import net.jpountz.lz4.LZ4Factory;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +22,7 @@ import java.util.*;
 @UtilityClass
 public class BinaryPeptideDbUtil {
 
-    private static ByteBuffer buffer = ByteBuffer.allocate(1024 * 1024 * 4); // 4MB, prilagodite po potrebi
+    private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 4); // 4MB, prilagodite po potrebi
 
 
     public static int readVarint2(ByteBuffer buffer) throws IOException {
@@ -37,6 +39,30 @@ public class BinaryPeptideDbUtil {
         buffer.put((byte) value);
     }
 
+    public void writeVarInt(DataOutputStream dos, int value) throws IOException {
+         while (value >= 128) {
+            dos.writeByte((byte) ((value & 0x7F) | 0x80));
+            value >>>= 7;
+        }
+        dos.writeByte((byte) value);
+    }
+
+    public int readVarInt(DataInputStream din) throws IOException {
+        int result = 0;
+        int shift = 0;
+        while (true) {
+            byte b = din.readByte();
+            result |= (b & 0x7F) << shift;
+            shift += 7;
+            if ((b & 0x80) == 0) {
+                return result;
+            }
+            if (shift >= 32) {
+                throw new IllegalStateException("Varint to large!");
+            }
+        }
+    }
+
     public int readVarint(ByteBuffer buffer) {
         int result = 0;
         int shift = 0;
@@ -51,7 +77,7 @@ public class BinaryPeptideDbUtil {
                 throw new IllegalStateException("Varint to large!");
             }
         }
-        throw new IllegalStateException("Incomplete varint in buffer!");
+        throw new IllegalStateException("Incomplete varint in buffer! Buffer: "+ buffer);
     }
 
 
@@ -90,7 +116,7 @@ public class BinaryPeptideDbUtil {
 
     public byte[] writeGroupedRow(String value) {
         try {
-            buffer.clear();
+            bufferCache.clear();
             int start = 0;
             while (start < value.length()) {
                 int colonIndex = value.indexOf(':', start);
@@ -103,20 +129,20 @@ public class BinaryPeptideDbUtil {
                 // sequence
                 // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
                 byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
-                ensureCapacity(buffer, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
-                writeVarint(buffer, seq.length()); // 4 bajta za dužinu sekvence
+                ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
+                writeVarint(bufferCache, seq.length()); // 4 bajta za dužinu sekvence
 
-                buffer.put(seqBytes);
+                bufferCache.put(seqBytes);
 
 
                 //buffer.put((byte) accessions.length); // 1 bajt za broj access
-                writeVarint(buffer, accessions.length); // 4 bajta za broj access
+                writeVarint(bufferCache, accessions.length); // 4 bajta za broj access
                 for (String acc : accessions) {
-                    writeVarint(buffer, Integer.parseInt(acc));
+                    writeVarint(bufferCache, Integer.parseInt(acc));
                 }
                 start = dashIndex + 1;
             }
-            return Arrays.copyOf(buffer.array(), buffer.position());
+            return Arrays.copyOf(bufferCache.array(), bufferCache.position());
         } catch (Exception e) {
             log.error("Error on line: " + value, e);
             throw e;
@@ -128,7 +154,7 @@ public class BinaryPeptideDbUtil {
             ByteBuffer newBuffer = ByteBuffer.allocate(buf.capacity() * 2 + additionalCapacity);
             buf.flip();
             newBuffer.put(buf);
-            buffer = newBuffer;
+            bufferCache = newBuffer;
         }
     }
 

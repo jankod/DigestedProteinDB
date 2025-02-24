@@ -65,7 +65,7 @@ public class DemoCsvToPeptideRocks {
         }
 
 
-        double mass4 = MyUtil.roundToFour(mass);
+        double mass4 = MyUtil.roundTo4(mass);
         if (mass4 != currentMass4) {
             currentPeptides.clear();
             currentMass4 = mass4;

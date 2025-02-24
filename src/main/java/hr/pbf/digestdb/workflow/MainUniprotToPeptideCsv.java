@@ -60,7 +60,7 @@ public class MainUniprotToPeptideCsv {
                             return;
                         }
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
-                        double mass4 = MyUtil.roundToFour(mass);
+                        double mass4 = MyUtil.roundTo4(mass);
                         String row = mass4 + "," + peptide + "," + p.getAccession()+ "\n";
                         try {
                             out.write(row.getBytes(standardCharset));

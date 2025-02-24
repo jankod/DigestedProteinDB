@@ -99,7 +99,7 @@ public class MainCsvMassGrouperWithAccIds {
             if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format: " + line);
 
             double prevMass = Double.parseDouble(parts[0]);
-            String prevMass4 = MyUtil.discretizedToFour(prevMass);
+            String prevMass4 = MyUtil.discretizedTo4(prevMass);
             //Map<String, Set<Integer>> seqIdsMap = new HashMap<>();
 
             Map<String, TIntHashSet> seqIdsMap = new HashMap<>();
@@ -113,7 +113,7 @@ public class MainCsvMassGrouperWithAccIds {
                 if (parts.length < 3) throw new IllegalArgumentException("Invalid input CSV format: " + line);
 
                 double mass = Double.parseDouble(parts[0]);
-                String mass4 = MyUtil.discretizedToFour(mass);
+                String mass4 = MyUtil.discretizedTo4(mass);
 
                 if (mass4.equals(prevMass4)) {
                     sequence = parts[1];

@@ -38,7 +38,7 @@ public class MainCsvMassGrouper {
             if (parts.length < 3) return; // Nevažeća datoteka
 
             double prevMass = Double.parseDouble(parts[0]);
-            String prevMass4 = MyUtil.discretizedToFour(prevMass);
+            String prevMass4 = MyUtil.discretizedTo4(prevMass);
             Map<String, Set<String>> seqAccessionsMap = new HashMap<>();
 
             String sequence = parts[1];
@@ -52,7 +52,7 @@ public class MainCsvMassGrouper {
                 if (parts.length < 3) throw new RuntimeException("Invalid line: " + line);
 
                 double mass = Double.parseDouble(parts[0]);
-                String mass4 = MyUtil.discretizedToFour(mass);
+                String mass4 = MyUtil.discretizedTo4(mass);
                 //long key = Math.round(mass * 10_000);
 
                 if (mass4.equals(prevMass4)) {

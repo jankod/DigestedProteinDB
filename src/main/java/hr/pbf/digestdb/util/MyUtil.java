@@ -14,18 +14,19 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MyUtil {
-    public static double roundToFour(double value) {
+    private static final DecimalFormat df4 = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.US));
+
+    public static double roundTo4(double value) {
         return Math.round(value * 10000.0) / 10000.0;
     }
 
-    public static double roundToFive(double value) {
+    public static double roundTo5(double value) {
         return Math.round(value * 100000.0) / 100000.0;
     }
 
-    private static final DecimalFormat df = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.US)); // Format za 4 decimale
 
-    public static String discretizedToFour(double mass) {
-        return df.format(mass);
+    public static String discretizedTo4(double mass) {
+        return df4.format(mass);
     }
 
     public static byte[] floatToByteArray(float floatValue) {
@@ -134,10 +135,15 @@ public class MyUtil {
         return list;
     }
 
-    public static void printMiliSec(StopWatch watch, String msg) {
+    public static void stopAndShowTime(StopWatch watch, String msg) {
+        watch.stop();
         long nanoTime = watch.getNanoTime();
         long millis = TimeUnit.NANOSECONDS.toMillis(nanoTime);
         System.out.println(msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
+
+    }
+
+    public static void showFileSize(String toDbPath) {
 
     }
 }
