@@ -25,81 +25,26 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MainMassRocksDb {
 
+//    private final String dbDir;
+
     public String fromCsvPath = "";
     public String toDbPath = "";
-   // public String accDbPath = "";
 
-//    public String dbAccessionPath = "";
-
-
-    public static void main(String[] args) throws RocksDBException {
-        MainMassRocksDb db = new MainMassRocksDb();
-        // db.fromCsvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human/grouped_with_ids.csv";
-        // db.toDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human/rocksdb_mass.db";
-
-        db.fromCsvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/grouped_with_ids.csv";
-        db.toDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db";
-     //   db.setAccDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_accession.db");
-        //  db.startCreateToRocksDb();
-        db.searchByMassInConsole();
-    }
-
-    public void searchByMassInConsole() throws RocksDBException {
-        System.out.println("Enter two numbers separated by space. Enter 'stop' to stop");
-        Console console = System.console();
-        RocksDB massDb = openReadDB();
-
-        CustomAccessionDb accDb = new CustomAccessionDb();
-        accDb.setToDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db");
-        accDb.loadDb();
-        while (true) {
-            String line = console.readLine();
-            if ("stop".equals(line)) {
-                log.info("Stoping");
-                break;
-            }
-            String[] parts = line.split(" ");
-            double mass1 = Double.parseDouble(parts[0]);
-            double mass2 = Double.parseDouble(parts[1]);
-
-
-            StopWatch watch = StopWatch.createStarted();
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>>
-                  result = searchByMass(massDb, mass1, mass2);
-            watch.stop();
-
-
-            StopWatch watchAcc = StopWatch.createStarted();
-            watchAcc.stop();
-            long millisAcc = TimeUnit.NANOSECONDS.toMillis(watchAcc.getNanoTime());
-            log.info("Search acc time " + DurationFormatUtils.formatDuration(millisAcc, "HH:mm:ss,SSS"));
-
-            long millisMass = TimeUnit.NANOSECONDS.toMillis(watch.getNanoTime());
-            log.info("Search mass time milisec " + DurationFormatUtils.formatDuration(millisMass, "HH:mm:ss,SSS"));
-            log.info("Results found: " + result.size());
-
-
-            for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> entry : result) {
-                Set<BinaryPeptideDbUtil.PeptideAcc> value = entry.getValue();
-                Double mass = entry.getKey();
-
-                StringBuilder sb = new StringBuilder();
-                value.forEach(acc -> {
-                    int[] accessions = acc.getAccessions();
-                    String seq = acc.getSeq();
-                    sb.append(seq).append(": ");
-                    for (int accNum : accessions) {
-                        String accStr = accDb.getAcc(accNum);
-                        sb.append(accStr).append(" ");
-                    }
-                });
-                log.info(mass + ": " + sb);
+    private void getCount() {
+        try (RocksDB db = openReadDB()) {
+            RocksIterator it = db.newIterator();
+            int count = 0;
+            for (it.seekToFirst(); it.isValid(); it.next()) {
+                count++;
             }
 
+            log.info("Count: " + count);
+        } catch (RocksDBException e) {
+            log.error("Error: ", e);
         }
-        massDb.close();
-
     }
+
+
 
 
     public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchByMass(RocksDB db, double mass1,
@@ -136,7 +81,7 @@ public class MainMassRocksDb {
             log.error("File not exists: {}", fromCsvPath);
             return;
         }
-
+        int countMasses = 0;
         try (RocksDB db = MyUtil.openWriteDB(toDbPath)) {
             try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(Path.of(fromCsvPath)), 8 * 1024 * 16)) {
 
@@ -155,13 +100,16 @@ public class MainMassRocksDb {
                     byte[] seqAccsBytes = BinaryPeptideDbUtil.writeGroupedRow(seqAccs);
                     byte[] massIntBytes = MyUtil.intToByteArray(massInt);
                     db.put(massIntBytes, seqAccsBytes);
+                    countMasses++;
                 }
             }
         } catch (IOException | RocksDBException e) {
             log.error("Error: ", e);
             throw new RuntimeException(e);
         }
-
+        log.info("Done. Count diferent masses as key in rocksdb: " + countMasses);
+        // get dir length
+        log.info("DB rockDB size "+ MyUtil.getDirSize(toDbPath));
 
     }
 

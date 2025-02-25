@@ -16,24 +16,37 @@ public class MainCsvMassGrouperWithAccIds {
 
 
     private final StringBuilder sb = new StringBuilder(1024);
+//    private final String dbDir;
 
-    String inputCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/peptide_mass_sorted_console.csv";
-    String outputGroupedCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/grouped_with_ids.csv";
-    String outputAccessionMapCsv = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated/accession_map.csv";
-    int bufferSize = 16 * 1024 * 1024; // 16MB buffer
+    String inputCsvPeptideMassSorted = "";
+    String outputGroupedCsv = "";
+    String outputAccessionMapCsv = "";
+    int bufferSize = 32 * 1024 * 1024; // 32MB buffer
 
-    public static void main(String[] args) {
-        MainCsvMassGrouperWithAccIds app = new MainCsvMassGrouperWithAccIds();
-        app.start();
+//    public MainCsvMassGrouperWithAccIds(String dbDir) {
+//        this.dbDir = dbDir;
+//        if(dbDir == null) {
+//            throw new IllegalArgumentException("dbDir is null");
+//        }
+//        if (!new File(dbDir).isDirectory()) {
+//            throw new IllegalArgumentException("Not a directory: " + dbDir);
+//        }
+//        this.outputGroupedCsv = dbDir + "/gen/grouped_with_ids.csv";
+//        this.outputAccessionMapCsv = dbDir + "/gen/accession_map.csv";
+//        this.inputCsvPeptideMassSorted = dbDir + "/gen/peptide_mass_sorted_console.csv";
+//    }
+
+
+    public void startAccAndGroup() {
+        TObjectIntHashMap<String> accessionToIdMap = startCreateAccessionMap();
+        startCreateGroupWithAccIds(inputCsvPeptideMassSorted, outputGroupedCsv, accessionToIdMap, bufferSize);
     }
 
-    public void start() {
+    public TObjectIntHashMap<String> startCreateAccessionMap() {
         // Faza 1: Izgradi mapiranje accession -> ID
-        TObjectIntHashMap<String> accessionToIdMap = buildAccessionMap(inputCsv, outputAccessionMapCsv, bufferSize);
-        // Map<String, Integer> accessionToIdMap = buildAccessionMap(inputCsv, outputAccessionMapCsv, bufferSize);
+        TObjectIntHashMap<String> accessionToIdMap = buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
         log.info("Created accessionToIdMap.size() = " + accessionToIdMap.size());
-        // Faza 2: Grupiraj podatke s ID-ovima
-        groupDataWithIds(inputCsv, outputGroupedCsv, accessionToIdMap, bufferSize);
+        return accessionToIdMap;
     }
 
     private TObjectIntHashMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
@@ -85,8 +98,8 @@ public class MainCsvMassGrouperWithAccIds {
         return accessionToIdMap;
     }
 
-    private void groupDataWithIds(String inputCsv, String outputGroupedCsv,
-                                  TObjectIntHashMap<String> accessionToIdMap, int bufferSize) {
+    private void startCreateGroupWithAccIds(String inputCsv, String outputGroupedCsv,
+                                            TObjectIntHashMap<String> accessionToIdMap, int bufferSize) {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv), bufferSize);
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsv), bufferSize)) {
 

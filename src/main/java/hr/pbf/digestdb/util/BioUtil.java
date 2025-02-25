@@ -18,6 +18,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -207,24 +208,16 @@ public class BioUtil {
     }
 
     /**
-     * Postavlja sve seq u velika slova.
-     *
-     * @param path
-     * @param callback
-     * @param koliko
-     * @throws IOException
+     * Read fasta file and call callback for each fasta sequence.
      */
     public void readLargeFasta(String path, Callback callback, long koliko) throws IOException {
-        // FileReader f = new FileReader(new File(path));
-        // reader = new BufferedReader(new InputStreamReader(new
-        // FileInputStream(csvFile), "Cp1252"));
 
         BufferedReader reader = null;
         try {
 
             long count = 1;
 
-            reader = newFileReader(path, "ASCII");
+            reader = newFileReader(path, StandardCharsets.US_ASCII.name());
             // BufferedReader reader = new BufferedReader(f);
             String line = null;
             StringBuilder seq = new StringBuilder(12345);
@@ -251,9 +244,7 @@ public class BioUtil {
                 }
 
             }
-            if (seq.length() != 0) {
-                // header = ctrlAPattern.matcher(header).replaceAll(">");
-                // header = header.replaceAll("\\p{Cntrl}", ">");
+            if (!seq.isEmpty()) {
                 FastaSeq fs = new FastaSeq(header, seq.toString().toUpperCase());
                 callback.readFasta(fs);
             }
@@ -278,12 +269,12 @@ public class BioUtil {
             String header = null;
             while (lines.hasNext()) {
                 // for (String line : lines) {
-                String line = lines.nextLine();
+                String line = lines.next();
                 if (line.startsWith(">")) {
                     if (count++ > num) {
                         break;
                     }
-                    if (seq.length() != 0) {
+                    if (!seq.isEmpty()) {
                         FastaSeq fs = new FastaSeq(header, seq.toString());
                         res.add(fs);
                         seq = new StringBuilder();
@@ -294,7 +285,7 @@ public class BioUtil {
 
                 }
             }
-            if (seq.length() != 0) {
+            if (!seq.isEmpty()) {
                 FastaSeq fs = new FastaSeq(header, seq.toString().toUpperCase());
                 res.add(fs);
             }
@@ -306,53 +297,17 @@ public class BioUtil {
         }
     }
 
-    private final Pattern pattternGI = Pattern.compile(">GI\\|([0-9]*)\\|", Pattern.CASE_INSENSITIVE);
+
+
+
 
     /**
-     * Vraca samo jedan GI, iako mozda ima ih vise
+     * Fast method for cleaving with 1 miss clevage. Cleaves after R or K if next. All chars must be upper case!
      *
-     * @param line
-     * @return
-     */
-    public int findOneGI(String line) {
-        Matcher res = pattternGI.matcher(line.toUpperCase());
-        int gi = 0;
-        while (res.find()) {
-            gi = Integer.parseInt(res.group(1));
-            return gi;
-
-        }
-        return gi;
-    }
-
-    public ArrayList<Integer> findGIasList(String line) {
-        ArrayList<Integer> intList = new ArrayList<Integer>();
-
-        Matcher res = pattternGI.matcher(line);
-
-        while (res.find()) {
-            intList.add(Integer.parseInt(res.group(1)));
-        }
-        return intList;
-
-    }
-
-    public String removeVersionFromAccession(String accession) {
-        int i = accession.indexOf('.');
-        if (i > 0) {
-            return accession.substring(0, i);
-        }
-        return accession;
-    }
-
-    /**
-     * Super brza metoda za cepanje sa 1 miss clevage. Cepa iza R ili K ako poslje
-     * nije P. Moraju biti velika slova!
-     *
-     * @param prot
-     * @param min
-     * @param max
-     * @return
+     * @param prot protein sequence
+     * @param min  minimal length of peptide
+     * @param max  maximal length of peptide
+     * @return list of peptides
      */
     public List<String> tripsyn(String prot, int min, int max) {
         final int numberOfRandK = StringUtils.countMatches(prot, "R") + StringUtils.countMatches(prot, "K");
@@ -365,7 +320,6 @@ public class BioUtil {
         List<String> result = new ArrayList<String>(numberOfRandK * 3 + 2);
 
         if (prot.length() < min) {
-            // result.add(prot);
             return result;
         }
 
@@ -399,29 +353,24 @@ public class BioUtil {
 
         }
 
-        // dodati jos zadnji chuk
+        // add last chunk
         if (lastPos < prot.length()) {
-            final String ostatak = prot.substring(lastPos);
+            final String residue = prot.substring(lastPos);
             if (lastChunk != null) {
-                String n = lastChunk + ostatak;
+                String n = lastChunk + residue;
                 if (n.length() >= min && n.length() <= max) {
                     result.add(n);
                 }
-                // i sami komad zadnji staviti
-                if (ostatak.length() >= min && ostatak.length() <= max) {
-                    result.add(ostatak);
+                if (residue.length() >= min && residue.length() <= max) {
+                    result.add(residue);
                 }
 
             } else {
-                String n = ostatak;
-                if (n.length() >= min && n.length() <= max) {
-                    result.add(n);
+                if (residue.length() <= max) {
+                    result.add(residue);
                 }
             }
         }
-
-        // dodati miss clevage
-
         return result;
     }
 

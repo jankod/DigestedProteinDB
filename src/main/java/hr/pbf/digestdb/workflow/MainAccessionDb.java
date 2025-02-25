@@ -34,21 +34,30 @@ public class MainAccessionDb {
             try (BufferedReader reader = new BufferedReader(new FileReader(fromCsvPath))) {
 
                 reader.lines().forEach(line -> {
-                    String[] splited = StringUtils.split(line, ',');
-                    // double mass = Double.parseDouble(splited[0]);
-                    //String sequence = splited[1];
-                    String accession = splited[2];
-                    byte[] value = accession.getBytes(StandardCharsets.UTF_8);
-
                     try {
-                        byte[] keyAccessionId = Longs.toByteArray(currentAccessionIdCounter);
-                        if (db.get(keyAccessionId) == null) {
-                            db.put(keyAccessionId, value);
+                        String[] splited = StringUtils.split(line, ',');
+                        String accession = splited[1];
+                        byte[] accessionBytes = accession.getBytes(StandardCharsets.UTF_8);
+                        if (currentAccessionIdCounter == 1) {
+                            // check only first line
+                            if (Integer.parseInt(splited[0]) != 1) {
+                                throw new RuntimeException("First id must be 1");
+                            }
                         }
-                    } catch (RocksDBException e) {
+
+                        try {
+                            byte[] keyAccessionId = Longs.toByteArray(currentAccessionIdCounter);
+                            if (db.get(keyAccessionId) == null) {
+                                db.put(keyAccessionId, accessionBytes);
+                            }
+                        } catch (RocksDBException e) {
+                            throw new RuntimeException(e);
+                        }
+                        currentAccessionIdCounter++;
+                    } catch (Exception e) {
+                        log.error("Error in line: '{}'.", line);
                         throw new RuntimeException(e);
                     }
-                    currentAccessionIdCounter++;
 
                     // int taxonomyId = Integer.parseInt(splited[3]);
                 });

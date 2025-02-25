@@ -1,10 +1,12 @@
 package hr.pbf.digestdb.util;
 
 import com.google.common.primitives.Longs;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.rocksdb.*;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -135,15 +137,22 @@ public class MyUtil {
         return list;
     }
 
-    public static void stopAndShowTime(StopWatch watch, String msg) {
+    public static String stopAndShowTime(StopWatch watch, String msg) {
         watch.stop();
         long nanoTime = watch.getNanoTime();
         long millis = TimeUnit.NANOSECONDS.toMillis(nanoTime);
-        System.out.println(msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
+        return (msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
 
     }
 
-    public static void showFileSize(String toDbPath) {
-
+    public static String getFileSize(String filePath) {
+        long size = FileUtils.sizeOf(new File(filePath));
+        return FileUtils.byteCountToDisplaySize(size);
     }
+
+    public static String getDirSize(String dirPath) {
+        long size = FileUtils.sizeOfDirectory(new File(dirPath));
+        return FileUtils.byteCountToDisplaySize(size);
+    }
+
 }

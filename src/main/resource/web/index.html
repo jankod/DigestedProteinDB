@@ -14,7 +14,16 @@
     <div class="row">
         <div class="col">
             <h2>Search for mass </h2>
-            <p>Bacterial trembl peptides with 1 miss clevage, from 7 to 30 amino acid</p>
+            <div x-show="dbInfo">
+                <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzime"></span></p>
+                <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
+                <p class="mb-1"><strong>Min Peptide Length:</strong> <span x-text="dbInfo.min_peptide_length"></span>
+                </p>
+                <p class="mb-1"><strong>Max Peptide Length:</strong> <span x-text="dbInfo.max_peptide_length"></span>
+                </p>
+                <p class="mb-1"><strong>Peptides Count:</strong> <span x-text="dbInfo.peptides_count"></span></p>
+                <p class="mb-3"><strong>Source:</strong> <span x-text="dbInfo.source"></span></p>
+            </div>
             <form @submit.prevent="search">
                 <div class="mb-3">
                     <label for="mass1" class="form-label">Mass from</label>
@@ -27,19 +36,23 @@
                            value="1500.1">
                 </div>
                 <button type="submit" class="btn btn-primary" :disabled="loading">
-                    <span x-show="loading">Loading...</span>
                     <span x-show="!loading">Search</span>
+                    <span x-show="loading" style="display: none;">Loading...</span>
                 </button>
             </form>
+
         </div>
+    </div>
+    <div class="text-end">
+        <p><a class="btn btn-link" href="/search?mass1=1600&mass2=1600.1">Exempla URL for mass search from: 1600
+            - 1600.1 Da</a></p>
     </div>
     <div class="row">
         <div class="col">
-            <a href="/search?mass1=1600&mass2=1600.1">Mass from 1600 - 1600.1</a>
             <h2>Results</h2>
-            <div class="alert alert-danger" role="alert" x-text="error" x-show="error"></div>
+            <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
 
-            <pre x-text="results" ></pre>
+            <pre x-text="results"></pre>
 
         </div>
     </div>
@@ -56,6 +69,20 @@
             results: "",
             error: "",
             loading: false,
+            dbInfo: {},
+            async init() {
+                try {
+                    const response = await fetch('/db-info');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch database info');
+                    }
+                    this.dbInfo = await response.json();
+                } catch (error) {
+                    console.error('Error fetching database info:', error);
+                    this.dbInfo = 'Error fetching database info';
+                }
+            },
+
             async search() {
                 this.error = null;
                 this.loading = true;

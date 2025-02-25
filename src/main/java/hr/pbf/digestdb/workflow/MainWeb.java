@@ -11,22 +11,46 @@ import org.jetbrains.annotations.NotNull;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
+@Data
 public class MainWeb {
+
+    //    private String rocksDbPath = "";
+//    private String accDbPath = "";
+    private String dbDir;
+    private int port = 7070;
+
+    public MainWeb(int port, String dbDir) {
+        this.port = port;
+        this.dbDir = dbDir;
+    }
+
+
     public static void main(String[] args) throws RocksDBException {
+        MainWeb app = new MainWeb(7070, "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot");
+//        app.rocksDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db";
+//        app.accDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db";
+        app.startWeb();
+    }
+
+
+    public void startWeb() throws RocksDBException {
         MainMassRocksDb db = new MainMassRocksDb();
-        db.setToDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db");
+
+        db.setToDbPath(dbDir + "/rocksdb_mass.db");
+
         RocksDB massRocksDb = db.openReadDB();
         CustomAccessionDb accDb = new CustomAccessionDb();
-        accDb.setToDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db");
+        accDb.setToDbPath(dbDir + "/custom_accession.db");
+
+
+//        accDb.setToDbPath(accDbPath);
         accDb.loadDb();
 
         var app = Javalin.create(config -> {
@@ -34,8 +58,6 @@ public class MainWeb {
                       @NotNull
                       @Override
                       public String render(@NotNull String filePath, @NotNull Map<String, ?> map, @NotNull Context context) {
-                          log.debug("resnder " + filePath);
-                          // return html page from src/main/resource/web
                           try (InputStream is = getClass().getResourceAsStream("/web/" + filePath)) {
                               if (is == null) {
                                   throw new IllegalArgumentException("File not found: /web/" + filePath);
@@ -50,26 +72,43 @@ public class MainWeb {
               .get("/", ctx -> {
                   ctx.render("index.html");
               })
-              .start(7070);
+              .start(port);
 
+        app.get("/db-info", ctx -> {
+            Properties prop = new Properties();
+            FileReader reader = new FileReader(dbDir + "/db-info_bacteria_trembl.properties");
+            prop.load(reader);
+            reader.close();
+            ctx.json(prop);
+        });
         app.get("/search", ctx -> {
-            double mass1 = Double.parseDouble(ctx.queryParam("mass1"));
-            double mass2 = Double.parseDouble(ctx.queryParam("mass2"));
+            double mass1 = 0;
+            double mass2 = 0;
+            try {
+                mass1 = ctx.queryParamAsClass("mass1", Double.class)
+                      .getOrThrow(stringMap -> new Exception("Mass1 is required as double."));
+                mass2 = ctx.queryParamAsClass("mass2", Double.class)
+                      .getOrThrow(stringMap -> new Exception("Mass2 is required as double."));
 
-            if (Math.abs(mass1 - mass2) > 0.3) {
+                if (Math.abs(mass1 - mass2) > 1) {
+                    ctx.status(400);
+                    ctx.json("Mass1 and Mass2 must be close 1 Da");
+                    return;
+                }
+            } catch (Exception e) {
                 ctx.status(400);
-                ctx.json("Mass1 and Mass2 must be close 0.3 Da");
+                ctx.json("Mass1 and Mass2 must be numbers. " + e.getMessage());
                 return;
             }
 
-            log.debug("Search mass1: {} mass2: {}", mass1, mass2);
+            // log.debug("Search mass1: {} mass2: {}", mass1, mass2);
             List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries = db.searchByMass(massRocksDb, mass1, mass2);
-            for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> entry : entries) {
-                System.out.println(entry.getKey());
-                for (BinaryPeptideDbUtil.PeptideAcc peptideAcc : entry.getValue()) {
-                    System.out.println(peptideAcc.getSeq());
-                }
-            }
+//            for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> entry : entries) {
+//                System.out.println(entry.getKey());
+//                for (BinaryPeptideDbUtil.PeptideAcc peptideAcc : entry.getValue()) {
+//                  //  System.out.println(peptideAcc.getSeq());
+//                }
+//            }
             ctx.json(new MassResult(entries, accDb));
 
 
@@ -81,6 +120,7 @@ public class MainWeb {
                 massRocksDb.close();
             });
         });
+        log.info("Web started on {}", "http://localhost:" + port);
     }
 }
 
@@ -88,10 +128,10 @@ public class MainWeb {
 class MassResult {
     int totalResult = 0;
 
-    List<SeqAcc> seqAccs;
+    List<SeqAcc> results;
 
     public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, CustomAccessionDb accDb) {
-        seqAccs = new ArrayList<>(entries.size());
+        results = new ArrayList<>(entries.size());
         totalResult = entries.size();
 
         entries.forEach(e -> {
@@ -100,14 +140,13 @@ class MassResult {
                 SeqAcc sa = new SeqAcc();
                 sa.mass = e.getKey();
                 int[] accessionsNum = peptide.getAccessions();
-                sa.accessions = new ArrayList<>(accessionsNum.length);
+                sa.acc = new ArrayList<>(accessionsNum.length);
                 sa.seq = peptide.getSeq();
                 for (int accNum : accessionsNum) {
                     String accStr = accDb.getAcc(accNum);
-                    sa.accessions.add(accStr);
+                    sa.acc.add(accStr);
                 }
-                seqAccs.add(sa);
-                sa = new SeqAcc();
+                results.add(sa);
             }
 
         });
@@ -117,6 +156,6 @@ class MassResult {
     static class SeqAcc {
         double mass;
         String seq;
-        List<String> accessions;
+        List<String> acc;
     }
 }

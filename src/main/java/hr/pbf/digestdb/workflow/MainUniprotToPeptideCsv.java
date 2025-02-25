@@ -4,7 +4,9 @@ import hr.pbf.digestdb.util.MyUtil;
 import hr.pbf.digestdb.util.UniprotXMLParser;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import hr.pbf.digestdb.util.BioUtil;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,34 +19,53 @@ import java.nio.charset.StandardCharsets;
 /**
  * Create CSV file with peptide mass, peptide sequence, protein accession [and taxonomy id].
  * Read uniprot xml file and create csv file with peptide mass, peptide sequence, protein accession and taxonomy id.
+ * https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/README
  */
+@Data
 @Slf4j
-//https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/README
 public class MainUniprotToPeptideCsv {
+
+    // result
+    public String resultPeptideMassAccCsvPath = "";
+
+    // params
+//    private final String dbDir;
     public String fromSwisprotPath = "";
+    public long maxProteinCount = Long.MAX_VALUE - 1;
+    public int minPeptideLength = 0;
+    public int maxPeptideLength = 0;
+    public int missClevage = 1;
 
-    public String toCsvPath = "";
-    public int maxProteinCount = Integer.MAX_VALUE - 1;
-
-    public int minPeptideLength = 7; // 7
-    public int maxPeptideLength = 30;
+//    public MainUniprotToPeptideCsv(String dbDir) throws IOException {
+//        this.dbDir = dbDir;
+//        if (!FileUtils.isDirectory(new File(dbDir))) {
+//            throw new IllegalArgumentException("Not a directory: " + dbDir);
+//        }
+//        FileUtils.forceMkdir(new File(dbDir + "/gen"));
+//        this.resultPeptideMassAccCsvPath = dbDir + "/gen/peptide_mass.csv";
+//    }
 
     public void start() throws IOException {
+        if (!new File(fromSwisprotPath).exists()) {
+            throw new RuntimeException("File not found: " + fromSwisprotPath);
+        }
+
+        if (new File(resultPeptideMassAccCsvPath).exists()) {
+            throw new RuntimeException("File already exists: " + resultPeptideMassAccCsvPath);
+        }
+
+        if (missClevage != 1) {
+            throw new RuntimeException("Miss clevage must be 1");
+        }
+        if (minPeptideLength < 1 || minPeptideLength > maxPeptideLength) {
+            throw new RuntimeException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
+                                       + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
+        }
 
         UniprotXMLParser parser = new UniprotXMLParser();
 
         Charset standardCharset = StandardCharsets.UTF_8;
-
-        if (!new File(fromSwisprotPath).exists()) {
-            throw new RuntimeException("File not found: " + fromSwisprotPath);
-        }
-        if (new File(toCsvPath).exists()) {
-            throw new RuntimeException("File already exists: " + toCsvPath);
-        }
-
-        // Default DEFAULT_MAX_BUFFER_SIZE = 8192
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(toCsvPath), 8 * 1024 * 16)) {
-            //   out.write(getCsvHeader().getBytes(standardCharset));
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16)) {
 
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
@@ -61,7 +82,7 @@ public class MainUniprotToPeptideCsv {
                         }
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
                         double mass4 = MyUtil.roundTo4(mass);
-                        String row = mass4 + "," + peptide + "," + p.getAccession()+ "\n";
+                        String row = mass4 + "," + peptide + "," + p.getAccession() + "\n";
                         try {
                             out.write(row.getBytes(standardCharset));
                             counter++;
@@ -82,7 +103,7 @@ public class MainUniprotToPeptideCsv {
             log.debug("Finish, protein count: {}", parser.getTotalCount());
         }
 
-        log.info("Finish uniprot to csv: " + toCsvPath);
+        log.info("Finish uniprot to csv: " + resultPeptideMassAccCsvPath);
 
 
     }

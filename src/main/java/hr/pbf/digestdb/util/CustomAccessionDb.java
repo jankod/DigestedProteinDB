@@ -6,11 +6,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * Create custom binary accession db from csv file. Csv file must be sorted by accession number (accNum, acc).
+ */
 @Data
 @Slf4j
 public class CustomAccessionDb {
@@ -20,10 +23,19 @@ public class CustomAccessionDb {
 
     private String[] accList;
 
+//    public CustomAccessionDb(String dbDir) {
+//        if (dbDir == null) {
+//            throw new IllegalArgumentException("dbDir is null");
+//        }
+//        if (!new File(dbDir).isDirectory()) {
+//            throw new IllegalArgumentException("Not a directory: " + dbDir);
+//        }
+//        this.toDbPath = dbDir + "/custom_accession.db";
+//        this.fromCsvPath = dbDir + "/gen/accession_map_sorted.csv";
+//    }
+
     public static void main(String[] args) throws IOException {
         CustomAccessionDb db = new CustomAccessionDb();
-        db.fromCsvPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/accession_map_sorted.csv";
-        db.toDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db";
 
         boolean create = false;
 
@@ -37,11 +49,7 @@ public class CustomAccessionDb {
 
         if (create) {
             StopWatch watch = StopWatch.createStarted();
-            List<String> map = db.startReadCsvToMap();
-            MyUtil.stopAndShowTime(watch, "Read CSV time");
-            watch = StopWatch.createStarted();
-            db.startCreateCustomAccessionDb(map);
-            MyUtil.showFileSize(db.toDbPath);
+            db.startCreateCustomAccessionDb();
             MyUtil.stopAndShowTime(watch, "Write DB time");
         }
 
@@ -57,7 +65,9 @@ public class CustomAccessionDb {
         return accList[index];
     }
 
-    public void startCreateCustomAccessionDb(List<String> map) throws IOException {
+    public void startCreateCustomAccessionDb() throws IOException {
+        List<String> map = startReadCsvToMap();
+
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toDbPath)))) {
             out.writeInt(map.size());
             for (String acc : map) {
@@ -82,12 +92,12 @@ public class CustomAccessionDb {
                 byte[] accBytes = new byte[len];
                 in.readFully(accBytes);
                 String acc = new String(accBytes, StandardCharsets.UTF_8);
-                if(i == 1) {
+            /*    if(i == 1) {
                     log.debug("First acc: {}", acc);
                 }
                 if (i == 2) {
                     log.debug("2 acc: {}", acc);
-                }
+                }*/
                 accList[i] = acc;
             }
         } catch (IOException e) {
