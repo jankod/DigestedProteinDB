@@ -18,6 +18,7 @@ import java.util.List;
 @Slf4j
 public class CustomAccessionDb {
 
+    //public static final String DEFAULT_DB_DIR_NAME = "custom_accession.db";
     private String fromCsvPath = "";
     private String toDbPath = "";
 
@@ -119,9 +120,9 @@ public class CustomAccessionDb {
             if (accNum != accMap.size()) {
                 throw new RuntimeException("Acc num is not in order. Expected: " + accMap.size() + " but got: " + accNum);
             }
-            if (accNum == 1) {
-                log.debug("First acc 1: {}", parts[1]);
-            }
+//            if (accNum == 1) {
+//                log.debug("First acc 1: {}", parts[1]);
+//            }
             String acc = parts[1];
             accMap.add(acc);
         }

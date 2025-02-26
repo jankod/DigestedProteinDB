@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MainMassRocksDb {
 
-//    private final String dbDir;
+    //public static final String DEFAULT_DB_DIR_NAME = "rocksdb_mass.db";
 
     public String fromCsvPath = "";
     public String toDbPath = "";
@@ -75,11 +75,11 @@ public class MainMassRocksDb {
     public void startCreateToRocksDb() throws RocksDBException {
         if (new File(toDbPath).exists()) {
             log.error("DB already exists: {}", toDbPath);
-            return;
+            throw new IllegalArgumentException("DB already exists: " + toDbPath);
         }
         if (!new File(fromCsvPath).exists()) {
             log.error("File not exists: {}", fromCsvPath);
-            return;
+            throw new IllegalArgumentException("File not exists: " + fromCsvPath);
         }
         int countMasses = 0;
         try (RocksDB db = MyUtil.openWriteDB(toDbPath)) {

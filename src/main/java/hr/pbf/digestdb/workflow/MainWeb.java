@@ -1,7 +1,9 @@
 package hr.pbf.digestdb.workflow;
 
+import hr.pbf.digestdb.model.DbInfo;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.CustomAccessionDb;
+import hr.pbf.digestdb.util.WorkflowConfig;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.rendering.FileRenderer;
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +24,11 @@ import java.util.*;
 @Data
 public class MainWeb {
 
-    //    private String rocksDbPath = "";
-//    private String accDbPath = "";
     private String dbDir;
     private int port = 7070;
+
+    private String dbPath;
+    private String accDbPath;
 
     public MainWeb(int port, String dbDir) {
         this.port = port;
@@ -33,24 +37,21 @@ public class MainWeb {
 
 
     public static void main(String[] args) throws RocksDBException {
-        MainWeb app = new MainWeb(7070, "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot");
-//        app.rocksDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db";
-//        app.accDbPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/custom_accession.db";
+        MainWeb app = new MainWeb(7070, "/Users/tag/IdeaProjects/DigestedProteinDB/misc/db_human_swisprot");
+        app.setDbPath(app.getDbDir() + "/rocksdb_mass.db");
+        app.setAccDbPath(app.getDbDir() + "/custom_accession.db");
+
+        log.debug("current dir: " + String.valueOf(new File(".").getAbsoluteFile()));
         app.startWeb();
     }
 
 
     public void startWeb() throws RocksDBException {
         MainMassRocksDb db = new MainMassRocksDb();
-
-        db.setToDbPath(dbDir + "/rocksdb_mass.db");
-
+        db.setToDbPath(dbPath);
         RocksDB massRocksDb = db.openReadDB();
         CustomAccessionDb accDb = new CustomAccessionDb();
-        accDb.setToDbPath(dbDir + "/custom_accession.db");
-
-
-//        accDb.setToDbPath(accDbPath);
+        accDb.setToDbPath(accDbPath);
         accDb.loadDb();
 
         var app = Javalin.create(config -> {
@@ -75,11 +76,9 @@ public class MainWeb {
               .start(port);
 
         app.get("/db-info", ctx -> {
-            Properties prop = new Properties();
-            FileReader reader = new FileReader(dbDir + "/db-info_bacteria_trembl.properties");
-            prop.load(reader);
-            reader.close();
-            ctx.json(prop);
+            WorkflowConfig config = new WorkflowConfig(dbDir);
+            ctx.json(config.getDbInfo());
+
         });
         app.get("/search", ctx -> {
             double mass1 = 0;
@@ -101,18 +100,9 @@ public class MainWeb {
                 return;
             }
 
-            // log.debug("Search mass1: {} mass2: {}", mass1, mass2);
             List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries = db.searchByMass(massRocksDb, mass1, mass2);
-//            for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> entry : entries) {
-//                System.out.println(entry.getKey());
-//                for (BinaryPeptideDbUtil.PeptideAcc peptideAcc : entry.getValue()) {
-//                  //  System.out.println(peptideAcc.getSeq());
-//                }
-//            }
             ctx.json(new MassResult(entries, accDb));
 
-
-            //ctx.json("Evo rezultat "+ mass1 + " "+ mass2);
         });
 
         app.events(eventConfig -> {
@@ -123,6 +113,7 @@ public class MainWeb {
         log.info("Web started on {}", "http://localhost:" + port);
     }
 }
+
 
 @Data
 class MassResult {

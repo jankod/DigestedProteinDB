@@ -25,6 +25,8 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class MainUniprotToPeptideCsv {
 
+    //public static final String PEPTIDE_MASS_CSV = "peptide_mass.csv";
+    //public static final String PEPTIDE_MASS_CSV_SORTED = "peptide_mass_acc_sorted.csv";
     // result
     public String resultPeptideMassAccCsvPath = "";
 

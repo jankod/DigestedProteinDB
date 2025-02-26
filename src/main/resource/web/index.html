@@ -15,14 +15,14 @@
         <div class="col">
             <h2>Search for mass </h2>
             <div x-show="dbInfo">
-                <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzime"></span></p>
+                <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
                 <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
                 <p class="mb-1"><strong>Min Peptide Length:</strong> <span x-text="dbInfo.min_peptide_length"></span>
                 </p>
                 <p class="mb-1"><strong>Max Peptide Length:</strong> <span x-text="dbInfo.max_peptide_length"></span>
                 </p>
-                <p class="mb-1"><strong>Peptides Count:</strong> <span x-text="dbInfo.peptides_count"></span></p>
-                <p class="mb-3"><strong>Source:</strong> <span x-text="dbInfo.source"></span></p>
+                <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span></p>
+                <p class="mb-3"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
             </div>
             <form @submit.prevent="search">
                 <div class="mb-3">

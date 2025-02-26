@@ -14,38 +14,23 @@ import java.util.*;
 @Data
 public class MainCsvMassGrouperWithAccIds {
 
-
     private final StringBuilder sb = new StringBuilder(1024);
-//    private final String dbDir;
 
     String inputCsvPeptideMassSorted = "";
     String outputGroupedCsv = "";
     String outputAccessionMapCsv = "";
     int bufferSize = 32 * 1024 * 1024; // 32MB buffer
 
-//    public MainCsvMassGrouperWithAccIds(String dbDir) {
-//        this.dbDir = dbDir;
-//        if(dbDir == null) {
-//            throw new IllegalArgumentException("dbDir is null");
-//        }
-//        if (!new File(dbDir).isDirectory()) {
-//            throw new IllegalArgumentException("Not a directory: " + dbDir);
-//        }
-//        this.outputGroupedCsv = dbDir + "/gen/grouped_with_ids.csv";
-//        this.outputAccessionMapCsv = dbDir + "/gen/accession_map.csv";
-//        this.inputCsvPeptideMassSorted = dbDir + "/gen/peptide_mass_sorted_console.csv";
-//    }
-
-
-    public void startAccAndGroup() {
+    public TObjectIntHashMap<String> startAccAndGroup() {
         TObjectIntHashMap<String> accessionToIdMap = startCreateAccessionMap();
         startCreateGroupWithAccIds(inputCsvPeptideMassSorted, outputGroupedCsv, accessionToIdMap, bufferSize);
+        return accessionToIdMap;
     }
 
     public TObjectIntHashMap<String> startCreateAccessionMap() {
         // Faza 1: Izgradi mapiranje accession -> ID
         TObjectIntHashMap<String> accessionToIdMap = buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
-        log.info("Created accessionToIdMap.size() = " + accessionToIdMap.size());
+        //log.info("Created accessionToIdMap.size() = " + accessionToIdMap.size());
         return accessionToIdMap;
     }
 
@@ -93,8 +78,9 @@ public class MainCsvMassGrouperWithAccIds {
 
         } catch (IOException e) {
             log.error("Error writing accession map", e);
+            throw new RuntimeException(e);
         }
-        log.info("Max acc Id = " + nextAccNumId);
+      //  log.info("Max acc Id = " + nextAccNumId);
         return accessionToIdMap;
     }
 
