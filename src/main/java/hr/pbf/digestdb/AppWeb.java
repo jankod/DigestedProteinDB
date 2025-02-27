@@ -1,9 +1,9 @@
-package hr.pbf.digestdb.workflow;
+package hr.pbf.digestdb;
 
-import hr.pbf.digestdb.model.DbInfo;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.CustomAccessionDb;
 import hr.pbf.digestdb.util.WorkflowConfig;
+import hr.pbf.digestdb.workflow.MassRocksDb;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.rendering.FileRenderer;
@@ -12,9 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
+import picocli.CommandLine;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -22,32 +22,45 @@ import java.util.*;
 
 @Slf4j
 @Data
-public class MainWeb {
+public class AppWeb {
 
     private String dbDir;
-    private int port = 7070;
+    private int port;
 
     private String dbPath;
     private String accDbPath;
 
-    public MainWeb(int port, String dbDir) {
-        this.port = port;
-        this.dbDir = dbDir;
+    public AppWeb(WebArgsParams params) {
+        this.port = params.port;
+        this.dbDir = params.dbDir;
+        setDbPath(getDbDir() + "/" + MassRocksDb.ROCKSDB_MASS_DB_FILE_NAME);
+        setAccDbPath(getDbDir() + "/"+ CustomAccessionDb.CUSTOM_ACCESSION_DB_FILE_NAME);
+    }
+
+    public static class WebArgsParams {
+        @CommandLine.Option(names = {"-p", "--port"}, description = "Port", required = true, defaultValue = "7070")
+        int port;
+
+        @CommandLine.Option(names = {"-d", "--db-dir"}, description = "Path to the directory with workflow.properties file", required = true)
+        String dbDir;
     }
 
 
     public static void main(String[] args) throws RocksDBException {
-        MainWeb app = new MainWeb(7070, "/Users/tag/IdeaProjects/DigestedProteinDB/misc/db_human_swisprot");
-        app.setDbPath(app.getDbDir() + "/rocksdb_mass.db");
-        app.setAccDbPath(app.getDbDir() + "/custom_accession.db");
 
-        log.debug("current dir: " + String.valueOf(new File(".").getAbsoluteFile()));
+        WebArgsParams params = new WebArgsParams();
+        new CommandLine(params).parseArgs(args);
+
+        AppWeb app = new AppWeb(params);
+
+
+        log.debug("current dir: " + new File(".").getAbsoluteFile());
         app.startWeb();
     }
 
 
     public void startWeb() throws RocksDBException {
-        MainMassRocksDb db = new MainMassRocksDb();
+        MassRocksDb db = new MassRocksDb();
         db.setToDbPath(dbPath);
         RocksDB massRocksDb = db.openReadDB();
         CustomAccessionDb accDb = new CustomAccessionDb();

@@ -1,12 +1,11 @@
 package hr.pbf.digestdb.workflow;
 
-import hr.pbf.digestdb.util.MyUtil;
-import hr.pbf.digestdb.util.UniprotXMLParser;
+import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
+import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
-import hr.pbf.digestdb.util.BioUtil;
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -23,51 +22,46 @@ import java.nio.charset.StandardCharsets;
  */
 @Data
 @Slf4j
-public class MainUniprotToPeptideCsv {
+public class JobUniprotToPeptideCsv implements Job<JobUniprotToPeptideCsv.Result> {
 
-    //public static final String PEPTIDE_MASS_CSV = "peptide_mass.csv";
-    //public static final String PEPTIDE_MASS_CSV_SORTED = "peptide_mass_acc_sorted.csv";
-    // result
     public String resultPeptideMassAccCsvPath = "";
 
-    // params
-//    private final String dbDir;
+    public String resultTaxAccCsvPath = "";
+
     public String fromSwisprotPath = "";
     public long maxProteinCount = Long.MAX_VALUE - 1;
     public int minPeptideLength = 0;
     public int maxPeptideLength = 0;
     public int missClevage = 1;
 
-//    public MainUniprotToPeptideCsv(String dbDir) throws IOException {
-//        this.dbDir = dbDir;
-//        if (!FileUtils.isDirectory(new File(dbDir))) {
-//            throw new IllegalArgumentException("Not a directory: " + dbDir);
-//        }
-//        FileUtils.forceMkdir(new File(dbDir + "/gen"));
-//        this.resultPeptideMassAccCsvPath = dbDir + "/gen/peptide_mass.csv";
-//    }
+    @Data
+    public static class Result {
+        long proteinCount;
+        long peptideCount;
 
-    public void start() throws IOException {
-        if (!new File(fromSwisprotPath).exists()) {
-            throw new RuntimeException("File not found: " + fromSwisprotPath);
-        }
 
-        if (new File(resultPeptideMassAccCsvPath).exists()) {
-            throw new RuntimeException("File already exists: " + resultPeptideMassAccCsvPath);
-        }
+    }
+
+    public Result start() throws IOException {
+        Validatate.fileMustExist(fromSwisprotPath);
+        Validatate.fileMustNotExist(resultPeptideMassAccCsvPath);
 
         if (missClevage != 1) {
-            throw new RuntimeException("Miss clevage must be 1");
+            throw new ValidationException("Miss clevage must be 1");
         }
         if (minPeptideLength < 1 || minPeptideLength > maxPeptideLength) {
-            throw new RuntimeException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
-                                       + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
+            throw new ValidationException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
+                                          + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
         }
 
         UniprotXMLParser parser = new UniprotXMLParser();
 
+        LongCounter proteinCount = new LongCounter();
+        LongCounter peptideCount = new LongCounter();
+
         Charset standardCharset = StandardCharsets.UTF_8;
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16)) {
+        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16);
+             BufferedOutputStream outTaxonomy = new BufferedOutputStream(new FileOutputStream(resultTaxAccCsvPath), 4 * 1024 * 16)) {
 
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
@@ -77,11 +71,14 @@ public class MainUniprotToPeptideCsv {
                         log.info("Max protein count reached: {}", maxProteinCount);
                         return;
                     }
+                    proteinCount.increment();
+                    saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
                     BioUtil.tripsyn(p.getSequence(), minPeptideLength, maxPeptideLength).forEach(peptide -> {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
                             return;
                         }
+                        peptideCount.increment();
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
                         double mass4 = MyUtil.roundTo4(mass);
                         String row = mass4 + "," + peptide + "," + p.getAccession() + "\n";
@@ -100,14 +97,19 @@ public class MainUniprotToPeptideCsv {
                 }
             });
 
-
-        } finally {
-            log.debug("Finish, protein count: {}", parser.getTotalCount());
         }
 
-        log.info("Finish uniprot to csv: " + resultPeptideMassAccCsvPath);
 
+        Result result = new Result();
+        result.setPeptideCount(peptideCount.get());
+        result.setProteinCount(proteinCount.get());
 
+        return result;
+    }
+
+    @SneakyThrows
+    private void saveTaxonomy(String accession, int taxonomyId, BufferedOutputStream outTaxonomy) {
+        outTaxonomy.write((accession + "," + taxonomyId + "\n").getBytes(StandardCharsets.UTF_8));
     }
 
 }

@@ -12,9 +12,13 @@ import java.io.File;
  */
 @Data
 @Slf4j
-public class MainExecuteCommand {
+public class ExecJob implements Job<Integer> {
 
-    public int exe(String cmd, File dir) {
+    private String cmd;
+    private File dir;
+
+    @Override
+    public Integer start() throws Exception {
         ProcessBuilder builder = new ProcessBuilder();
         builder.command("bash", "-c", cmd);
         if (dir != null) {
@@ -28,4 +32,6 @@ public class MainExecuteCommand {
             throw new RuntimeException("Error executing command: " + cmd, e);
         }
     }
+
+
 }

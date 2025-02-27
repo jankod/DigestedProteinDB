@@ -2,28 +2,24 @@ package hr.pbf.digestdb.workflow;
 
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
-import hr.pbf.digestdb.util.CustomAccessionDb;
 import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.commons.lang3.time.StopWatch;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @Data
 @Slf4j
-public class MainMassRocksDb {
+public class MassRocksDb {
+    public static final String ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
 
     //public static final String DEFAULT_DB_DIR_NAME = "rocksdb_mass.db";
 

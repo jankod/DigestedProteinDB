@@ -18,6 +18,7 @@ import java.util.List;
 @Slf4j
 public class CustomAccessionDb {
 
+    public static final String CUSTOM_ACCESSION_DB_FILE_NAME = "custom_accession.db";
     //public static final String DEFAULT_DB_DIR_NAME = "custom_accession.db";
     private String fromCsvPath = "";
     private String toDbPath = "";

@@ -8,6 +8,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,7 @@ import java.util.*;
 @UtilityClass
 public class BinaryPeptideDbUtil {
 
-    private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 4); // 4MB, prilagodite po potrebi
+    private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 32); // 32MB, prilagodite po potrebi
 
 
     public static int readVarint2(ByteBuffer buffer) throws IOException {
@@ -129,6 +130,7 @@ public class BinaryPeptideDbUtil {
                 // sequence
                 // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
                 byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
+                // large: TVDRPTK
                 ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
                 writeVarint(bufferCache, seq.length()); // 4 bajta za dužinu sekvence
 
@@ -144,16 +146,16 @@ public class BinaryPeptideDbUtil {
             }
             return Arrays.copyOf(bufferCache.array(), bufferCache.position());
         } catch (Exception e) {
-            log.error("Error on line: " + value, e);
+            log.error("Error on line: " + StringUtils.truncate(value, 20_000), e);
             throw e;
         }
     }
 
-    private void ensureCapacity(ByteBuffer buf, int additionalCapacity) {
-        if (buf.remaining() < additionalCapacity) {
-            ByteBuffer newBuffer = ByteBuffer.allocate(buf.capacity() * 2 + additionalCapacity);
-            buf.flip();
-            newBuffer.put(buf);
+    private void ensureCapacity(ByteBuffer buff, int additionalCapacity) {
+        if (buff.remaining() < additionalCapacity) {
+            ByteBuffer newBuffer = ByteBuffer.allocate((int) (buff.capacity() * 1.2 + additionalCapacity));
+            buff.flip();
+            newBuffer.put(buff);
             bufferCache = newBuffer;
         }
     }

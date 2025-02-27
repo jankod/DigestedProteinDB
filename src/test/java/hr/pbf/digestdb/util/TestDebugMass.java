@@ -1,6 +1,6 @@
 package hr.pbf.digestdb.util;
 
-import hr.pbf.digestdb.workflow.MainMassRocksDb;
+import hr.pbf.digestdb.workflow.MassRocksDb;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class TestDebugMass {
     public static void main(String[] args) throws RocksDBException {
-        MainMassRocksDb db = new MainMassRocksDb();
+        MassRocksDb db = new MassRocksDb();
 
         db.setToDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/rocksdb_mass.db");
         RocksDB rocksDB = db.openReadDB();
