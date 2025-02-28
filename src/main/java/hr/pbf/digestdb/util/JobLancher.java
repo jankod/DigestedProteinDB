@@ -1,9 +1,15 @@
 package hr.pbf.digestdb.util;
 
+import hr.pbf.digestdb.workflow.ExecJob;
 import hr.pbf.digestdb.workflow.Job;
 import hr.pbf.digestdb.workflow.JobResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@
 public class JobLancher {
+    private List<ExecJob> jobs = new ArrayList<>();
 
     public <R> JobResult<R> run(Job<R> workflow) throws Exception {
         try {
@@ -22,4 +28,7 @@ public class JobLancher {
     }
 
 
+    public void addJob(ExecJob cmd) {
+        jobs.add(cmd);
+    }
 }

@@ -125,6 +125,7 @@ public class AppWorkflow {
             log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
             cmd.setCmd(cmdSortAccession);
             cmd.setDir(genDir);
+            jobLancher.addJob(cmd);
             jobLancher.run(cmd);
         }
 
