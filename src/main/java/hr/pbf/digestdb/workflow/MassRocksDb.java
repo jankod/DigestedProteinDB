@@ -68,7 +68,7 @@ public class MassRocksDb {
         return results;
     }
 
-    public void startCreateToRocksDb() throws RocksDBException {
+    public void start() throws RocksDBException {
         if (new File(toDbPath).exists()) {
             log.error("DB already exists: {}", toDbPath);
             throw new IllegalArgumentException("DB already exists: " + toDbPath);

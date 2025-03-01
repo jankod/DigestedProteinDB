@@ -21,7 +21,7 @@ public class MainCsvMassGrouperWithAccIds {
     String outputAccessionMapCsv = "";
     int bufferSize = 32 * 1024 * 1024; // 32MB buffer
 
-    public TObjectIntHashMap<String> startAccAndGroup() {
+    public TObjectIntHashMap<String> start() {
         TObjectIntHashMap<String> accessionToIdMap = startCreateAccessionMap();
         startCreateGroupWithAccIds(inputCsvPeptideMassSorted, outputGroupedCsv, accessionToIdMap, bufferSize);
         return accessionToIdMap;

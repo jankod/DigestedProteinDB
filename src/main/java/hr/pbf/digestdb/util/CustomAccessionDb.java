@@ -51,7 +51,7 @@ public class CustomAccessionDb {
 
         if (create) {
             StopWatch watch = StopWatch.createStarted();
-            db.startCreateCustomAccessionDb();
+            db.start();
             MyUtil.stopAndShowTime(watch, "Write DB time");
         }
 
@@ -67,7 +67,7 @@ public class CustomAccessionDb {
         return accList[index];
     }
 
-    public void startCreateCustomAccessionDb() throws IOException {
+    public void start() throws IOException {
         List<String> map = startReadCsvToMap();
 
         try (DataOutputStream out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(toDbPath)))) {

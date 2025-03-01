@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.workflow;
+package hr.pbf.digestdb.exception;
 
 import lombok.Getter;
 

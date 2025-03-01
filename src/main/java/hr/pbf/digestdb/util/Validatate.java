@@ -1,7 +1,7 @@
 package hr.pbf.digestdb.util;
 
-import hr.pbf.digestdb.workflow.ValidationException;
 
+import hr.pbf.digestdb.exception.ValidationException;
 public class Validatate {
     public static void fileMustExist(String filePath) {
         if (filePath == null) {

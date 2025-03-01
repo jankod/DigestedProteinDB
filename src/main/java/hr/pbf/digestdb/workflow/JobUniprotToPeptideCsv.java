@@ -1,6 +1,7 @@
 package hr.pbf.digestdb.workflow;
 
 import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
+import hr.pbf.digestdb.exception.ValidationException;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import lombok.Data;
@@ -22,7 +23,7 @@ import java.nio.charset.StandardCharsets;
  */
 @Data
 @Slf4j
-public class JobUniprotToPeptideCsv implements Job<JobUniprotToPeptideCsv.Result> {
+public class JobUniprotToPeptideCsv {
 
     public String resultPeptideMassAccCsvPath = "";
 

@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.workflow;
 
+import hr.pbf.digestdb.workflow.core.Job;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,7 @@ import java.io.File;
  */
 @Data
 @Slf4j
-public class ExecJob implements Job<Integer> {
+public class ExeCommand implements Job<Integer> {
 
     private String cmd;
     private File dir;

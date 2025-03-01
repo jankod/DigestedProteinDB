@@ -3,6 +3,7 @@ package hr.pbf.digestdb;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
+import hr.pbf.digestdb.workflow.ExeCommand;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -60,7 +61,7 @@ public class AppWorkflow {
 
         FileUtils.forceMkdir(genDir);
 
-        JobLancher jobLancher = new JobLancher();
+        //  JobLancher jobLancher = new JobLancher();
 
         {            // 1. Uniprot xml to CSV
             JobUniprotToPeptideCsv app1UniprotToCsv = new JobUniprotToPeptideCsv();
@@ -70,13 +71,15 @@ public class AppWorkflow {
             app1UniprotToCsv.missClevage = config.getMissCleavage();
             app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
             app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
-            JobResult<JobUniprotToPeptideCsv.Result> result = jobLancher.run(app1UniprotToCsv);
+            //  JobResult<JobUniprotToPeptideCsv.Result> result = jobLancher.run(app1UniprotToCsv);
+            JobUniprotToPeptideCsv.Result re = app1UniprotToCsv.start();
+            log.info("Uniprot extracted. Protein count: {}, Peptide count: {}", re.getProteinCount(), re.getPeptideCount());
         }
 
         {
             // 2. export TMPDIR=/disk4/janko/temp_dir # Stvorite ovaj direktorij ako ne postoji
             //    sort -t',' -k1n peptide_mass.csv -o peptide_mass_sorted_console.csv
-            ExecJob app2CmdSortMass = new ExecJob();
+            ExeCommand app2CmdSortMass = new ExeCommand();
 
             String sortTempDir = config.getSortTempDir();
             String cmdString = "";
@@ -99,7 +102,8 @@ public class AppWorkflow {
 
             app2CmdSortMass.setCmd(cmdString);
             app2CmdSortMass.setDir(genDir);
-            jobLancher.run(app2CmdSortMass);
+            //jobLancher.run(app2CmdSortMass);
+            app2CmdSortMass.start();
         }
 
         long proteinCountResult = 0;
@@ -109,13 +113,14 @@ public class AppWorkflow {
             app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
             app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
 
-            TObjectIntHashMap<String> accCustomDb = app3csvMassGroup.startAccAndGroup();
+            TObjectIntHashMap<String> accCustomDb = app3csvMassGroup.start();
             proteinCountResult = accCustomDb.size();
+            log.info("Grouped with ids: {}", GROUPED_WITH_IDS_CSV_PATH);
         }
 
         { // 4.
             //  sort -t',' -k1n accession_map.csv -o accession_map_sorted.csv
-            ExecJob cmd = new ExecJob();
+            ExeCommand cmd = new ExeCommand();
             String cmdSortAccession = " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
             cmdSortAccession = new MyFormatter(cmdSortAccession)
                   .param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
@@ -125,8 +130,8 @@ public class AppWorkflow {
             log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
             cmd.setCmd(cmdSortAccession);
             cmd.setDir(genDir);
-            jobLancher.addJob(cmd);
-            jobLancher.run(cmd);
+            cmd.start();
+            log.info("Accession map sorted: {}", ACCESSION_MAP_CSV_SORTED_PATH);
         }
 
         { // 5. Create rocksdb mass
@@ -134,7 +139,8 @@ public class AppWorkflow {
 
             app4createMassRocksDb.setToDbPath(ROCKDB_DB_DIR_PATH);
             app4createMassRocksDb.setFromCsvPath(GROUPED_WITH_IDS_CSV_PATH);
-            app4createMassRocksDb.startCreateToRocksDb();
+            app4createMassRocksDb.start();
+            log.info("RockDB db is created: {}", ROCKDB_DB_DIR_PATH);
         }
 
         { // 6. Create custom accession db
@@ -142,7 +148,8 @@ public class AppWorkflow {
             app5createCustomAccessionDb.setFromCsvPath(ACCESSION_MAP_CSV_SORTED_PATH);
 
             app5createCustomAccessionDb.setToDbPath(CUSTOM_ACCESSION_DB_DIR_PATH);
-            app5createCustomAccessionDb.startCreateCustomAccessionDb();
+            app5createCustomAccessionDb.start();
+            log.info("Custom accession db is created: {}", CUSTOM_ACCESSION_DB_DIR_PATH);
         }
 
         { // 7. Properties
