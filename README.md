@@ -10,7 +10,8 @@ The primary goal is to support rapid mass\-based searches, even on less powerful
 - **Mass\-Oriented Search**: Stores peptide data keyed by mass to expedite lookups based on precise mass ranges.  
 
 ## Created Peptide Database
-- [x] Uniprot TrEMBL bacteria dataset. ~50GB , 7 to 30 amino acids, 1 miss cleavage. 
+- [x] Uniprot TrEMBL bacteria dataset. ~50GB , 7 to 30 amino acids, 1 miss cleavage.
+  -  Download ...
 - [ ] Uniprot TrEMBL human dataset. (NOT FINISHED).
 
 ## Workflow for creating the database
