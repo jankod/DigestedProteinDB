@@ -2,7 +2,7 @@ package hr.pbf.digestdb.util;
 
 
 import hr.pbf.digestdb.exception.ValidationException;
-public class Validatate {
+public class ValidatateUtil {
     public static void fileMustExist(String filePath) {
         if (filePath == null) {
             throw new ValidationException("File path is null.");

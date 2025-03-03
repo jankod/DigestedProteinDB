@@ -27,7 +27,9 @@ public class DemoJob {
     static class SimpleJob1 implements Job<Void> {
 
         String param1;
+
         int param2;
+
         public final String PARAM3 = "param3";
 
         @Override

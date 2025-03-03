@@ -1,9 +1,8 @@
-package hr.pbf.digestdb.util;
+package hr.pbf.digestdb.demo;
 
+import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.mapdb.Serializer;
 import org.mapdb.SortedTableMap;
@@ -22,12 +21,10 @@ public class MapdbPeptideDatabase {
 
     public static void main(String[] args) throws Exception {
         MapdbPeptideDatabase db = new MapdbPeptideDatabase();
-        //db.setDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human/mapdb_sstable.db");
-        //db.setGroupedCsvPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_human/grouped_with_ids.csv");
 
 
-        db.setGroupedCsvPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/grouped_with_ids.csv");
-        db.setDbPath("/Users/tag/IdeaProjects/DigestedProteinDB/misc/generated_bacteria_uniprot/mapdb_sstable.db");
+        db.setGroupedCsvPath("../misc/generated_bacteria_uniprot/grouped_with_ids.csv");
+        db.setDbPath(".../misc/generated_bacteria_uniprot/mapdb_sstable.db");
 
         //  FileUtils.delete(new File(db.dbPath));
          db.startBuild();

@@ -13,12 +13,11 @@ import java.io.File;
  */
 @Data
 @Slf4j
-public class ExeCommand implements Job<Integer> {
+public class ExeCommand  {
 
     private String cmd;
     private File dir;
 
-    @Override
     public Integer start() throws Exception {
         ProcessBuilder builder = new ProcessBuilder();
         builder.command("bash", "-c", cmd);

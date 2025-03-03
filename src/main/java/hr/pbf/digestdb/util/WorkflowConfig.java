@@ -5,15 +5,11 @@ import com.typesafe.config.ConfigFactory;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 @Data
 @Slf4j
@@ -72,31 +68,6 @@ public class WorkflowConfig {
         }
     }
 
-    public void WorkflowConfigOLD(String dbDir) throws IOException {
-        File fileDbDir = new File(dbDir);
-        if (!FileUtils.isDirectory(fileDbDir)) {
-            throw new FileNotFoundException("Not a directory: " + dbDir);
-        }
-
-        File fileWorkflowProperties = new File(dbDir + "/workflow.properties");
-        if (!fileWorkflowProperties.exists()) {
-            throw new FileNotFoundException("File not found: " + dbDir + "/workflow.properties");
-        }
-
-        Properties properties = new Properties();
-
-        try (FileReader reader = new FileReader(fileWorkflowProperties)) {
-            properties.load(reader);
-            minPeptideLength = Integer.parseInt(properties.getProperty("min_peptide_length"));
-            maxPeptideLength = Integer.parseInt(properties.getProperty("max_peptide_length"));
-            missCleavage = Integer.parseInt(properties.getProperty("miss_cleavage"));
-            dbName = properties.getProperty("db_name");
-            enzymeName = properties.getProperty("enzyme_name");
-            uniprotXmlPath = properties.getProperty("uniprot_xml_path");
-            sortTempDir = properties.getProperty("sort_temp_dir");
-        }
-    }
-
     public String toUniprotXmlFullPath() {
         return dbDir + "/" + uniprotXmlPath;
     }
@@ -104,17 +75,6 @@ public class WorkflowConfig {
     public static void main(String[] args) throws IOException {
         WorkflowConfig config = new WorkflowConfig("/Users/tag/IdeaProjects/DigestedProteinDB/misc/db_bacteria_swisprot");
     }
-
-//    public DbInfo getDbInfo() {
-//        hr.pbf.digestdb.model.DbInfo dbInfo = new DbInfo();
-//        dbInfo.setMissCleavage(String.valueOf(missCleavage));
-//        dbInfo.setMinPeptideLength(String.valueOf(minPeptideLength));
-//        dbInfo.setMaxPeptideLength(String.valueOf(maxPeptideLength));
-//        dbInfo.setDbName(dbName);
-//        dbInfo.setEnzimeName(enzymeName);
-//        return dbInfo;
-//    }
-
 
     final static DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 

@@ -79,17 +79,17 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>org.iq80.leveldb</groupId>
-            <artifactId>leveldb</artifactId>
-            <version>0.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.iq80.leveldb</groupId>-->
+<!--            <artifactId>leveldb</artifactId>-->
+<!--            <version>0.12</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.google.guava</groupId>-->
+<!--                    <artifactId>guava</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.univocity</groupId>
             <artifactId>univocity-parsers</artifactId>

@@ -19,22 +19,10 @@ import java.util.List;
 public class CustomAccessionDb {
 
     public static final String CUSTOM_ACCESSION_DB_FILE_NAME = "custom_accession.db";
-    //public static final String DEFAULT_DB_DIR_NAME = "custom_accession.db";
     private String fromCsvPath = "";
     private String toDbPath = "";
 
     private String[] accList;
-
-//    public CustomAccessionDb(String dbDir) {
-//        if (dbDir == null) {
-//            throw new IllegalArgumentException("dbDir is null");
-//        }
-//        if (!new File(dbDir).isDirectory()) {
-//            throw new IllegalArgumentException("Not a directory: " + dbDir);
-//        }
-//        this.toDbPath = dbDir + "/custom_accession.db";
-//        this.fromCsvPath = dbDir + "/gen/accession_map_sorted.csv";
-//    }
 
     public static void main(String[] args) throws IOException {
         CustomAccessionDb db = new CustomAccessionDb();
@@ -94,12 +82,6 @@ public class CustomAccessionDb {
                 byte[] accBytes = new byte[len];
                 in.readFully(accBytes);
                 String acc = new String(accBytes, StandardCharsets.UTF_8);
-            /*    if(i == 1) {
-                    log.debug("First acc: {}", acc);
-                }
-                if (i == 2) {
-                    log.debug("2 acc: {}", acc);
-                }*/
                 accList[i] = acc;
             }
         } catch (IOException e) {

@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Future;
 
 @Data
 @Slf4j
@@ -16,16 +18,15 @@ public class JobLancher {
     private List<JobExecution<?>> jobs = new ArrayList<>();
 
 
-    private ScheduledExecutorService executorService;
+    private ExecutorService executorService;
 
     public JobLancher() {
-        executorService = Executors.newScheduledThreadPool(5);
+        executorService = Executors.newFixedThreadPool(8);
     }
 
-    private <R> JobResult<R> run(JobExecution<R> job) throws Exception {
+    private <R> void run(JobExecution<R> job) {
         JobContext jobContext = new JobContext();
 
-        Exception jobException = null;
         JobResult<R> jobResult = new JobResult<>();
         try {
             job.status = JobExecution.Status.STARTED;
@@ -42,16 +43,14 @@ public class JobLancher {
         job.setResult(jobResult);
         jobResult.setEndTime(time2);
 
-        return jobResult;
     }
 
-    public void runAll() throws Exception {
-
+    public <R> void runAll() {
         for (JobExecution<?> job : jobs) {
+           // Future<R> future = executorService.submit((Callable<R>) () -> run(job));
             run(job);
         }
     }
-
 
     public void addJob(Job<?> job) {
         jobs.add(new JobExecution(job));
@@ -75,6 +74,5 @@ public class JobLancher {
             this.job = job;
         }
     }
-
 
 }

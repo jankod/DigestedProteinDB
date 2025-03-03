@@ -1,6 +1,5 @@
 package hr.pbf.digestdb.workflow;
 
-import com.fasterxml.jackson.databind.deser.impl.CreatorCandidate;
 import hr.pbf.digestdb.exception.ValidationException;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
@@ -9,7 +8,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -44,8 +42,8 @@ public class JobUniprotToPeptideCsv {
     }
 
     public Result start() throws IOException {
-        Validatate.fileMustExist(fromSwisprotPath);
-        Validatate.fileMustNotExist(resultPeptideMassAccCsvPath);
+        ValidatateUtil.fileMustExist(fromSwisprotPath);
+        ValidatateUtil.fileMustNotExist(resultPeptideMassAccCsvPath);
 
         if (missClevage != 1) {
             throw new ValidationException("Miss clevage must be 1");

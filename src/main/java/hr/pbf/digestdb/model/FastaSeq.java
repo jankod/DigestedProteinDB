@@ -2,8 +2,6 @@ package hr.pbf.digestdb.model;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FastaSeq implements Serializable {
 
@@ -12,13 +10,7 @@ public class FastaSeq implements Serializable {
 
 	private DigestInformation digestInformation;
 
-	/**
-	 * Jedna seq ima vise GI i vise desc: np: ./blastdbcmd -entry 17943209
-	 * -outfmt '%g %t'
-	 */
-	public Map<Integer, String> gisDesc = new HashMap<Integer, String>();
-
-	public String header;
+		public String header;
 	public String seq;
 
 	public FastaSeq(String header, String seq) {

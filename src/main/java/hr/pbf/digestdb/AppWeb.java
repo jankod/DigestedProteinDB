@@ -30,19 +30,19 @@ public class AppWeb {
     private String dbPath;
     private String accDbPath;
 
-    public AppWeb(WebArgsParams params) {
-        this.port = params.port;
-        this.dbDir = params.dbDir;
-        setDbPath(getDbDir() + "/" + MassRocksDb.ROCKSDB_MASS_DB_FILE_NAME);
-        setAccDbPath(getDbDir() + "/"+ CustomAccessionDb.CUSTOM_ACCESSION_DB_FILE_NAME);
-    }
-
     public static class WebArgsParams {
         @CommandLine.Option(names = {"-p", "--port"}, description = "Port", required = true, defaultValue = "7070")
         int port;
 
         @CommandLine.Option(names = {"-d", "--db-dir"}, description = "Path to the directory with workflow.properties file", required = true)
         String dbDir;
+    }
+
+    public AppWeb(WebArgsParams params) {
+        this.port = params.port;
+        this.dbDir = params.dbDir;
+        setDbPath(getDbDir() + "/" + MassRocksDb.ROCKSDB_MASS_DB_FILE_NAME);
+        setAccDbPath(getDbDir() + "/" + CustomAccessionDb.CUSTOM_ACCESSION_DB_FILE_NAME);
     }
 
 
