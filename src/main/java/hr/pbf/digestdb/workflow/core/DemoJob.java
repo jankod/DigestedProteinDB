@@ -1,9 +1,9 @@
 package hr.pbf.digestdb.workflow.core;
 
-import hr.pbf.digestdb.workflow.ExeCommand;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DemoJob {
 
     public static void main(String[] args) throws Exception {
@@ -20,6 +20,8 @@ public class DemoJob {
         jobLancher.addJob(simpleJob2);
 
         jobLancher.runAll();
+        boolean res = jobLancher.waitForAll();
+        log.debug("All jobs finished: {}", res);
     }
 
     @Slf4j
@@ -36,6 +38,10 @@ public class DemoJob {
         public Void start(JobContext jobContext) throws Exception {
             log.info("Starting job SimpleJob1");
             jobContext.setParam(PARAM3, param1);
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(2000);
+                log.debug("Job SimpleJob1, iteration: {}", i);
+            }
 
             return null;
         }
@@ -49,7 +55,10 @@ public class DemoJob {
 
         @Override
         public Void start(JobContext jobContext) throws Exception {
-            log.info("Starting job SimpleJob2");
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(2000);
+                log.debug("Job SimpleJob2, iteration: {}", i);
+            }
             return null;
         }
     }

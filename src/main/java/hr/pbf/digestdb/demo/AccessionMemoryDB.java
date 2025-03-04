@@ -1,28 +1,22 @@
 package hr.pbf.digestdb.demo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
-
 import hr.pbf.digestdb.util.BioUtil;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.SerializationUtils;
 
-import gnu.trove.map.hash.TObjectLongHashMap;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+
 
 public class AccessionMemoryDB implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	// private HashMap<String, Long> map;
-	TObjectLongHashMap<String> map;
+	Object2LongMap<String> map;
 
 	private static final String pathSerialize = "/home/tag/AccessionMemoryDB.ser";
 
@@ -47,7 +41,7 @@ public class AccessionMemoryDB implements Serializable {
 		LineIterator it = IOUtils.lineIterator(in, StandardCharsets.US_ASCII);
 		// map = new HashMap<>(lines.size());
 		int maxLines = 413_086_738;
-		map = new TObjectLongHashMap<>(maxLines);
+		map = new Object2LongOpenHashMap<>(maxLines);
 		int c = 0;
 		int petStoTisuca = 900_000;
 		while (it.hasNext()) {

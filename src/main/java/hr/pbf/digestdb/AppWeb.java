@@ -53,7 +53,6 @@ public class AppWeb {
 
         AppWeb app = new AppWeb(params);
 
-
         log.debug("current dir: " + new File(".").getAbsoluteFile());
         app.startWeb();
     }

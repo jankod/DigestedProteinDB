@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * Create CSV file with peptide mass, peptide sequence, protein accession [and taxonomy id].
  * Read uniprot xml file and create csv file with peptide mass, peptide sequence, protein accession and taxonomy id.
- * https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/proteomics_mapping/README
  */
 @Data
 @Slf4j

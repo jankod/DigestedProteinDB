@@ -14,30 +14,22 @@ import java.util.Properties;
 @Data
 @Slf4j
 public class WorkflowConfig {
-    private final String dbDir;
+    final static DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
+    private final String dbDir;
     int minPeptideLength;
     int maxPeptideLength;
     int missCleavage;
-    String dbName;
-    String enzymeName;
-    String uniprotXmlPath;
-    String sortTempDir;
-
+    private String dbName;
+    private String enzymeName;
+    private String uniprotXmlPath;
+    private String sortTempDir;
 
     public WorkflowConfig(String dbDir) throws IOException {
         this.dbDir = dbDir;
         String workflofPath = dbDir + "/workflow.properties";
         log.debug("Load config: {}", workflofPath);
         Config config = ConfigFactory.parseFile(new File(workflofPath));
-
-        // uniprot_xml_path=src/uniprot_sprot_bacteria.xml.gz
-        //min_peptide_length=7
-        //max_peptide_length=30
-        //miss_cleavage=1
-        //db_name=Uniprot Swis-Prot bacteria
-        //enzyme_name=Trypsine
-        //#sort_temp_dir=/disk4/janko/temp_dir
 
         minPeptideLength = config.getInt("min_peptide_length");
         if (minPeptideLength < 1) {
@@ -63,7 +55,7 @@ public class WorkflowConfig {
         uniprotXmlPath = config.getString("uniprot_xml_path");
 
         sortTempDir = config.hasPath("sort_temp_dir") ? config.getString("sort_temp_dir") : null;
-        if(sortTempDir != null && !new File(sortTempDir).isDirectory()) {
+        if (sortTempDir != null && !new File(sortTempDir).isDirectory()) {
             throw new IllegalArgumentException("sort_temp_dir is not a directory: " + sortTempDir);
         }
     }
@@ -71,12 +63,6 @@ public class WorkflowConfig {
     public String toUniprotXmlFullPath() {
         return dbDir + "/" + uniprotXmlPath;
     }
-
-    public static void main(String[] args) throws IOException {
-        WorkflowConfig config = new WorkflowConfig("/Users/tag/IdeaProjects/DigestedProteinDB/misc/db_bacteria_swisprot");
-    }
-
-    final static DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 
 
     @SneakyThrows
@@ -88,7 +74,7 @@ public class WorkflowConfig {
         return prop;
     }
 
-    public void saveDbInfoProperties(long proteinCount, String dbInfoPropertiesPath) {
+    public void saveDbInfoToProperties(long proteinCount, String dbInfoPropertiesPath) {
         Properties prop = new Properties();
 
         prop.setProperty("uniprot_xml_path", toUniprotXmlFullPath());

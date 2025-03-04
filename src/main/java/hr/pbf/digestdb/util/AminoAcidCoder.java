@@ -118,55 +118,7 @@ public class AminoAcidCoder {
         System.out.println("Dekodirani peptid (duži): " + decodePeptideByteBuffer(encodedPeptideBytes_longer, peptideSequence_longer.length()));
     }
 
-    @Deprecated
-    private static byte[] encodePeptideByteBufferWithLength(String sequence) {
-        // Allocate extra 4 bytes to store the length
-        ByteBuffer buffer = ByteBuffer.allocate(4 + (int) Math.ceil(sequence.length() * 5.0 / 8.0));
-        buffer.putInt(sequence.length()); // Store length at the start
 
-        int bitBuffer = 0, bitCount = 0;
-        for (int i = 0; i < sequence.length(); i++) {
-            String aminoAcidUpper = String.valueOf(sequence.charAt(i)).toUpperCase();
-            if (aminoAcidEncoding.get(aminoAcidUpper) == null) {
-                throw new IllegalArgumentException("Nepoznata aminokiselina: " + sequence.charAt(i));
-            }
-            int code = aminoAcidEncoding.get(aminoAcidUpper);
-            bitBuffer = (bitBuffer << 5) | code;
-            bitCount += 5;
-            while (bitCount >= 8) {
-                buffer.put((byte) ((bitBuffer >> (bitCount - 8)) & 0xFF));
-                bitCount -= 8;
-                bitBuffer &= (1 << bitCount) - 1;
-            }
-        }
-        if (bitCount > 0) {
-            buffer.put((byte) (bitBuffer << (8 - bitCount)));
-        }
-        return buffer.array();
-    }
-
-    @Deprecated
-    private static String decodePeptideByteBufferWithLength(byte[] encodedBytes) {
-        ByteBuffer buffer = ByteBuffer.wrap(encodedBytes);
-        int peptideLength = buffer.getInt(); // Retrieve the stored length
-        int bitBuffer = 0, bitCount = 0, decodedCount = 0;
-        StringBuilder decoded = new StringBuilder();
-
-        while (buffer.hasRemaining() && decodedCount < peptideLength) {
-            bitBuffer = (bitBuffer << 8) | (buffer.get() & 0xFF);
-            bitCount += 8;
-            while (bitCount >= 5 && decodedCount < peptideLength) {
-                int code = (bitBuffer >> (bitCount - 5)) & 0x1F;
-                decoded.append(encodingToAminoAcid.get(code));
-                bitCount -= 5;
-                bitBuffer &= (1 << bitCount) - 1;
-                decodedCount++;
-            }
-        }
-        return decoded.toString();
-    }
-
-    // Pomoćna funkcija za ispis byte arraya u heksadecimalnom formatu (radi čitljivosti)
     public static String byteArrayToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {

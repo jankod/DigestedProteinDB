@@ -51,9 +51,6 @@ public class UniprotXMLParser {
                             if (proteinHandler.stopped) {
                                 return;
                             }
-//                            if (proteinList.size() > 100) {
-//                                return proteinList;
-//                            }
                         } else if (proteinInfo != null) {
                             switch (reader.getLocalName()) {
                                 case "accession":

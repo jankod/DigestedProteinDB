@@ -1,9 +1,9 @@
 package hr.pbf.digestdb;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
-import hr.pbf.digestdb.workflow.ExeCommand;
+import hr.pbf.digestdb.workflow.BashCommand;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -79,7 +79,7 @@ public class AppWorkflow {
         {
             // 2. export TMPDIR=/disk4/janko/temp_dir # Stvorite ovaj direktorij ako ne postoji
             //    sort -t',' -k1n peptide_mass.csv -o peptide_mass_sorted_console.csv
-            ExeCommand app2CmdSortMass = new ExeCommand();
+            BashCommand app2CmdSortMass = new BashCommand();
 
             String sortTempDir = config.getSortTempDir();
             String cmdString = "";
@@ -113,14 +113,14 @@ public class AppWorkflow {
             app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
             app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
 
-            TObjectIntHashMap<String> accCustomDb = app3csvMassGroup.start();
+            Object2IntMap<String> accCustomDb = app3csvMassGroup.start();
             proteinCountResult = accCustomDb.size();
             log.info("Grouped with ids: {}", GROUPED_WITH_IDS_CSV_PATH);
         }
 
         { // 4.
             //  sort -t',' -k1n accession_map.csv -o accession_map_sorted.csv
-            ExeCommand cmd = new ExeCommand();
+            BashCommand cmd = new BashCommand();
             String cmdSortAccession = " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
             cmdSortAccession = new MyFormatter(cmdSortAccession)
                   .param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
@@ -154,7 +154,7 @@ public class AppWorkflow {
 
         { // 7. Properties
 
-            config.saveDbInfoProperties(0, DB_INFO_PROPERTIES_PATH);
+            config.saveDbInfoToProperties(0, DB_INFO_PROPERTIES_PATH);
         }
 
         log.info("Finished time: {}", DurationFormatUtils.formatDurationHMS(watch.getTime()));

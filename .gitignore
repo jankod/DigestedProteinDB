@@ -10,4 +10,4 @@ war/node_modules
 .project
 .DS_Store
 /src/main/java/hr/pbf/digestdb/App.java
-DigestedProteinDB.iml
+/DigestedProteinDB.iml

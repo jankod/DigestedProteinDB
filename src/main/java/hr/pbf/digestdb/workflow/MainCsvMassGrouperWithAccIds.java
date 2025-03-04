@@ -1,14 +1,17 @@
 package hr.pbf.digestdb.workflow;
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.TIntHashSet;
 import hr.pbf.digestdb.util.MyUtil;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -21,26 +24,22 @@ public class MainCsvMassGrouperWithAccIds {
     String outputAccessionMapCsv = "";
     int bufferSize = 32 * 1024 * 1024; // 32MB buffer
 
-    public TObjectIntHashMap<String> start() {
-        TObjectIntHashMap<String> accessionToIdMap = startCreateAccessionMap();
+    public Object2IntMap<String> start() {
+        Object2IntMap<String> accessionToIdMap = startCreateAccessionMap();
         startCreateGroupWithAccIds(inputCsvPeptideMassSorted, outputGroupedCsv, accessionToIdMap, bufferSize);
         return accessionToIdMap;
     }
 
-    public TObjectIntHashMap<String> startCreateAccessionMap() {
-        // Faza 1: Izgradi mapiranje accession -> ID
-        TObjectIntHashMap<String> accessionToIdMap = buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
-        //log.info("Created accessionToIdMap.size() = " + accessionToIdMap.size());
-        return accessionToIdMap;
+    public Object2IntMap<String> startCreateAccessionMap() {
+        return buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
     }
 
-    private TObjectIntHashMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
-        TObjectIntHashMap<String> accessionToIdMap = new TObjectIntHashMap<>();
+    private Object2IntMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
+        Object2IntMap<String> accessionToIdMap = new Object2IntOpenHashMap<>();
+
         int nextAccNumId = 1;
 
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsvPath), bufferSize)) {
-            // reader.readLine(); // Preskoči header
-
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -59,33 +58,27 @@ public class MainCsvMassGrouperWithAccIds {
             throw new RuntimeException(e);
         }
 
-        // Spremi mapiranje u CSV
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsvPath), bufferSize)) {
-            //writer.write("id,accession");
-            //writer.newLine();
 
-            accessionToIdMap.forEachEntry((accession, id) -> {
+            accessionToIdMap.forEach((accession, id) -> {
                 try {
                     writer.write(id + "," + accession);
                     writer.newLine();
                 } catch (IOException e) {
                     log.error("Error writing accession map", e);
-                    return false;
+                    throw new RuntimeException(e);
                 }
-                return true;
             });
-
 
         } catch (IOException e) {
             log.error("Error writing accession map", e);
             throw new RuntimeException(e);
         }
-      //  log.info("Max acc Id = " + nextAccNumId);
         return accessionToIdMap;
     }
 
     private void startCreateGroupWithAccIds(String inputCsv, String outputGroupedCsv,
-                                            TObjectIntHashMap<String> accessionToIdMap, int bufferSize) {
+                                            Object2IntMap<String> accessionToIdMap, int bufferSize) {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputCsv), bufferSize);
              BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsv), bufferSize)) {
 
@@ -101,11 +94,13 @@ public class MainCsvMassGrouperWithAccIds {
             String prevMass4 = MyUtil.discretizedTo4(prevMass);
             //Map<String, Set<Integer>> seqIdsMap = new HashMap<>();
 
-            Map<String, TIntHashSet> seqIdsMap = new HashMap<>();
+            //Map<String, TIntHashSet> seqIdsMap = new HashMap<>();
+            Map<String, IntOpenHashSet> seqIdsMap = new HashMap<>();
 
             String sequence = parts[1];
             int id = accessionToIdMap.get(parts[2]);
-            seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
+            //seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
+            seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
 
             while ((line = reader.readLine()) != null) {
                 parts = line.split(",");
@@ -117,14 +112,14 @@ public class MainCsvMassGrouperWithAccIds {
                 if (mass4.equals(prevMass4)) {
                     sequence = parts[1];
                     id = accessionToIdMap.get(parts[2]);
-                    seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
+                    seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
                 } else {
                     writeMassToCsv(writer, prevMass4, seqIdsMap);
                     prevMass4 = mass4;
                     seqIdsMap.clear();
                     sequence = parts[1];
                     id = accessionToIdMap.get(parts[2]);
-                    seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
+                    seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
                 }
             }
             writeMassToCsv(writer, prevMass4, seqIdsMap);
@@ -135,29 +130,22 @@ public class MainCsvMassGrouperWithAccIds {
         }
     }
 
-    private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, TIntHashSet> sequenceMap)
+    private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, IntOpenHashSet> sequenceMap)
           throws IOException {
         sb.setLength(0);
-        Set<Map.Entry<String, TIntHashSet>> entries = sequenceMap.entrySet();
-        for (Map.Entry<String, TIntHashSet> entry : entries) {
+        Set<Map.Entry<String, IntOpenHashSet>> entries = sequenceMap.entrySet();
+        for (Map.Entry<String, IntOpenHashSet> entry : entries) {
             String sequence = entry.getKey();
-            TIntHashSet ids = entry.getValue();
+            IntOpenHashSet ids = entry.getValue();
 
             StringBuilder idsStr = new StringBuilder(ids.size() * 6);
-            for (TIntIterator it = ids.iterator(); it.hasNext(); ) {
-                idsStr.append(it.next()).append(";");
+            for (IntIterator it = ids.iterator(); it.hasNext(); ) {
+                idsStr.append(it.nextInt()).append(";");
             }
             if (!idsStr.isEmpty()) idsStr.setLength(idsStr.length() - 1);
 
-            //String idsStr = String.join(";", ids.stream().mapToObj(String::valueOf).toArray(String[]::new));
             sb.append(sequence).append(":").append(idsStr).append("-");
         }
-//        for (Set<Map.Entry<String, TIntHashSet>> entry : sequenceMap.entrySet()) {
-//            String sequence = entry.ge
-//            Set<Integer> ids = entry.getValue();
-//            String idsStr = String.join(";", ids.stream().map(String::valueOf).toArray(String[]::new));
-//            sb.append(sequence).append(":").append(idsStr).append("-");
-//        }
         if (!sb.isEmpty()) sb.setLength(sb.length() - 1);
 
         writer.write(mass + "," + sb);

@@ -1,15 +1,17 @@
 package hr.pbf.digestdb.util;
 
-import gnu.trove.set.hash.TIntHashSet;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class TaxonomyParser {
@@ -134,7 +136,7 @@ public class TaxonomyParser {
     }
 
     private static void createTaxonomyTree(Map<Integer, TaxonomyNode> taxonomyMap, Map<Short, Division> divisions, TaxonomyNode parent) {
-        parent.childrenTaxIds = findChildren(taxonomyMap, divisions, parent).toArray();
+        parent.childrenTaxIds = findChildren(taxonomyMap, divisions, parent).toIntArray();
         log.debug("Tree: " + parent.name + " has children " + parent.childrenTaxIds.length);
         for (int i = 0; i < parent.childrenTaxIds.length; i++) {
             TaxonomyNode child = taxonomyMap.get(parent.childrenTaxIds[i]);
@@ -142,8 +144,8 @@ public class TaxonomyParser {
         }
     }
 
-    private static TIntHashSet findChildren(Map<Integer, TaxonomyNode> taxonomyMap, Map<Short, Division> divisions, TaxonomyNode parent) {
-        TIntHashSet childrenTaxIds = new TIntHashSet();
+    private static IntSet findChildren(Map<Integer, TaxonomyNode> taxonomyMap, Map<Short, Division> divisions, TaxonomyNode parent) {
+        IntSet childrenTaxIds = new IntOpenHashSet();
         for (TaxonomyNode node : taxonomyMap.values()) {
             if (node.parentTaxId == parent.taxId) {
                 childrenTaxIds.add(node.taxId);
@@ -162,7 +164,7 @@ public class TaxonomyParser {
     }
 
  public static void main(String[] args) {
-        String dir = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/ncbi_taxonomy/taxdump";
+        String dir = ".../misc/ncbi_taxonomy/taxdump";
         String nodesPath = dir + "/nodes.dmp";
         String namesPath = dir + "/names.dmp";
         String divisionPath = dir + "/division.dmp";

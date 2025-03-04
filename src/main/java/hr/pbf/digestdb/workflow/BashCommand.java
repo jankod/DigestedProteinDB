@@ -1,6 +1,5 @@
 package hr.pbf.digestdb.workflow;
 
-import hr.pbf.digestdb.workflow.core.Job;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,12 +7,12 @@ import java.io.File;
 
 
 /**
- * export TMPDIR=/disk4/janko/temp_dir # Stvorite ovaj direktorij ako ne postoji
+ * Example usage:
  * sort -t',' -k1n peptide_mass.csv -o peptide_mass_sorted_console.csv
  */
 @Data
 @Slf4j
-public class ExeCommand  {
+public class BashCommand {
 
     private String cmd;
     private File dir;

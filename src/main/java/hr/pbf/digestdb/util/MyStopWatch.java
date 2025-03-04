@@ -5,8 +5,6 @@ import org.apache.commons.lang3.time.StopWatch;
 
 public class MyStopWatch {
 
-    private String name;
-
     StopWatch stopWatch;
 
     public MyStopWatch() {

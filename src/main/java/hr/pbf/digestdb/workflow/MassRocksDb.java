@@ -21,41 +21,21 @@ import java.util.*;
 public class MassRocksDb {
     public static final String ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
 
-    //public static final String DEFAULT_DB_DIR_NAME = "rocksdb_mass.db";
-
     public String fromCsvPath = "";
     public String toDbPath = "";
-
-    private void getCount() {
-        try (RocksDB db = openReadDB()) {
-            RocksIterator it = db.newIterator();
-            int count = 0;
-            for (it.seekToFirst(); it.isValid(); it.next()) {
-                count++;
-            }
-
-            log.info("Count: " + count);
-        } catch (RocksDBException e) {
-            log.error("Error: ", e);
-        }
-    }
-
-
-
 
     public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchByMass(RocksDB db, double mass1,
                                                                                      double mass2) throws RocksDBException, UnknownAminoacidException {
 
         List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results = new ArrayList<>();
 
-        int mass1Int = (int) Math.round(mass1 * 10000);
-        // int mass2Int = (int) Math.round(mass2 * 10000);
+        int mass1Int = (int) Math.round(mass1 * 10_000);
 
         RocksIterator it = db.newIterator();
         it.seek(MyUtil.intToByteArray(mass1Int));
         while (it.isValid()) {
             int massInt = MyUtil.byteArrayToInt(it.key());
-            double keyMass = massInt / 10000.0;
+            double keyMass = massInt / 10_000.0;
             Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
             results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
 
