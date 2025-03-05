@@ -1,6 +1,6 @@
 package hr.pbf.digestdb;
 
-import hr.pbf.digestdb.db.CustomAccessionDb;
+import hr.pbf.digestdb.db.AccessionDbCreator;
 import hr.pbf.digestdb.db.MassRocksDbCreator;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
@@ -17,7 +17,7 @@ import java.io.File;
 
 
 @Slf4j
-public class AppWorkflow {
+public class CreateDatabaseApp {
 
     public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
     public static final String DEFAULT_DB_FILE_NAME = "custom_accession.db";
@@ -152,11 +152,8 @@ public class AppWorkflow {
         }
 
         { // 6. Create custom accession db
-            CustomAccessionDb app5createCustomAccessionDb = new CustomAccessionDb();
-            app5createCustomAccessionDb.setFromCsvPath(ACCESSION_MAP_CSV_SORTED_PATH);
-
-            app5createCustomAccessionDb.setToDbPath(CUSTOM_ACCESSION_DB_DIR_PATH);
-            app5createCustomAccessionDb.start();
+            AccessionDbCreator accDb = new AccessionDbCreator(ACCESSION_MAP_CSV_SORTED_PATH, CUSTOM_ACCESSION_DB_DIR_PATH);
+            accDb.startCreate();
             log.info("Custom accession db is created: {}", CUSTOM_ACCESSION_DB_DIR_PATH);
         }
 

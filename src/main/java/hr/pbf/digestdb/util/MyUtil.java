@@ -1,6 +1,5 @@
 package hr.pbf.digestdb.util;
 
-import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -110,15 +109,6 @@ public class MyUtil {
 
         return RocksDB.open(options, path);
 
-    }
-
-
-    public static long byteArrayToLong(byte[] accessionValue) {
-        return Longs.fromByteArray(accessionValue);
-    }
-
-    public static byte[] longToByteArray(Long longNum) {
-        return Longs.toByteArray(longNum);
     }
 
     public static byte[] intToByteArray(int someInt) {

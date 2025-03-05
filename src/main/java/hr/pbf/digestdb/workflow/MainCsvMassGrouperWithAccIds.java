@@ -98,7 +98,7 @@ public class MainCsvMassGrouperWithAccIds {
             Map<String, IntOpenHashSet> seqIdsMap = new HashMap<>();
 
             String sequence = parts[1];
-            int id = accessionToIdMap.get(parts[2]);
+            int id = accessionToIdMap.getInt(parts[2]);
             //seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
             seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
 
@@ -111,14 +111,14 @@ public class MainCsvMassGrouperWithAccIds {
 
                 if (mass4.equals(prevMass4)) {
                     sequence = parts[1];
-                    id = accessionToIdMap.get(parts[2]);
+                    id = accessionToIdMap.getInt(parts[2]);
                     seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
                 } else {
                     writeMassToCsv(writer, prevMass4, seqIdsMap);
                     prevMass4 = mass4;
                     seqIdsMap.clear();
                     sequence = parts[1];
-                    id = accessionToIdMap.get(parts[2]);
+                    id = accessionToIdMap.getInt(parts[2]);
                     seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
                 }
             }

@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.wildfly.common.annotation.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

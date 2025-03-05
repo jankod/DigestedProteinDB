@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.google.common.base.Charsets;
 import hr.pbf.digestdb.model.FastaSeq;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -381,30 +380,5 @@ public class BioUtil {
         return list.subList(0, resultSize).toArray(result);
     }
 
-
-
-    public byte[] toBytes(int value) {
-        return ByteBuffer.allocate(4).putInt(value).array();
-    }
-
-    public int toInt(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).getInt();
-    }
-
-    public String toStringFromByte(byte[] b) {
-        return new String(b, Charsets.US_ASCII);
-    }
-
-    public byte[] toBytes(String s) {
-        return s.getBytes(Charsets.US_ASCII);
-    }
-
-    public byte[] toBytes(float f) {
-        return ByteBuffer.allocate(4).putFloat(f).array();
-    }
-
-    public float toFloat(byte[] bytes) {
-        return ByteBuffer.wrap(bytes).getFloat();
-    }
 
 }

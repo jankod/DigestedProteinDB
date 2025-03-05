@@ -92,7 +92,6 @@
                         throw new Error(`Server error: ${errorMessage}`);
                     }
                     this.results = await response.json();
-
                     this.results = JSON.stringify(this.results, null, 2);
                 } catch (error) {
                     console.error('Error:', error);
