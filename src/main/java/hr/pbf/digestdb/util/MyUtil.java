@@ -65,7 +65,7 @@ public class MyUtil {
         tableConfig.setCacheIndexAndFilterBlocks(true);
         tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
 
-        // Optimizacija za točkasto čitanje
+        //  Optimization for point read
         options.optimizeForPointLookup(32 * 1024 * 1024);
 
         options.setTableFormatConfig(tableConfig);
@@ -84,7 +84,7 @@ public class MyUtil {
         tableConfig.setCacheIndexAndFilterBlocks(true);
         tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
 
-        // Optimizacija za točkasto čitanje
+        // Optimization for point read
         // options.optimizeForPointLookup(32  * 1024 * 1024); // 512 MB block cache
 
         options.setTableFormatConfig(tableConfig);

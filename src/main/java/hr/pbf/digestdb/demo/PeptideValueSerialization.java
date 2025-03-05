@@ -1,7 +1,7 @@
 package hr.pbf.digestdb.demo;
 
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
-import hr.pbf.digestdb.util.AminoAcidCoder;
+import hr.pbf.digestdb.util.AminoAcid5bitCoder;
 import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,7 @@ public class PeptideValueSerialization {
                 String peptide = entry.getKey();
                 Set<Long> positions = entry.getValue();
 
-                byte[] peptideByteBuffer = AminoAcidCoder.encodePeptideByteBuffer(peptide);
+                byte[] peptideByteBuffer = AminoAcid5bitCoder.encodePeptide(peptide);
                 dos.writeInt(peptideByteBuffer.length);
                 //  dos.write(peptide.getBytes(StandardCharsets.US_ASCII));
                 dos.write(peptideByteBuffer);
@@ -54,7 +54,7 @@ public class PeptideValueSerialization {
             for (int i = 0; i < mapSize; i++) {
                 int peptideLength = dis.readInt();
                 // String peptide = new String(dis.readNBytes(peptideLength), 0, peptideLength, StandardCharsets.US_ASCII);
-                String peptide = AminoAcidCoder.decodePeptideByteBuffer(dis.readNBytes(peptideLength), peptideLength);
+                String peptide = AminoAcid5bitCoder.decodePeptide(dis.readNBytes(peptideLength), peptideLength);
 
                 int positionsSize = dis.readInt();
                 Set<Long> positions = new HashSet<>();

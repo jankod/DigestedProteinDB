@@ -1,4 +1,4 @@
-package hr.pbf.digestdb.workflow;
+package hr.pbf.digestdb.db;
 
 import hr.pbf.digestdb.exception.UnknownAminoacidException;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
@@ -18,8 +18,10 @@ import java.util.*;
 
 @Data
 @Slf4j
+@Deprecated
 public class MassRocksDb {
-    public static final String ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
+
+
 
     public String fromCsvPath = "";
     public String toDbPath = "";
@@ -85,7 +87,7 @@ public class MassRocksDb {
         }
         log.info("Done. Count diferent masses as key in rocksdb: " + countMasses);
         // get dir length
-        log.info("DB rockDB size "+ MyUtil.getDirSize(toDbPath));
+        //log.info("DB rockDB size "+ MyUtil.getDirSize(toDbPath));
 
     }
 

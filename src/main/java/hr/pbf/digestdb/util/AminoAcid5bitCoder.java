@@ -6,13 +6,12 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AminoAcidCoder {
+public class AminoAcid5bitCoder {
 
-    private static final Map<String, Integer> aminoAcidEncoding = new HashMap<>();
-    private static final Map<Integer, String> encodingToAminoAcid = new HashMap<>();
+    private static final Map<String, Integer> aminoAcidEncoding = new HashMap<>(22);
+    private static final Map<Integer, String> encodingToAminoAcid = new HashMap<>(22);
 
     static {
-        // Mapiranje aminokiselina na 5-bitne kodove (heksadecimalni prikaz radi lakšeg čitanja)
         aminoAcidEncoding.put("A", 0x0);
         aminoAcidEncoding.put("C", 0x1);
         aminoAcidEncoding.put("D", 0x2);
@@ -37,19 +36,19 @@ public class AminoAcidCoder {
         aminoAcidEncoding.put("O", 0x15); // Piroglutamat
 
 
-        // Obrnuto mapiranje za dekodiranje
+        // reverse mapping
         for (Map.Entry<String, Integer> entry : aminoAcidEncoding.entrySet()) {
             encodingToAminoAcid.put(entry.getValue(), entry.getKey());
         }
     }
 
-    public static byte[] encodePeptideByteBuffer(String sequence) throws UnknownAminoacidException {
-        ByteBuffer buffer = ByteBuffer.allocate((int) Math.ceil(sequence.length() * 5.0 / 8.0)); // Izračunaj veličinu byte arraya
+    public static byte[] encodePeptide(String sequence) throws UnknownAminoacidException {
+        ByteBuffer buffer = ByteBuffer.allocate((int) Math.ceil(sequence.length() * 5.0 / 8.0));
         int bitBuffer = 0;
         int bitCount = 0;
 
         for (int i = 0; i < sequence.length(); i++) {
-            String aminoAcid = String.valueOf(sequence.charAt(i)).toUpperCase(); // Pretvori u uppercase radi robusnosti
+            String aminoAcid = String.valueOf(sequence.charAt(i)).toUpperCase();
             Integer code = aminoAcidEncoding.get(aminoAcid);
             if (code == null) {
                 throw new UnknownAminoacidException(aminoAcid, sequence);
@@ -67,14 +66,14 @@ public class AminoAcidCoder {
         }
 
         if (bitCount > 0) {
-            buffer.put((byte) (bitBuffer << (8 - bitCount))); // Padding s nulama
+            buffer.put((byte) (bitBuffer << (8 - bitCount)));
         }
 
-        return buffer.flip().array(); // flip() za prebacivanje u read mode, array() za dobivanje byte arraya
+        return buffer.flip().array();
     }
 
 
-    public static String decodePeptideByteBuffer(byte[] encodedBytes, int peptideLength) {
+    public static String decodePeptide(byte[] encodedBytes, int peptideLength) {
         ByteBuffer buffer = ByteBuffer.wrap(encodedBytes);
         StringBuilder decodedSequence = new StringBuilder();
         int bitBuffer = 0;
@@ -90,7 +89,7 @@ public class AminoAcidCoder {
                 int code = (bitBuffer >> (bitCount - 5)) & 0x1F;
                 String aminoAcid = encodingToAminoAcid.get(code);
                 if (aminoAcid == null) {
-                    throw new IllegalArgumentException("Nepoznati 5-bitni kod: " + code);
+                    throw new IllegalArgumentException("Unknown amino acid: " + code);
                 }
                 decodedSequence.append(aminoAcid);
                 bitCount -= 5;
@@ -99,23 +98,6 @@ public class AminoAcidCoder {
             }
         }
         return decodedSequence.toString();
-    }
-
-
-    public static void main(String[] args) throws UnknownAminoacidException {
-        String peptideSequence = "ASELTGEKDLANSSLR";
-        byte[] encodedPeptideBytes = encodePeptideByteBuffer(peptideSequence);
-
-        System.out.println("Originalni peptid: " + peptideSequence.getBytes().length);
-        System.out.println("Encoded: " + encodedPeptideBytes.length);
-        System.out.println("Kodirani peptid (ByteBuffer - byte array): " + byteArrayToHexString(encodedPeptideBytes)); // Ispis u heksadecimalnom formatu za čitljivost
-        System.out.println("Dekodirani peptid: " + decodePeptideByteBuffer(encodedPeptideBytes, peptideSequence.length()));
-
-        String peptideSequence_longer = "LVFFAEDVGSNK";
-        byte[] encodedPeptideBytes_longer = encodePeptideByteBuffer(peptideSequence_longer);
-        System.out.println("\nOriginalni peptid (duži): " + peptideSequence_longer);
-        System.out.println("Kodirani peptid (ByteBuffer - byte array - duži): " + byteArrayToHexString(encodedPeptideBytes_longer));
-        System.out.println("Dekodirani peptid (duži): " + decodePeptideByteBuffer(encodedPeptideBytes_longer, peptideSequence_longer.length()));
     }
 
 

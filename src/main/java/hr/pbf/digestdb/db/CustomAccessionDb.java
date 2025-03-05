@@ -1,5 +1,7 @@
-package hr.pbf.digestdb.util;
+package hr.pbf.digestdb.db;
 
+import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
+import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -13,12 +15,14 @@ import java.util.List;
 
 /**
  * Create custom binary accession db from csv file. Csv file must be sorted by accession number (accNum, acc).
+ *
  */
 @Data
 @Slf4j
+@Deprecated()
 public class CustomAccessionDb {
 
-    public static final String CUSTOM_ACCESSION_DB_FILE_NAME = "custom_accession.db";
+
     private String fromCsvPath = "";
     private String toDbPath = "";
 
@@ -95,22 +99,19 @@ public class CustomAccessionDb {
     public List<String> startReadCsvToMap() throws IOException {
         BufferedReader reader = IOUtils.toBufferedReader(new FileReader(fromCsvPath));
         String line;
-        ArrayList<String> accMap = new ArrayList<>(100_000);
-        accMap.add("0"); // 0 index is empty
+        ArrayList<String> accList = new ArrayList<>(100_000);
+        accList.add("0"); // 0 index is empty
         while ((line = reader.readLine()) != null) {
             String[] parts = line.split(",");
             int accNum = Integer.parseInt(parts[0]);
-            if (accNum != accMap.size()) {
-                throw new RuntimeException("Acc num is not in order. Expected: " + accMap.size() + " but got: " + accNum);
+            if (accNum != accList.size()) {
+                throw new RuntimeException("Acc num is not in order. Expected: " + accList.size() + " but got: " + accNum);
             }
-//            if (accNum == 1) {
-//                log.debug("First acc 1: {}", parts[1]);
-//            }
             String acc = parts[1];
-            accMap.add(acc);
+            accList.add(acc);
         }
         reader.close();
-        return accMap;
+        return accList;
 
 
     }

@@ -1,5 +1,7 @@
 package hr.pbf.digestdb;
 
+import hr.pbf.digestdb.db.CustomAccessionDb;
+import hr.pbf.digestdb.db.MassRocksDbCreator;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
 import hr.pbf.digestdb.workflow.BashCommand;
@@ -13,8 +15,12 @@ import picocli.CommandLine;
 
 import java.io.File;
 
+
 @Slf4j
 public class AppWorkflow {
+
+    public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
+    public static final String DEFAULT_DB_FILE_NAME = "custom_accession.db";
 
     @Data
     static class ArgsParams {
@@ -40,12 +46,12 @@ public class AppWorkflow {
         final String GROUPED_WITH_IDS_CSV_PATH = DB_DIR_PATH + "/gen/grouped_with_ids.csv";
         final String ACCESSION_MAP_CSV_PATH = DB_DIR_PATH + "/gen/accession_map.csv";
         final String ACCESSION_MAP_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/accession_map.csv.sorted";
-        final String CUSTOM_ACCESSION_DB_DIR_PATH = DB_DIR_PATH + "/" + CustomAccessionDb.CUSTOM_ACCESSION_DB_FILE_NAME;
-        final String ROCKDB_DB_DIR_PATH = DB_DIR_PATH + "/" + MassRocksDb.ROCKSDB_MASS_DB_FILE_NAME;
+        final String CUSTOM_ACCESSION_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_DB_FILE_NAME;
+        final String ROCKDB_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_ROCKSDB_MASS_DB_FILE_NAME;
         final String TAX_ACC_CSV_PATH = DB_DIR_PATH + "/gen/tax_acc.csv";
         final String DB_INFO_PROPERTIES_PATH = DB_DIR_PATH + "/db_info.properties";
 
-        File genDir = new File(DB_DIR_PATH + "/gen");
+        File genDir = new File(DB_DIR_PATH + "/generated");
 
         // if args contain --clean
         if (params.isClean()) {
@@ -57,7 +63,7 @@ public class AppWorkflow {
         }
 
 
-        log.info("Start workflow, params  {}!", config);
+        log.info("Start create DB, params  {}!", config);
 
         FileUtils.forceMkdir(genDir);
 
@@ -77,7 +83,7 @@ public class AppWorkflow {
         }
 
         {
-            // 2. export TMPDIR=/disk4/janko/temp_dir # Stvorite ovaj direktorij ako ne postoji
+            // 2. export TMPDIR=.../temp_dir
             //    sort -t',' -k1n peptide_mass.csv -o peptide_mass_sorted_console.csv
             BashCommand app2CmdSortMass = new BashCommand();
 
@@ -135,11 +141,13 @@ public class AppWorkflow {
         }
 
         { // 5. Create rocksdb mass
-            MassRocksDb app4createMassRocksDb = new MassRocksDb();
+            //  MassRocksDb app4createMassRocksDb = new MassRocksDb();
+            MassRocksDbCreator massDb = new MassRocksDbCreator(GROUPED_WITH_IDS_CSV_PATH, ROCKDB_DB_DIR_PATH);
 
-            app4createMassRocksDb.setToDbPath(ROCKDB_DB_DIR_PATH);
-            app4createMassRocksDb.setFromCsvPath(GROUPED_WITH_IDS_CSV_PATH);
-            app4createMassRocksDb.start();
+            massDb.startCreate();
+            //app4createMassRocksDb.setToDbPath(ROCKDB_DB_DIR_PATH);
+//            app4createMassRocksDb.setFromCsvPath(GROUPED_WITH_IDS_CSV_PATH);
+//            app4createMassRocksDb.start();
             log.info("RockDB db is created: {}", ROCKDB_DB_DIR_PATH);
         }
 

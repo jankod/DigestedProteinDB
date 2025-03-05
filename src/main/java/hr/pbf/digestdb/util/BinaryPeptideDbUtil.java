@@ -13,12 +13,16 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Utility class for working with binary peptide databases.
+ * <b>It is not thread safe!</b>
+ *
+ */
 @Slf4j
 @UtilityClass
 public class BinaryPeptideDbUtil {
 
     private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 32); // 32MB, prilagodite po potrebi
-
 
     public void writeVarint(ByteBuffer buffer, int value) {
         while (value >= 128) {

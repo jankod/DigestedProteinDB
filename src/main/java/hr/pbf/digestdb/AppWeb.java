@@ -1,16 +1,15 @@
 package hr.pbf.digestdb;
 
+import hr.pbf.digestdb.db.AccessionDbReader;
+import hr.pbf.digestdb.db.MassRocksDbReader;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
-import hr.pbf.digestdb.util.CustomAccessionDb;
 import hr.pbf.digestdb.util.WorkflowConfig;
-import hr.pbf.digestdb.workflow.MassRocksDb;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 import io.javalin.rendering.FileRenderer;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import picocli.CommandLine;
 
@@ -18,7 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Data
@@ -41,8 +43,8 @@ public class AppWeb {
     public AppWeb(WebArgsParams params) {
         this.port = params.port;
         this.dbDir = params.dbDir;
-        setDbPath(getDbDir() + "/" + MassRocksDb.ROCKSDB_MASS_DB_FILE_NAME);
-        setAccDbPath(getDbDir() + "/" + CustomAccessionDb.CUSTOM_ACCESSION_DB_FILE_NAME);
+        setDbPath(getDbDir() + "/" + AppWorkflow.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
+        setAccDbPath(getDbDir() + "/" + AppWorkflow.DEFAULT_DB_FILE_NAME);
     }
 
 
@@ -59,12 +61,8 @@ public class AppWeb {
 
 
     public void startWeb() throws RocksDBException {
-        MassRocksDb db = new MassRocksDb();
-        db.setToDbPath(dbPath);
-        RocksDB massRocksDb = db.openReadDB();
-        CustomAccessionDb accDb = new CustomAccessionDb();
-        accDb.setToDbPath(accDbPath);
-        accDb.loadDb();
+        MassRocksDbReader massDb = new MassRocksDbReader(dbPath);
+        AccessionDbReader accDb = new AccessionDbReader(accDbPath);
 
         var app = Javalin.create(config -> {
                   config.fileRenderer(new FileRenderer() {
@@ -112,14 +110,16 @@ public class AppWeb {
                 return;
             }
 
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries = db.searchByMass(massRocksDb, mass1, mass2);
-            ctx.json(new MassResult(entries, accDb));
+            //  List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries = db.searchByMass(massRocksDb, mass1, mass2);
+            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass1, mass2);
+            ctx.json(new MassResult(result, accDb));
 
         });
 
         app.events(eventConfig -> {
             eventConfig.serverStopping(() -> {
-                massRocksDb.close();
+                massDb.close();
+                // massRocksDb.close();
             });
         });
         log.info("Web started on {}", "http://localhost:" + port);
@@ -133,7 +133,7 @@ class MassResult {
 
     List<SeqAcc> results;
 
-    public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, CustomAccessionDb accDb) {
+    public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, AccessionDbReader accDb) {
         results = new ArrayList<>(entries.size());
         totalResult = entries.size();
 
@@ -146,8 +146,8 @@ class MassResult {
                 sa.acc = new ArrayList<>(accessionsNum.length);
                 sa.seq = peptide.getSeq();
                 for (int accNum : accessionsNum) {
-                    String accStr = accDb.getAcc(accNum);
-                    sa.acc.add(accStr);
+                    String accession = accDb.getAccession(accNum);
+                    sa.acc.add(accession);
                 }
                 results.add(sa);
             }

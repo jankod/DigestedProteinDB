@@ -9,7 +9,8 @@ public class MyFormatter {
 
     private final String template;
 
-    private Map<String, String> params = new HashMap<>();
+    private final Map<String, String> params = new HashMap<>();
+
     public MyFormatter(String template) {
         this.template = template;
     }
@@ -23,6 +24,12 @@ public class MyFormatter {
         return sub.replace(template);
     }
 
+    /**
+     * Format string with parameters, odd number of parameters is not allowed.
+     * Use StringSubstitutor.
+     * @param template template string with parameters in form of {key}.
+     * @param paramValue array of key, value pairs.
+     */
     public static String format(String template, String... paramValue) {
         Map<String, String> map = new HashMap<>();
         for (int i = 0; i < paramValue.length; i++) {
