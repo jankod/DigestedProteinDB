@@ -27,6 +27,7 @@ public class JobUniprotToPeptideCsv {
     public String resultTaxAccCsvPath = "";
 
     public String fromSwisprotPath = "";
+
     public long maxProteinCount = Long.MAX_VALUE - 1;
     public int minPeptideLength = 0;
     public int maxPeptideLength = 0;

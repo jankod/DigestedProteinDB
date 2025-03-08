@@ -41,6 +41,7 @@ public class CreateDatabaseApp {
 
         StopWatch watch = StopWatch.createStarted();
         final String DB_DIR_PATH = config.getDbDir();
+
         final String PEPTIDE_MASS_CSV_PATH = DB_DIR_PATH + "/gen/peptide_mass.csv";
         final String PEPTIDE_MASS_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/peptide_mass_sorted.csv";
         final String GROUPED_WITH_IDS_CSV_PATH = DB_DIR_PATH + "/gen/grouped_with_ids.csv";
@@ -51,7 +52,7 @@ public class CreateDatabaseApp {
         final String TAX_ACC_CSV_PATH = DB_DIR_PATH + "/gen/tax_acc.csv";
         final String DB_INFO_PROPERTIES_PATH = DB_DIR_PATH + "/db_info.properties";
 
-        File genDir = new File(DB_DIR_PATH + "/generated");
+        File genDir = new File(DB_DIR_PATH + "/gen");
 
         // if args contain --clean
         if (params.isClean()) {
@@ -62,19 +63,17 @@ public class CreateDatabaseApp {
             FileUtils.deleteQuietly(new File(DB_INFO_PROPERTIES_PATH));
         }
 
-
         log.info("Start create DB, params  {}!", config);
 
         FileUtils.forceMkdir(genDir);
-
-        //  JobLancher jobLancher = new JobLancher();
 
         {            // 1. Uniprot xml to CSV
             JobUniprotToPeptideCsv app1UniprotToCsv = new JobUniprotToPeptideCsv();
             app1UniprotToCsv.minPeptideLength = config.getMinPeptideLength();
             app1UniprotToCsv.maxPeptideLength = config.getMaxPeptideLength();
-            app1UniprotToCsv.fromSwisprotPath = config.toUniprotXmlFullPath();
             app1UniprotToCsv.missClevage = config.getMissCleavage();
+            app1UniprotToCsv.fromSwisprotPath = config.toUniprotXmlFullPath();
+
             app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
             app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
             //  JobResult<JobUniprotToPeptideCsv.Result> result = jobLancher.run(app1UniprotToCsv);
@@ -145,9 +144,6 @@ public class CreateDatabaseApp {
             MassRocksDbCreator massDb = new MassRocksDbCreator(GROUPED_WITH_IDS_CSV_PATH, ROCKDB_DB_DIR_PATH);
 
             massDb.startCreate();
-            //app4createMassRocksDb.setToDbPath(ROCKDB_DB_DIR_PATH);
-//            app4createMassRocksDb.setFromCsvPath(GROUPED_WITH_IDS_CSV_PATH);
-//            app4createMassRocksDb.start();
             log.info("RockDB db is created: {}", ROCKDB_DB_DIR_PATH);
         }
 
@@ -158,7 +154,6 @@ public class CreateDatabaseApp {
         }
 
         { // 7. Properties
-
             config.saveDbInfoToProperties(0, DB_INFO_PROPERTIES_PATH);
         }
 

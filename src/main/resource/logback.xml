@@ -24,6 +24,7 @@
         <logger name="ch.qos.logback" level="WARN"/>
 
     <logger name="hr" level="DEBUG"/>
+    <logger name="org.xnio.nio" level="INFO"/>
 
 
     <root level="WARN">

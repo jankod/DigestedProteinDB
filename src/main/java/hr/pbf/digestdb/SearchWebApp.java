@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hr.pbf.digestdb.db.AccessionDbReader;
 import hr.pbf.digestdb.db.MassRocksDbReader;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
+import hr.pbf.digestdb.util.BioUtil;
+import hr.pbf.digestdb.util.MyStopWatch;
 import hr.pbf.digestdb.util.WorkflowConfig;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
@@ -19,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 import picocli.CommandLine;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -56,25 +57,33 @@ public class SearchWebApp {
         new CommandLine(params).parseArgs(args);
 
         SearchWebApp app = new SearchWebApp(params);
-        log.debug("current dir: " + new File(".").getAbsoluteFile());
+        log.debug("Start web on port: " + app.getPort() + " db dir: " + app.getDbDir());
         app.startWeb();
     }
 
     public void startWeb() throws RocksDBException {
         try {
+            long startTime = System.currentTimeMillis();
+
+            log.info("Initializing database...");
+
             massDb = new MassRocksDbReader(dbPath);
             accDb = new AccessionDbReader(accDbPath);
+            log.info("Database initialized in {} ms", System.currentTimeMillis() - startTime);
+
 
             // Resource handler for static files
             ResourceHandler resourceHandler = new ResourceHandler(
-                  new ClassPathResourceManager(getClass().getClassLoader(), "web"))
+                  new ClassPathResourceManager(getClass().getClassLoader(), "web/"))
                   .setWelcomeFiles("index.html");
 
             // Create paths
             PathHandler pathHandler = new PathHandler()
                   .addPrefixPath("/", resourceHandler)
                   .addExactPath("/db-info", this::handleDbInfo)
-                  .addExactPath("/search", this::handleSearch);
+                  .addExactPath("/search", this::handleSearch)
+                  .addExactPath("/search-peptide", this::handleBySearch);
+
 
             // Build and start server
             server = Undertow.builder()
@@ -92,6 +101,44 @@ public class SearchWebApp {
             log.error("Error starting web server", e);
             shutdown();
         }
+    }
+
+    private void handleBySearch(HttpServerExchange http) {
+        if (http.isInIoThread()) {
+            http.dispatch(this::handleBySearch);
+            return;
+        }
+
+        Map<String, String> params = createParam(http);
+
+        try {
+            String peptide = params.getOrDefault("peptide", "");
+            if (peptide.isEmpty()) {
+                sendJsonResponse(http, StatusCodes.BAD_REQUEST,
+                      "{\"error\": \"Peptide is required\"}");
+                return;
+            }
+            double mass = BioUtil.calculateMassWidthH2O(peptide);
+            MyStopWatch watch = new MyStopWatch();
+            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass, mass);
+            long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            String memory = l / 1024 / 1024 + " MB";
+            MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + " Memory used: " + memory);
+            sendJsonResponse(http, StatusCodes.OK, toJson(massResult));
+        } catch (Exception e) {
+            sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
+                  "{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    private static Map<String, String> createParam(HttpServerExchange http) {
+        Map<String, String> params = new HashMap<>();
+        http.getQueryParameters().forEach((key, value) -> {
+            if (!value.isEmpty()) {
+                params.put(key, value.getFirst());
+            }
+        });
+        return params;
     }
 
     private void handleDbInfo(HttpServerExchange exchange) throws IOException {
@@ -115,12 +162,7 @@ public class SearchWebApp {
             return;
         }
 
-        Map<String, String> params = new HashMap<>();
-        exchange.getQueryParameters().forEach((key, value) -> {
-            if (!value.isEmpty()) {
-                params.put(key, value.getFirst());
-            }
-        });
+        Map<String, String> params = createParam(exchange);
 
         try {
             double mass1 = Double.parseDouble(params.getOrDefault("mass1", "0"));
@@ -137,9 +179,12 @@ public class SearchWebApp {
                       "{\"error\": \"Mass1 and Mass2 must be close 1 Da\"}");
                 return;
             }
-
+            MyStopWatch watch = new MyStopWatch();
             List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass1, mass2);
-            MassResult massResult = new MassResult(result, accDb);
+            long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            String memory = l / 1024 / 1024 + " MB";
+            MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + ", Memory used: " + memory);
+
             sendJsonResponse(exchange, StatusCodes.OK, toJson(massResult));
         } catch (NumberFormatException e) {
             sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
@@ -182,12 +227,14 @@ public class SearchWebApp {
 @Data
 class MassResult {
     int totalResult = 0;
+    String duration = "";
 
     List<SeqAcc> results;
 
-    public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, AccessionDbReader accDb) {
+    public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, AccessionDbReader accDb, String currentDuration) {
         results = new ArrayList<>(entries.size());
         totalResult = entries.size();
+        duration = currentDuration;
 
         entries.forEach(e -> {
             Set<BinaryPeptideDbUtil.PeptideAcc> peptides = e.getValue();
