@@ -37,6 +37,8 @@ public class SearchWebApp {
     private MassRocksDbReader massDb;
     private AccessionDbReader accDb;
 
+    private WorkflowConfig config;
+
     public static class WebArgsParams {
         @CommandLine.Option(names = {"-p", "--port"}, description = "Port", required = true, defaultValue = "7070")
         int port;
@@ -45,14 +47,15 @@ public class SearchWebApp {
         String dbDir;
     }
 
-    public SearchWebApp(WebArgsParams params) {
+    public SearchWebApp(WebArgsParams params) throws IOException {
         this.port = params.port;
         this.dbDir = params.dbDir;
         setDbPath(getDbDir() + "/" + CreateDatabaseApp.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
         setAccDbPath(getDbDir() + "/" + CreateDatabaseApp.DEFAULT_DB_FILE_NAME);
+        config = new WorkflowConfig(dbDir);
     }
 
-    public static void main(String[] args) throws RocksDBException {
+    public static void main(String[] args) throws RocksDBException, IOException {
         WebArgsParams params = new WebArgsParams();
         new CommandLine(params).parseArgs(args);
 
@@ -73,13 +76,13 @@ public class SearchWebApp {
 
 
             // Resource handler for static files
-            ResourceHandler resourceHandler = new ResourceHandler(
-                  new ClassPathResourceManager(getClass().getClassLoader(), "web/"))
+            ResourceHandler homeHtmlPageHandler = new ResourceHandler(
+                  new ClassPathResourceManager(getClass().getClassLoader(), "web"))
                   .setWelcomeFiles("index.html");
 
             // Create paths
             PathHandler pathHandler = new PathHandler()
-                  .addPrefixPath("/", resourceHandler)
+                  .addPrefixPath("/", homeHtmlPageHandler)
                   .addExactPath("/db-info", this::handleDbInfo)
                   .addExactPath("/search", this::handleSearch)
                   .addExactPath("/search-peptide", this::handleBySearch);
@@ -148,7 +151,7 @@ public class SearchWebApp {
         }
 
         try {
-            WorkflowConfig config = new WorkflowConfig(dbDir);
+
             sendJsonResponse(exchange, StatusCodes.OK, toJson(config.getDbInfo()));
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
