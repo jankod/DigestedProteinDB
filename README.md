@@ -4,7 +4,7 @@
 
 This is a Java library for creating and searching a digested peptide database with RocksDB key-value store.
 Digested peptides are generated from protein sequences using a specific enzyme (e.g., trypsin) and are stored in a
-database for rapid mass-based searches. The library is designed to be efficient and easy to use, with a focus on
+database for rapid mass-based searches. This library is designed to be efficient and easy to use, with a focus on
 performance.
 The database is designed to be a compact and efficient storage of in-silico digested peptides. The primary goal is to
 support rapid mass-based searches, even on less powerful desktop machines.
