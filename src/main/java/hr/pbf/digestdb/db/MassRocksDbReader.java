@@ -28,24 +28,29 @@ public class MassRocksDbReader implements AutoCloseable {
         }
     }
 
-    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchByMass(double mass1, double mass2) {
-
+    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchByMass(double mass1, double mass2, int page, int pageSize) {
         List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results = new ArrayList<>();
-
         int mass1Int = (int) Math.round(mass1 * 10_000);
+        int count = 0;
+        int start = (page - 1) * pageSize;
+        int end = page * pageSize;
 
         RocksIterator it = db.newIterator();
         it.seek(MyUtil.intToByteArray(mass1Int));
+
         while (it.isValid()) {
             int massInt = MyUtil.byteArrayToInt(it.key());
             double keyMass = massInt / 10_000.0;
-            Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+
             if (keyMass > mass2) {
                 break;
             }
-            results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
 
-
+            if (count >= start && count < end) {
+                Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+                results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
+            }
+            count++;
             it.next();
         }
 

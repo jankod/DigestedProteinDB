@@ -97,9 +97,9 @@ public class BinaryPeptideDbUtil {
             // Kreiranje PeptideAcc objekta i dodavanje u listu
             PeptideAcc acc = new PeptideAcc();
             acc.seq = sequence;
-            acc.accessions = new int[accessions.size()];
+            acc.acc = new int[accessions.size()];
             for (int i = 0; i < accessions.size(); i++) {
-                acc.accessions[i] = accessions.get(i);
+                acc.acc[i] = accessions.get(i);
             }
             peptides.add(acc);
         }
@@ -155,7 +155,7 @@ public class BinaryPeptideDbUtil {
     @Data
     public static class PeptideAcc implements Comparable<PeptideAcc> {
         String seq;
-        int[] accessions;
+        int[] acc;
 
         @Override
         public int compareTo(@NotNull PeptideAcc o) {
@@ -167,7 +167,7 @@ public class BinaryPeptideDbUtil {
 
         @Override
         public String toString() {
-            return seq + " " + Arrays.toString(accessions);
+            return seq + " " + Arrays.toString(acc);
         }
     }
 

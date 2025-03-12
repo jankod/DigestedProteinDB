@@ -121,13 +121,12 @@ public class SearchWebApp {
                       "{\"error\": \"Peptide is required\"}");
                 return;
             }
-            double mass = BioUtil.calculateMassWidthH2O(peptide);
-            MyStopWatch watch = new MyStopWatch();
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass, mass);
-            long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-            String memory = l / 1024 / 1024 + " MB";
-            MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + " Memory used: " + memory);
-            sendJsonResponse(http, StatusCodes.OK, toJson(massResult));
+            double mass1 = BioUtil.calculateMassWidthH2O(peptide);
+            double mass2 = mass1;
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "1000"));
+
+           searchByMass(http, mass1, mass2, page, pageSize);
         } catch (Exception e) {
             sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
                   "{\"error\": \"" + e.getMessage() + "\"}");
@@ -171,30 +170,60 @@ public class SearchWebApp {
             double mass1 = Double.parseDouble(params.getOrDefault("mass1", "0"));
             double mass2 = Double.parseDouble(params.getOrDefault("mass2", "0"));
 
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "1000"));
+
             if (mass1 == 0 || mass2 == 0) {
                 sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
                       "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
                 return;
             }
 
-            if (Math.abs(mass1 - mass2) > 1) {
-                sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-                      "{\"error\": \"Mass1 and Mass2 must be close 1 Da\"}");
-                return;
-            }
-            MyStopWatch watch = new MyStopWatch();
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass1, mass2);
-            long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-            String memory = l / 1024 / 1024 + " MB";
-            MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + ", Memory used: " + memory);
+//            if (Math.abs(mass1 - mass2) > 100) {
+//                sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
+//                      "{\"error\": \"Mass1 and Mass2 must be close 100 Da\"}");
+//                return;
+//            }
+            searchByMass(exchange, mass1, mass2, page, pageSize);
 
-            sendJsonResponse(exchange, StatusCodes.OK, toJson(massResult));
         } catch (NumberFormatException e) {
             sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
                   "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
                   "{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
+        MyStopWatch watch = new MyStopWatch();
+        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass1, mass2, page, pageSize);
+        long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        String memory = l / 1024 / 1024 + " MB";
+        //MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + ", Memory used: " + memory);
+
+        //sendJsonResponse(exchange, StatusCodes.OK, toJson(massResult));
+        PageResult pageResult = new PageResult(result.size(), result, memory, watch.getCurrentDuration());
+        String jsonResult = toJson(pageResult);
+    //    exchange.getResponseHeaders().put(HttpString.tryFromString("Access-Control-Expose-Headers"), "X-memory, X-duration");
+      //  exchange.getResponseHeaders().put(HttpString.tryFromString("X-memory"), memory);
+       // exchange.getResponseHeaders().put(HttpString.tryFromString("X-duration"), watch.getCurrentDuration());
+        sendJsonResponse(exchange, StatusCodes.OK, jsonResult);
+    }
+
+    @Data
+    static
+    class PageResult {
+        private final int totalResult;
+        private final String memory;
+        private final String duration;
+        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result;
+
+        public PageResult(int totalResult, List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result, String memory, String currentDuration) {
+            this.totalResult = totalResult;
+            this.result = result;
+            this.memory = memory;
+            this.duration = currentDuration;
         }
     }
 
@@ -244,7 +273,7 @@ class MassResult {
             for (BinaryPeptideDbUtil.PeptideAcc peptide : peptides) {
                 SeqAcc sa = new SeqAcc();
                 sa.mass = e.getKey();
-                int[] accessionsNum = peptide.getAccessions();
+                int[] accessionsNum = peptide.getAcc();
                 sa.acc = new ArrayList<>(accessionsNum.length);
                 sa.seq = peptide.getSeq();
                 for (int accNum : accessionsNum) {

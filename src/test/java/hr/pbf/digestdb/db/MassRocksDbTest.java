@@ -78,7 +78,7 @@ class MassRocksDbTest {
                     Set<BinaryPeptideDbUtil.PeptideAcc> valuePeptide = result3.getFirst().getValue();
                     assertEquals(1, valuePeptide.size());
                     assertEquals("AGGGGPK", valuePeptide.iterator().next().getSeq());
-                    assertArrayEquals(new int[]{29}, valuePeptide.iterator().next().getAccessions());
+                    assertArrayEquals(new int[]{29}, valuePeptide.iterator().next().getAcc());
                     assertEquals(542.2813, key542_2813, 0.0001);
                 }
                 {
@@ -101,12 +101,12 @@ class MassRocksDbTest {
 
 
                     pepAccFirstSet.forEach(pepAcc -> {;
-                        log.debug("seq: " + pepAcc.getSeq() + " acc: " + Arrays.toString(pepAcc.getAccessions()));
+                        log.debug("seq: " + pepAcc.getSeq() + " acc: " + Arrays.toString(pepAcc.getAcc()));
 
                         switch (pepAcc.getSeq()) {
-                            case "GAGAGGR" -> assertArrayEquals(new int[]{34}, pepAcc.getAccessions());
-                            case "AAGGGGR" -> assertArrayEquals(new int[]{33}, pepAcc.getAccessions());
-                            case "RAGGGAG" -> assertArrayEquals(new int[]{35}, pepAcc.getAccessions());
+                            case "GAGAGGR" -> assertArrayEquals(new int[]{34}, pepAcc.getAcc());
+                            case "AAGGGGR" -> assertArrayEquals(new int[]{33}, pepAcc.getAcc());
+                            case "RAGGGAG" -> assertArrayEquals(new int[]{35}, pepAcc.getAcc());
                             default -> fail("Unexpected peptide sequence: " + pepAcc.getSeq());
                         }
                     });
@@ -118,9 +118,9 @@ class MassRocksDbTest {
                     pepAccSecondSet.getValue().forEach(pepAcc -> {
 
                         switch (pepAcc.getSeq()) {
-                            case "GGAGAGR" -> assertArrayEquals(new int[]{39, 38, 37, 36}, pepAcc.getAccessions());
-                            case "GGAGGAR" -> assertArrayEquals(new int[]{40}, pepAcc.getAccessions());
-                            case "GGGGAAR" -> assertArrayEquals(new int[]{41}, pepAcc.getAccessions());
+                            case "GGAGAGR" -> assertArrayEquals(new int[]{39, 38, 37, 36}, pepAcc.getAcc());
+                            case "GGAGGAR" -> assertArrayEquals(new int[]{40}, pepAcc.getAcc());
+                            case "GGGGAAR" -> assertArrayEquals(new int[]{41}, pepAcc.getAcc());
                             default -> fail("Unexpected peptide sequence: " + pepAcc.getSeq());
                         }
                     });

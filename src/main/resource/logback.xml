@@ -25,7 +25,7 @@
 
     <logger name="hr" level="DEBUG"/>
     <logger name="org.xnio.nio" level="INFO"/>
-
+    <logger name="io.undertow" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
