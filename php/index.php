@@ -28,14 +28,14 @@
             <div class="row">
                 <div class="col">
                     <h3>Search by mass</h3>
-                    <form @submit.prevent="search">
+                    <form @submit.prevent="searchNew">
                         <div class="mb-3">
-                            <label for="mass1" class="form-label">Mass from</label>
+                            <label for="mass1" class="form-label">Mass from (Da)</label>
                             <input x-model="mass1" type="text" class="form-control" id="mass1" name="mass1" required
                                    value="1500.6">
                         </div>
                         <div class="mb-3">
-                            <label for="mass2" class="form-label">Mass to</label>
+                            <label for="mass2" class="form-label">Mass to (Da)</label>
                             <input x-model="mass2" type="text" class="form-control" id="mass2" name="mass2" required
                                    value="1500.8">
                         </div>
@@ -47,8 +47,6 @@
                 </div>
 
                 <div class="col">
-
-
                     <h3>Search by sequence</h3>
                     <form method="get" @submit.prevent="search">
                         <div class="mb-3">
@@ -197,6 +195,11 @@
 
             pageChanged() {
                 this.currentPage = 1; // Reset to first page when changing page size
+                this.search();
+            },
+
+            searchNew() {
+                this.currentPage = 1;
                 this.search();
             },
 

@@ -126,7 +126,7 @@ public class SearchWebApp {
             int page = Integer.parseInt(params.getOrDefault("page", "1"));
             int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "1000"));
 
-           searchByMass(http, mass1, mass2, page, pageSize);
+            searchByMass(http, mass1, mass2, page, pageSize);
         } catch (Exception e) {
             sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
                   "{\"error\": \"" + e.getMessage() + "\"}");
@@ -195,7 +195,7 @@ public class SearchWebApp {
         }
     }
 
-    private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
+    synchronized private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
         MyStopWatch watch = new MyStopWatch();
         MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
         long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
