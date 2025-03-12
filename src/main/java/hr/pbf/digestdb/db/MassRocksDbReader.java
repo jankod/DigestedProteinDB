@@ -52,6 +52,7 @@ public class MassRocksDbReader implements AutoCloseable {
 
             if (count >= start && count < end) {
                 Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+
                 results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
             }
             count++;

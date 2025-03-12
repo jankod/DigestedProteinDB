@@ -19,6 +19,7 @@ import io.undertow.util.StatusCodes;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
+import org.wildfly.common.annotation.NotNull;
 import picocli.CommandLine;
 
 import java.io.IOException;
@@ -200,9 +201,61 @@ public class SearchWebApp {
         MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
         long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         String memory = l / 1024 / 1024 + " MB";
-        PageResult pageResult = new PageResult(result.getTotalCount(), result.getResults(), memory, watch.getCurrentDuration(), page, pageSize);
+        PageResult pageResult = new PageResult(result.getTotalCount(), toAccession(result.getResults()), memory, watch.getCurrentDuration(), page, pageSize);
         String jsonResult = toJson(pageResult);
         sendJsonResponse(exchange, StatusCodes.OK, jsonResult);
+    }
+
+    private List<Map.Entry<Double, Set<PeptideAccText>>> toAccession(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results) {
+        List<Map.Entry<Double, Set<PeptideAccText>>> result = new ArrayList<>(results.size());
+        for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> e : results) {
+            Set<PeptideAccText> peptides = new HashSet<>();
+            for (BinaryPeptideDbUtil.PeptideAcc acc : e.getValue()) {
+                PeptideAccText accText = new PeptideAccText();
+                accText.setSeq(acc.getSeq());
+                String[] accs = new String[acc.getAcc().length];
+                for (int i = 0; i < acc.getAcc().length; i++) {
+                    accs[i] = getAccDb().getAccession(acc.getAcc()[i]);
+                }
+                accText.setAcc(accs);
+                peptides.add(accText);
+            }
+            result.add(new AbstractMap.SimpleEntry<>(e.getKey(), peptides));
+        }
+        return result;
+    }
+
+
+    @Data
+    public static class PeptideAccText implements Comparable<BinaryPeptideDbUtil.PeptideAcc> {
+        private String seq;
+        private String[] acc;
+
+        @Override
+        public int compareTo(@NotNull BinaryPeptideDbUtil.PeptideAcc o) {
+            if (seq.equals(o.getSeq())) {
+                return 0;
+            }
+            return seq.compareTo(o.getSeq());
+        }
+
+        @Override
+        public String toString() {
+            return seq + " " + Arrays.toString(acc);
+        }
+
+
+        public int hashCode() {
+            return seq.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+
+            return Objects.equals(seq, ((PeptideAccText) obj).seq);
+        }
     }
 
     @Data
@@ -213,9 +266,9 @@ public class SearchWebApp {
         private final String duration;
         private final int page;
         private final int pageSize;
-        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result;
+        private final List<Map.Entry<Double, Set<PeptideAccText>>> result;
 
-        public PageResult(int totalResult, List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result, String memory, String currentDuration, int page, int pageSize) {
+        public PageResult(int totalResult, List<Map.Entry<Double, Set<PeptideAccText>>> result, String memory, String currentDuration, int page, int pageSize) {
             this.totalResult = totalResult;
             this.result = result;
             this.memory = memory;
@@ -231,7 +284,7 @@ public class SearchWebApp {
         exchange.getResponseSender().send(response);
     }
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String toJson(Object obj) {
         try {

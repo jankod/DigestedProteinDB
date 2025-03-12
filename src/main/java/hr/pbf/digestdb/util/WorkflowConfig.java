@@ -76,7 +76,6 @@ public class WorkflowConfig {
 
     public void saveDbInfoToProperties(long proteinCount, String dbInfoPropertiesPath) {
         Properties prop = new Properties();
-
         prop.setProperty("uniprot_xml_path", toUniprotXmlFullPath());
         prop.setProperty("min_peptide_length", String.valueOf(getMinPeptideLength()));
         prop.setProperty("max_peptide_length", String.valueOf(getMaxPeptideLength()));

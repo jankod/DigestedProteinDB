@@ -14,17 +14,33 @@
 <div class="container" x-data="searchData()">
     <div class="row">
         <div class="col">
-            <h3>Database info </h3>
-            <div x-show="dbInfo">
-                <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
-                <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
-                <p class="mb-1"><strong>Min Peptide Length:</strong> <span x-text="dbInfo.min_peptide_length"></span>
-                </p>
-                <p class="mb-1"><strong>Max Peptide Length:</strong> <span x-text="dbInfo.max_peptide_length"></span>
-                </p>
-                <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span></p>
-                <p class="mb-3"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
+
+            <div class="container">
+                <div class="row align-items-start">
+                    <div class="col">
+                        <h3>Database info </h3>
+                        <div x-show="dbInfo">
+                            <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
+                            <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span>
+                            </p>
+                            <p class="mb-1"><strong>Min Peptide Length:</strong> <span
+                                        x-text="dbInfo.min_peptide_length"></span>
+                            </p>
+                            <p class="mb-1"><strong>Max Peptide Length:</strong> <span
+                                        x-text="dbInfo.max_peptide_length"></span>
+                            </p>
+                            <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span>
+                            </p>
+                            <p class="mb-1"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
+                            <p class="mb-3"><strong>DB size:</strong> <span x-text="dbInfo.db_size"></span></p>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
+
+
             <div class="row">
                 <div class="col">
                     <h3>Search by mass</h3>
@@ -51,13 +67,16 @@
                     <form method="get" @submit.prevent="search">
                         <div class="mb-3">
                             <label for="sequence" class="form-label">Sequence</label>
-                            <input x-model="peptideSequence" @input="calculatePeptideMass" type="text" class="form-control" id="sequence" name="sequence" >
+                            <input x-model="peptideSequence" @input="calculatePeptideMass" type="text"
+                                   class="form-control" id="sequence" name="sequence">
                         </div>
                     </form>
 
                 </div>
             </div>
         </div>
+
+
     </div>
 
     <!-- Improved Pagination Section -->
@@ -66,14 +85,11 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                        <div class="badge bg-success text-white ">
-                            <span>Total: <span x-text="totalItems"></span> results</span>
-                        </div>
-
                         <nav aria-label="Page navigation">
                             <ul class="pagination m-0">
                                 <li class="page-item" :class="{ 'disabled': currentPage <= 1 }">
-                                    <a class="page-link" href="#" @click.prevent="currentPage > 1 && goToPage(currentPage - 1)">&laquo;</a>
+                                    <a class="page-link" href="#"
+                                       @click.prevent="currentPage > 1 && goToPage(currentPage - 1)">&laquo;</a>
                                 </li>
 
                                 <template x-for="p in getPaginationRange()" :key="p">
@@ -83,14 +99,16 @@
                                 </template>
 
                                 <li class="page-item" :class="{ 'disabled': currentPage >= totalPages }">
-                                    <a class="page-link" href="#" @click.prevent="currentPage < totalPages && goToPage(currentPage + 1)">&raquo;</a>
+                                    <a class="page-link" href="#"
+                                       @click.prevent="currentPage < totalPages && goToPage(currentPage + 1)">&raquo;</a>
                                 </li>
                             </ul>
                         </nav>
 
                         <div class="d-flex align-items-center">
                             <label class="me-2 mb-0">Items per page:</label>
-                            <select class="form-select form-select-sm" style="width: 100px;" x-model.number="pageSize" @change="pageChanged()">
+                            <select class="form-select form-select-sm" style="width: 100px;" x-model.number="pageSize"
+                                    @change="pageChanged()">
                                 <option>100</option>
                                 <option>200</option>
                                 <option>500</option>
@@ -99,9 +117,21 @@
                         </div>
                     </div>
 
-                    <div class="text-muted text-center mt-2">
+
+                    <div class="text-muted text-left mt-2">
                         <small>Page <span x-text="currentPage"></span> of <span x-text="totalPages"></span></small>
                     </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="badge bg-success text-white">
+                    <span>Total: <span x-text="totalItems"></span> results</span>
+                </div>
+                <div class="badge bg-success text-white">
+                    <div>Response JSON Size: <span x-text="responseSize"></span></div>
                 </div>
             </div>
         </div>
@@ -111,9 +141,25 @@
         <div class="col">
             <h2>Results</h2>
             <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
-
             <pre x-text="results"></pre>
+        </div>
+    </div>
 
+    <div class="row mt-4 mb-4">
+        <h4>Contact</h4>
+        <div class="text-body-secondary">
+            Contact: <a href="mailto:jdiminic@pbf.hr">jdiminic@pbf.hr</a>
+            <br>
+            <span>
+                Bioinformatics Laboratory,
+                Faculty of Food Technology and Biotechnology,
+                University of Zagreb, Croatia
+                <a href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
+                   class="btn-link link-underline" target="_blank">
+                    PBF
+                </a>
+
+            </span>
         </div>
     </div>
 </div>
@@ -137,6 +183,8 @@
             pageSize: 10,
             totalItems: 0,
             totalPages: 0,
+
+            responseSize: "",
 
             async init() {
                 try {
@@ -210,13 +258,27 @@
                     const url = `/search.php?mass1=${this.mass1}&mass2=${this.mass2}&page=${this.currentPage}&pageSize=${this.pageSize}`;
                     const response = await fetch(url);
 
-
                     if (!response.ok) {
-                        const errorMessage = await response.text(); // Read error from response
+                        const errorMessage = await response.text();
+
+
                         throw new Error(`Server error: ${errorMessage}`);
                     }
 
-                    const data = await response.json();
+                    const responseText = await response.text();
+
+
+                    const sizeInKB = responseText.length / 1024;
+                    if (sizeInKB < 1000) {
+                        this.responseSize = sizeInKB.toFixed(2) + " KB";
+                    } else {
+                        this.responseSize = (sizeInKB / 1024).toFixed(2) + " MB";
+                    }
+
+                    //  this.responseSizeInMB = (responseText.length / (1024 * 1024)).toFixed(2) + " MB";
+
+
+                    const data = JSON.parse(responseText);
 
                     this.totalItems = data.totalResult || 0;
                     //this.totalPages = data.totalPages || 1;
@@ -231,7 +293,7 @@
                     this.results = `Error: ${error.message}`;
                     this.error = error.message;
 
-                    this.totalPages =0;
+                    this.totalPages = 0;
                     this.results = [];
                 } finally {
                     this.loading = false;

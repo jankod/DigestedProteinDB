@@ -16,7 +16,6 @@ import java.util.*;
 /**
  * Utility class for working with binary peptide databases.
  * <b>It is not thread safe!</b>
- *
  */
 @Slf4j
 @UtilityClass
@@ -170,5 +169,7 @@ public class BinaryPeptideDbUtil {
             return seq + " " + Arrays.toString(acc);
         }
     }
+
+
 
 }
