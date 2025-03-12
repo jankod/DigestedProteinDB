@@ -197,17 +197,11 @@ public class SearchWebApp {
 
     private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
         MyStopWatch watch = new MyStopWatch();
-        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result = massDb.searchByMass(mass1, mass2, page, pageSize);
+        MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
         long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         String memory = l / 1024 / 1024 + " MB";
-        //MassResult massResult = new MassResult(result, accDb, watch.getCurrentDuration() + ", Memory used: " + memory);
-
-        //sendJsonResponse(exchange, StatusCodes.OK, toJson(massResult));
-        PageResult pageResult = new PageResult(result.size(), result, memory, watch.getCurrentDuration());
+        PageResult pageResult = new PageResult(result.getTotalCount(), result.getResults(), memory, watch.getCurrentDuration(), page, pageSize);
         String jsonResult = toJson(pageResult);
-    //    exchange.getResponseHeaders().put(HttpString.tryFromString("Access-Control-Expose-Headers"), "X-memory, X-duration");
-      //  exchange.getResponseHeaders().put(HttpString.tryFromString("X-memory"), memory);
-       // exchange.getResponseHeaders().put(HttpString.tryFromString("X-duration"), watch.getCurrentDuration());
         sendJsonResponse(exchange, StatusCodes.OK, jsonResult);
     }
 
@@ -217,13 +211,17 @@ public class SearchWebApp {
         private final int totalResult;
         private final String memory;
         private final String duration;
+        private final int page;
+        private final int pageSize;
         private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result;
 
-        public PageResult(int totalResult, List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result, String memory, String currentDuration) {
+        public PageResult(int totalResult, List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result, String memory, String currentDuration, int page, int pageSize) {
             this.totalResult = totalResult;
             this.result = result;
             this.memory = memory;
             this.duration = currentDuration;
+            this.page = page;
+            this.pageSize = pageSize;
         }
     }
 

@@ -2,7 +2,19 @@
 include_once "lib.php";
 header('Content-Type: application/json');
 
-$url = DIGESTED_DB_URL . '/search?mass1=' . $_GET['mass1'] . '&mass2=' . $_GET['mass2'];
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$pageSize = isset($_GET['pageSize']) ? intval($_GET['pageSize']) : 10;
+
+if ($page < 1) $page = 1;
+if ($pageSize < 1) $pageSize = 10;
+
+// Make sure mass1 and mass2 exist
+$mass1 = isset($_GET['mass1']) ? $_GET['mass1'] : '';
+$mass2 = isset($_GET['mass2']) ? $_GET['mass2'] : '';
+
+// Build the URL with search and pagination parameters
+$url = DIGESTED_DB_URL . '/search?mass1=' . $mass1 . '&mass2=' . $mass2 . '&page=' . $page . '&pageSize=' . $pageSize;
+
 $result = sendRestRequest($url, 'GET');
 //echo json_encode($result['response']);
 

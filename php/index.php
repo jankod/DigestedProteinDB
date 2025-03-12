@@ -9,12 +9,12 @@
 
 </head>
 <body>
-<h1>DigestedDB</h1>
+<h1 class="text-center">DigestedDB</h1>
 
 <div class="container" x-data="searchData()">
     <div class="row">
         <div class="col">
-            <h2>Search for mass </h2>
+            <h3>Database info </h3>
             <div x-show="dbInfo">
                 <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
                 <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
@@ -59,11 +59,54 @@
 
                 </div>
             </div>
-
-
         </div>
+    </div>
 
+    <!-- Improved Pagination Section -->
+    <div class="row mt-4 mb-4" x-show="results && totalPages > 0">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                        <div class="badge bg-success text-white ">
+                            <span>Total: <span x-text="totalItems"></span> results</span>
+                        </div>
 
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination m-0">
+                                <li class="page-item" :class="{ 'disabled': currentPage <= 1 }">
+                                    <a class="page-link" href="#" @click.prevent="currentPage > 1 && goToPage(currentPage - 1)">&laquo;</a>
+                                </li>
+
+                                <template x-for="p in getPaginationRange()" :key="p">
+                                    <li class="page-item" :class="{ 'active': currentPage === p }">
+                                        <a class="page-link" href="#" @click.prevent="goToPage(p)" x-text="p"></a>
+                                    </li>
+                                </template>
+
+                                <li class="page-item" :class="{ 'disabled': currentPage >= totalPages }">
+                                    <a class="page-link" href="#" @click.prevent="currentPage < totalPages && goToPage(currentPage + 1)">&raquo;</a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <div class="d-flex align-items-center">
+                            <label class="me-2 mb-0">Items per page:</label>
+                            <select class="form-select form-select-sm" style="width: 100px;" x-model.number="pageSize" @change="pageChanged()">
+                                <option>100</option>
+                                <option>200</option>
+                                <option>500</option>
+                                <option>1000</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-muted text-center mt-2">
+                        <small>Page <span x-text="currentPage"></span> of <span x-text="totalPages"></span></small>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row">
@@ -91,6 +134,12 @@
             error: "",
             loading: false,
             dbInfo: {},
+
+            currentPage: 1,
+            pageSize: 10,
+            totalItems: 0,
+            totalPages: 0,
+
             async init() {
                 try {
                     const response = await fetch('/db-info.php');
@@ -112,7 +161,7 @@
                     }
 
                     const mass = calculateMassWidthH2O(this.peptideSequence.toUpperCase());
-                    this.calculatedMass = mass.toFixed(6);
+                    this.calculatedMass = mass.toFixed(4);
                     this.mass1 = this.calculatedMass;
                     this.mass2 = this.calculatedMass;
                 } catch (error) {
@@ -121,23 +170,65 @@
                 }
             },
 
+
+            getPaginationRange() {
+                const range = [];
+                const maxVisiblePages = 5;
+
+                let start = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+                let end = Math.min(this.totalPages, start + maxVisiblePages - 1);
+
+                if (end - start + 1 < maxVisiblePages) {
+                    start = Math.max(1, end - maxVisiblePages + 1);
+                }
+
+                for (let i = start; i <= end; i++) {
+                    range.push(i);
+                }
+
+                return range;
+            },
+
+            goToPage(page) {
+                if (page < 1 || page > this.totalPages) return;
+                this.currentPage = page;
+                this.search();
+            },
+
+            pageChanged() {
+                this.currentPage = 1; // Reset to first page when changing page size
+                this.search();
+            },
+
             async search() {
                 this.error = null;
                 this.loading = true;
                 try {
-                    const response = await fetch(`/search.php?mass1=${this.mass1}&mass2=${this.mass2}`);
+                    const url = `/search.php?mass1=${this.mass1}&mass2=${this.mass2}&page=${this.currentPage}&pageSize=${this.pageSize}`;
+                    const response = await fetch(url);
+
+
                     if (!response.ok) {
                         const errorMessage = await response.text(); // Read error from response
                         throw new Error(`Server error: ${errorMessage}`);
                     }
-                    this.results = await response.json();
-                    this.results = JSON.stringify(this.results, null, 2);
+
+                    const data = await response.json();
+
+                    this.totalItems = data.totalResult || 0;
+                    //this.totalPages = data.totalPages || 1;
+                    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+                    const memoryUsage = data.memory;
+                    const duration = data.duration;
+
+                    this.results = JSON.stringify(data, null, 2);
                 } catch (error) {
                     console.error('Error:', error);
                     this.results = `Error: ${error.message}`;
                     this.error = error.message;
 
-
+                    this.totalPages =0;
                     this.results = [];
                 } finally {
                     this.loading = false;
