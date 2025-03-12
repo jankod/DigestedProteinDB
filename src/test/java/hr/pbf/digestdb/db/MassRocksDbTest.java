@@ -64,15 +64,15 @@ class MassRocksDbTest {
             try (MassRocksDbReader reader = new MassRocksDbReader(dbDirPath)) {
 
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> emptyResult = reader.searchByMass(400, 503);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> emptyResult = reader.searchByMass(400, 503, 1, 1000    );
                     assertEquals(0, emptyResult.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultLeft8 = reader.searchByMass(503, 530);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultLeft8 = reader.searchByMass(503, 530, 1, 1000);
                     assertEquals(8, resultLeft8.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result3 = reader.searchByMass(542, 544);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result3 = reader.searchByMass(542, 544, 1, 1000);
                     assertEquals(3, result3.size());
                     Double key542_2813 = result3.getFirst().getKey(); // 542.2813,AGGGGPK:29
                     Set<BinaryPeptideDbUtil.PeptideAcc> valuePeptide = result3.getFirst().getValue();
@@ -82,15 +82,15 @@ class MassRocksDbTest {
                     assertEquals(542.2813, key542_2813, 0.0001);
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultRight9 = reader.searchByMass(530, 544);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultRight9 = reader.searchByMass(530, 544, 1, 1000);
                     assertEquals(9, resultRight9.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMass(544, 545);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMass(544, 545, 1, 1000);
                     assertEquals(2, result2.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMass(544, 545.2657);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMass(544, 545.2657, 1, 1000);
                     assertEquals(2, result2.size());
 
 
@@ -126,7 +126,7 @@ class MassRocksDbTest {
                     });
 
                     { // non existing rigth
-                        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2NonExisting = reader.searchByMass(544.3, 545);
+                        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2NonExisting = reader.searchByMass(544.3, 545, 1, 1000);
                         assertEquals(0, result2NonExisting.size());
 
                     }
