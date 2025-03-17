@@ -3,43 +3,36 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Digested DB</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Digested Protein DB</title>
+    <link href="bootstrap-sandstone.min.css" rel="stylesheet">
 
 </head>
 <body>
-<h1 class="text-center">DigestedDB</h1>
+<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">
+    Digested Protein DB
+</h1>
 
 <div class="container" x-data="searchData()">
     <div class="row">
         <div class="col">
 
-            <div class="container">
-                <div class="row align-items-start">
-                    <div class="col">
-                        <h3>Database info </h3>
-                        <div x-show="dbInfo">
-                            <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
-                            <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span>
-                            </p>
-                            <p class="mb-1"><strong>Min Peptide Length:</strong> <span
-                                        x-text="dbInfo.min_peptide_length"></span>
-                            </p>
-                            <p class="mb-1"><strong>Max Peptide Length:</strong> <span
-                                        x-text="dbInfo.max_peptide_length"></span>
-                            </p>
-                            <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span>
-                            </p>
-                            <p class="mb-1"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
-                            <p class="mb-3"><strong>DB size:</strong> <span x-text="dbInfo.db_size"></span></p>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
+                    <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
+                    <p class="mb-1"><strong>Missed Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
+                    <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span></p>
+                </div>
+                <div class="col-md-6">
 
-
+                    <p class="mb-1"><strong>DB size:</strong> <span x-text="dbInfo.db_size"></span></p>
+                    <p class="mb-1"><strong>Min Peptide Length:</strong> <span
+                                x-text="dbInfo.min_peptide_length"></span></p>
+                    <p class="mb-1"><strong>Max Peptide Length:</strong> <span
+                                x-text="dbInfo.max_peptide_length"></span></p>
                 </div>
             </div>
-
+            <hr>
 
             <div class="row">
                 <div class="col">
@@ -75,11 +68,8 @@
                 </div>
             </div>
         </div>
-
-
     </div>
 
-    <!-- Improved Pagination Section -->
     <div class="row mt-4 mb-4" x-show="results && totalPages > 0">
         <div class="col">
             <div class="card shadow-sm">
@@ -145,23 +135,46 @@
         </div>
     </div>
 
-    <div class="row mt-4 mb-4">
-        <h4>Contact</h4>
-        <div class="text-body-secondary">
-            Contact: <a href="mailto:jdiminic@pbf.hr">jdiminic@pbf.hr</a>
-            <br>
-            <span>
-                Bioinformatics Laboratory,
-                Faculty of Food Technology and Biotechnology,
-                University of Zagreb, Croatia
-                <a href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
-                   class="btn-link link-underline" target="_blank">
-                    PBF
-                </a>
 
-            </span>
+
+    <style>
+        .card a {
+            color: #0056b3 !important;
+        }
+        .card a:hover {
+            color: #003580;
+        }
+    </style>
+    <div class="row mt-5 mb-4">
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title text-center mb-3">Contact</h4>
+                    <p class="card-text ">
+
+                        <strong>Department:</strong> <a
+                                href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
+                                class="href"> Bioinformatics Laboratory</a><br>
+                        <strong>Institute:</strong>
+                        <a href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
+                           class="btn-link" target="_blank">
+                            Faculty of Food Technology and Biotechnology
+                            University of Zagreb, Croatia
+                        </a>
+                        <br>
+                        <strong>GitHub:</strong> <a href="https://github.com/jankod/DigestedProteinDB" class="btn-link"
+                                                    target="_blank">Digested Protein DB</a>
+                        <br>
+                        <strong>Email:</strong> <a href="mailto:jdiminic@pbf.hr">jdiminic@pbf.hr</a><br>
+
+                    </p>
+
+                </div>
+            </div>
         </div>
     </div>
+
+
 </div>
 
 
@@ -242,7 +255,7 @@
             },
 
             pageChanged() {
-                this.currentPage = 1; // Reset to first page when changing page size
+                this.currentPage = 1;
                 this.search();
             },
 
@@ -275,17 +288,13 @@
                         this.responseSize = (sizeInKB / 1024).toFixed(2) + " MB";
                     }
 
-                    //  this.responseSizeInMB = (responseText.length / (1024 * 1024)).toFixed(2) + " MB";
-
-
                     const data = JSON.parse(responseText);
 
                     this.totalItems = data.totalResult || 0;
-                    //this.totalPages = data.totalPages || 1;
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
-                    const memoryUsage = data.memory;
-                    const duration = data.duration;
+//                    const memoryUsage = data.memory;
+//                    const duration = data.duration;
 
                     this.results = JSON.stringify(data, null, 2);
                 } catch (error) {
@@ -303,13 +312,8 @@
     }
 
 </script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
+<script src="bootstrap.bundle.min.js"></script>
 <script src="bio-lib.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
-
 </body>
 </html>

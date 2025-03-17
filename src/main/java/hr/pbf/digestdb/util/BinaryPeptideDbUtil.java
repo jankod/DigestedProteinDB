@@ -119,7 +119,7 @@ public class BinaryPeptideDbUtil {
 
 
                 // sequence
-                // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
+               // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
                 byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
                 // large: TVDRPTK
                 ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data

@@ -92,14 +92,11 @@ public class MainCsvMassGrouperWithAccIds {
 
             double prevMass = Double.parseDouble(parts[0]);
             String prevMass4 = MyUtil.discretizedTo4(prevMass);
-            //Map<String, Set<Integer>> seqIdsMap = new HashMap<>();
 
-            //Map<String, TIntHashSet> seqIdsMap = new HashMap<>();
             Map<String, IntOpenHashSet> seqIdsMap = new HashMap<>();
 
             String sequence = parts[1];
             int id = accessionToIdMap.getInt(parts[2]);
-            //seqIdsMap.computeIfAbsent(sequence, k -> new TIntHashSet()).add(id);
             seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
 
             while ((line = reader.readLine()) != null) {

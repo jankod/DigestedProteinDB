@@ -91,6 +91,11 @@ Search example: masss from: `1900` Da to `1900.3`Da gives results like:
     - Download ...
 - [ ] Uniprot TrEMBL human dataset. (NOT FINISHED).
 
+## Library Integration
+This database is designed as a Java library that can be easily embedded into existing software applications. 
+The library provides a clean API for programmatic access to peptide data, making it ideal for integration with mass spectrometry 
+analysis tools or custom bioinformatics pipelines.
+
 ## Create database workflow
 
 The database is created from the uniprot .xml.gz or .xml file.
