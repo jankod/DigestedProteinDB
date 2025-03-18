@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -64,21 +63,21 @@ public class BioUtil {
 
 
     public BufferedReader newFileReader(String path, String charset, int bufSize)
-          throws UnsupportedEncodingException, FileNotFoundException {
+            throws UnsupportedEncodingException, FileNotFoundException {
         if (charset == null) {
             charset = "ASCII";
         }
         return new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset),
-              bufSize);
+                bufSize);
     }
 
     public BufferedReader newFileReader(String path, String charset)
-          throws UnsupportedEncodingException, FileNotFoundException {
+            throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, charset, 8192);
     }
 
     public BufferedWriter newFileWiter(String path, String charset)
-          throws UnsupportedEncodingException, FileNotFoundException {
+            throws UnsupportedEncodingException, FileNotFoundException {
 
         if (charset == null) {
             charset = "ASCII";
@@ -87,13 +86,13 @@ public class BioUtil {
 
 
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
-              BUFFER);
+                BUFFER);
     }
 
     public DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
         return new DataOutputStream(
-              new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
+                new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
     }
 
     public DataInputStream newDataInputStreamCompressed(String path) throws IOException {
@@ -220,6 +219,51 @@ public class BioUtil {
 
 
     /**
+     * (C-term to F/Y/W, not before P).
+     * 1 missed cleavage. Cleaves after F, W, or Y if next is not P. All chars must be upper case!
+     */
+    public List<String> chymotrypsin1(String prot, int min, int max) {
+
+        // sites is the list of positions where the cleavage occurs
+        List<Integer> sites = new ArrayList<>();
+        for (int i = 0; i < prot.length() - 1; i++) {
+            char current = prot.charAt(i);
+            char next = prot.charAt(i + 1);
+            if ((current == 'F' || current == 'W' || current == 'Y') && next != 'P') {
+                sites.add(i + 1);
+            }
+        }
+        List<String> peptides = new ArrayList<>();
+        int n = prot.length();
+
+        List<Integer> extendedSites = new ArrayList<>(sites.size()+2);
+        extendedSites.add(0);
+        extendedSites.addAll(sites);
+        extendedSites.add(n);
+
+        for (int i = 0; i < extendedSites.size() - 1; i++) {
+            int start = extendedSites.get(i);
+            int end = extendedSites.get(i + 1);
+            String peptide = prot.substring(start, end);
+            if (peptide.length() >= min && peptide.length() <= max) {
+                peptides.add(peptide);
+            }
+        }
+
+        for (int i = 0; i < extendedSites.size() - 2; i++) {
+            int start = extendedSites.get(i);
+            int end = extendedSites.get(i + 2);
+            String peptide = prot.substring(start, end);
+            if (peptide.length() >= min && peptide.length() <= max) {
+                peptides.add(peptide);
+            }
+        }
+        return peptides;
+
+    }
+
+
+    /**
      * Fast method for cleaving with 1 miss clevage. Cleaves after R or K if next. All chars must be upper case!
      *
      * @param prot protein sequence
@@ -295,7 +339,6 @@ public class BioUtil {
     /**
      * This is mass that is in the database! This mass takes as it usually calculates
      * peptide mass other libs. New fast calculation of mass + water 18.01.
-     *
      */
     public double calculateMassWidthH2O(final String peptide) {
         float h = 0;

@@ -2,10 +2,16 @@ package hr.pbf.digestdb.util;
 
 import org.apache.commons.text.StringSubstitutor;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MyFormatter {
+
+
+    final static DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
 
     private final String template;
 
@@ -14,6 +20,11 @@ public class MyFormatter {
     public MyFormatter(String template) {
         this.template = template;
     }
+
+    public static String format(LocalDateTime now) {
+        return dateTimeFormater.format(now);
+    }
+
     public MyFormatter param(String key, String value) {
         params.put(key, value);
         return this;

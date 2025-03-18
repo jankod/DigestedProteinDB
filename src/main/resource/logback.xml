@@ -24,8 +24,12 @@
         <logger name="ch.qos.logback" level="WARN"/>
 
     <logger name="hr" level="DEBUG"/>
-    <logger name="org.xnio.nio" level="INFO"/>
-    <logger name="io.undertow" level="INFO"/>
+
+    <logger name="sun.nio.ch" level="WARN"/>
+    <logger name="org.xnio" level="ERROR" />
+    <logger name="org.xnio.nio" level="ERROR" />
+    <logger name="io.undertow" level="WARN" />
+    <logger name="org.jboss" level="WARN" />
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

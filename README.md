@@ -96,10 +96,22 @@ This database is designed as a Java library that can be easily embedded into exi
 The library provides a clean API for programmatic access to peptide data, making it ideal for integration with mass spectrometry 
 analysis tools or custom bioinformatics pipelines.
 
+
+
+`create-db` - for database creation with relevant options
+`server` - for web server with port and database location options
+
+`java -jar target/DigestedProteinDB-0.1-uber.jar create-db -c -d /path/to/db_bacteria_swisprot -u /path/to/uniprot_sprot_bacteria.xml.gz -n UniprotSwot_bacteria`
+
+
+
+`java -jar DigestedProteinDB-.jar server --port 8080 --db-dir /path/to/db`
+
+
 ## Create database workflow
 
 The database is created from the uniprot .xml.gz or .xml file.
-Example class `hr.pbf.digestdb.CreateDatabaseApp` is used to create the database.
+Example class `hr.pbf.digestdb.CreateDatabase` is used to create the database.
 
 Steps to create the database:
 1. **Parse Uniprot Data**: Extract sequences and relevant metadata from uniprot .xml.gz database and NCBI Taxonomy.
@@ -127,16 +139,16 @@ enzyme_name=Trypsine
 ```
 
 ```bash
-java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.CreateDatabaseApp -d /path/to/database/folder
+java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.CreateDatabase -d /path/to/database/folder
 # or
-java -Xmx128g -cp "DigestedProteinDB-0.1-uber.jar" hr.pbf.digestdb.CreateDatabaseApp -d /path/to/database/folder
+java -Xmx128g -cp "DigestedProteinDB-0.1-uber.jar" hr.pbf.digestdb.CreateDatabase -d /path/to/database/folder
 
 ```
 
 ## Example to run database and web server
 
 ```bash
-java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.SearchWebApp -d /path/to/database/folder
+java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.SearchWeb -d /path/to/database/folder
 ```
 
 ## TODO

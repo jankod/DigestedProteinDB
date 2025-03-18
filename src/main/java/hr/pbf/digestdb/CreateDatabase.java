@@ -11,36 +11,55 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import picocli.CommandLine;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Properties;
 
 
 @Slf4j
-public class CreateDatabaseApp {
+public class CreateDatabase {
 
     public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
     public static final String DEFAULT_DB_FILE_NAME = "custom_accession.db";
+    private final CreateDatabaseConfig config;
 
     @Data
-    static class ArgsParams {
+    public static class CreateDatabaseConfig {
+        int minPeptideLength = 7;
+        int maxPeptideLength = 50;
+        int missedCleavage = 2;
+        boolean cleanBefore = false;
+        String dbDir;
+        String uniprotXmlPath;
+        String sortTempDir;
+        String dbName;
+        Enzyme enzyme = Enzyme.Trypsin;
 
-        @CommandLine.Option(names = {"--clean", "-c"}, description = "Clean all files in db dir")
-        boolean clean = false;
-
-        @CommandLine.Option(names = {"--db-dir", "-d"}, required = true, description = "Path to the directory with workflow.properties file")
-        String dbDir = "";
+        public enum Enzyme {
+            Trypsin,
+            Chymotrypsin,
+//            LysC,
+//            GluC,
+//            AspN,
+//            ArgC,
+//            LysN
+        }
     }
 
-    public static void main(String[] args) throws Throwable {
+    public CreateDatabase(CreateDatabaseConfig config) {
+        this.config = config;
+    }
 
-        ArgsParams params = new ArgsParams();
-        new CommandLine(params).parseArgs(args);
+    public void start() throws Throwable {
 
-        WorkflowConfig config = new WorkflowConfig(params.dbDir);
+
+//        WorkflowConfig config = new WorkflowConfig(params.dbDir);
 
         StopWatch watch = StopWatch.createStarted();
-        final String DB_DIR_PATH = config.getDbDir();
+        final String DB_DIR_PATH = config.dbDir;
 
         final String PEPTIDE_MASS_CSV_PATH = DB_DIR_PATH + "/gen/peptide_mass.csv";
         final String PEPTIDE_MASS_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/peptide_mass_sorted.csv";
@@ -55,7 +74,7 @@ public class CreateDatabaseApp {
         File genDir = new File(DB_DIR_PATH + "/gen");
 
         // if args contain --clean
-        if (params.isClean()) {
+        if (config.cleanBefore) {
             log.info("Clean all files in dir: {}", DB_DIR_PATH);
             FileUtils.deleteQuietly(genDir);
             FileUtils.deleteQuietly(new File(ROCKDB_DB_DIR_PATH));
@@ -66,19 +85,19 @@ public class CreateDatabaseApp {
         log.info("Start create DB, params  {}!", config);
 
         FileUtils.forceMkdir(genDir);
-
+        JobUniprotToPeptideCsv.Result readXmlResult;
         {            // 1. Uniprot xml to CSV
             JobUniprotToPeptideCsv app1UniprotToCsv = new JobUniprotToPeptideCsv();
             app1UniprotToCsv.minPeptideLength = config.getMinPeptideLength();
             app1UniprotToCsv.maxPeptideLength = config.getMaxPeptideLength();
-            app1UniprotToCsv.missClevage = config.getMissCleavage();
-            app1UniprotToCsv.fromSwisprotPath = config.toUniprotXmlFullPath();
-
+            app1UniprotToCsv.missedClevage = config.getMissedCleavage();
+            app1UniprotToCsv.fromSwisprotPath = config.getUniprotXmlPath();
+            app1UniprotToCsv.setEnzyme(config.getEnzyme());
             app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
             app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
-            //  JobResult<JobUniprotToPeptideCsv.Result> result = jobLancher.run(app1UniprotToCsv);
-            JobUniprotToPeptideCsv.Result re = app1UniprotToCsv.start();
-            log.info("Uniprot extracted. Protein count: {}, Peptide count: {}", re.getProteinCount(), re.getPeptideCount());
+
+            readXmlResult = app1UniprotToCsv.start();
+            log.info("Uniprot extracted. Protein count: {}, Peptide count: {}", readXmlResult.getProteinCount(), readXmlResult.getPeptideCount());
         }
 
         {
@@ -100,10 +119,10 @@ public class CreateDatabaseApp {
             cmdString += "sort -t',' -k1n ${peptide_mass_csv_path} -o ${peptide_mass_sorted_console}";
 
             cmdString = new MyFormatter(cmdString)
-                  .param("sort_temp_dir", sortTempDir)
-                  .param("peptide_mass_csv_path", PEPTIDE_MASS_CSV_PATH)
-                  .param("peptide_mass_sorted_console", PEPTIDE_MASS_CSV_SORTED_PATH)
-                  .format();
+                    .param("sort_temp_dir", sortTempDir)
+                    .param("peptide_mass_csv_path", PEPTIDE_MASS_CSV_PATH)
+                    .param("peptide_mass_sorted_console", PEPTIDE_MASS_CSV_SORTED_PATH)
+                    .format();
 
             app2CmdSortMass.setCmd(cmdString);
             app2CmdSortMass.setDir(genDir);
@@ -128,9 +147,9 @@ public class CreateDatabaseApp {
             BashCommand cmd = new BashCommand();
             String cmdSortAccession = " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
             cmdSortAccession = new MyFormatter(cmdSortAccession)
-                  .param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
-                  .param("accession_map.csv.sorted", ACCESSION_MAP_CSV_SORTED_PATH)
-                  .format();
+                    .param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
+                    .param("accession_map.csv.sorted", ACCESSION_MAP_CSV_SORTED_PATH)
+                    .format();
 
             log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
             cmd.setCmd(cmdSortAccession);
@@ -154,10 +173,31 @@ public class CreateDatabaseApp {
         }
 
         { // 7. Properties
-            config.saveDbInfoToProperties(0, DB_INFO_PROPERTIES_PATH);
+            saveDbInfoToProperties(proteinCountResult, DB_INFO_PROPERTIES_PATH, readXmlResult.getPeptideCount());
         }
 
         log.info("Finished time: {}", DurationFormatUtils.formatDurationHMS(watch.getTime()));
+    }
+
+    private void saveDbInfoToProperties(long proteinCount, String dbInfoPropertiesPath, long peptideCount) {
+
+        Properties prop = new Properties();
+        prop.setProperty("uniprot_xml_path", config.getUniprotXmlPath());
+        prop.setProperty("min_peptide_length", String.valueOf(config.getMinPeptideLength()));
+        prop.setProperty("max_peptide_length", String.valueOf(config.getMaxPeptideLength()));
+        prop.setProperty("miss_cleavage", String.valueOf(config.getMissedCleavage()));
+        prop.setProperty("db_name", config.getDbName());
+        prop.setProperty("enzyme_name", config.getEnzyme().name());
+        prop.setProperty("protein_count", proteinCount + "");
+        prop.setProperty("peptide_count", peptideCount+ "");
+
+        try {
+            try (FileWriter writer = new FileWriter(dbInfoPropertiesPath)) {
+                prop.store(writer, "Created " + MyFormatter.format(LocalDateTime.now()));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

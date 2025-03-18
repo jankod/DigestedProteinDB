@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 @Data
+@Deprecated
 @Slf4j
 public class WorkflowConfig {
     final static DateTimeFormatter dateTimeFormater = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");

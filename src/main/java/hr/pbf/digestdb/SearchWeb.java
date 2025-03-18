@@ -8,7 +8,6 @@ import hr.pbf.digestdb.db.MassRocksDbReader;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.MyStopWatch;
-import hr.pbf.digestdb.util.WorkflowConfig;
 import io.undertow.Undertow;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.PathHandler;
@@ -20,86 +19,67 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 import org.wildfly.common.annotation.NotNull;
-import picocli.CommandLine;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
 @Slf4j
 @Data
-public class SearchWebApp {
+public class SearchWeb {
+    private String dbDirPath;
+    private final int port;
 
-    private String dbDir;
-    private int port;
-
-    private String dbPath;
     private String accDbPath;
     private Undertow server;
     private MassRocksDbReader massDb;
     private AccessionDbReader accDb;
 
-    private WorkflowConfig config;
 
-    public static class WebArgsParams {
-        @CommandLine.Option(names = {"-p", "--port"}, description = "Port", required = true, defaultValue = "7070")
-        int port;
-
-        @CommandLine.Option(names = {"-d", "--db-dir"}, description = "Path to the directory with workflow.properties file", required = true)
-        String dbDir;
+    public SearchWeb(String dbDirPath, int port) {
+        this.dbDirPath = dbDirPath;
+        this.port = port;
+        setDbDirPath(dbDirPath + "/" + CreateDatabase.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
+        setAccDbPath(dbDirPath + "/" + CreateDatabase.DEFAULT_DB_FILE_NAME);
     }
 
-    public SearchWebApp(WebArgsParams params) throws IOException {
-        this.port = params.port;
-        this.dbDir = params.dbDir;
-        setDbPath(getDbDir() + "/" + CreateDatabaseApp.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
-        setAccDbPath(getDbDir() + "/" + CreateDatabaseApp.DEFAULT_DB_FILE_NAME);
-        config = new WorkflowConfig(dbDir);
-    }
+    public void start() throws RocksDBException, IOException {
 
-    public static void main(String[] args) throws RocksDBException, IOException {
-        WebArgsParams params = new WebArgsParams();
-        new CommandLine(params).parseArgs(args);
-
-        SearchWebApp app = new SearchWebApp(params);
-        log.debug("Start web on port: " + app.getPort() + " db dir: " + app.getDbDir());
-        app.startWeb();
-    }
-
-    public void startWeb() throws RocksDBException {
+        log.debug("Start web on port: " + port + " db dir: " + dbDirPath);
         try {
             long startTime = System.currentTimeMillis();
 
             log.info("Initializing database...");
 
-            massDb = new MassRocksDbReader(dbPath);
+            massDb = new MassRocksDbReader(dbDirPath);
             accDb = new AccessionDbReader(accDbPath);
             log.info("Database initialized in {} ms", System.currentTimeMillis() - startTime);
 
 
             // Resource handler for static files
             ResourceHandler homeHtmlPageHandler = new ResourceHandler(
-                  new ClassPathResourceManager(getClass().getClassLoader(), "web"))
-                  .setWelcomeFiles("index.html");
+                    new ClassPathResourceManager(getClass().getClassLoader(), "web"))
+                    .setWelcomeFiles("index.html");
 
             // Create paths
             PathHandler pathHandler = new PathHandler()
-                  .addPrefixPath("/", homeHtmlPageHandler)
-                  .addExactPath("/db-info", this::handleDbInfo)
-                  .addExactPath("/search", this::handleSearch)
-                  .addExactPath("/search-peptide", this::handleBySearch);
+                    .addPrefixPath("/", homeHtmlPageHandler)
+                    .addExactPath("/db-info", this::handleDbInfo)
+                    .addExactPath("/search", this::handleSearch)
+                    .addExactPath("/search-peptide", this::handleBySearch);
 
 
-            // Build and start server
             server = Undertow.builder()
-                  .addHttpListener(port, "0.0.0.0")
-                  .setHandler(pathHandler)
-                  .build();
+                    .addHttpListener(port, "0.0.0.0")
+                    .setHandler(pathHandler)
+                    .build();
 
             server.start();
             log.info("Web started on {}", "http://localhost:" + port);
 
-            // Add shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+            // Keep the main thread alive until shutdown
+            Thread.currentThread().join();
 
         } catch (Exception e) {
             log.error("Error starting web server", e);
@@ -119,7 +99,7 @@ public class SearchWebApp {
             String peptide = params.getOrDefault("peptide", "");
             if (peptide.isEmpty()) {
                 sendJsonResponse(http, StatusCodes.BAD_REQUEST,
-                      "{\"error\": \"Peptide is required\"}");
+                        "{\"error\": \"Peptide is required\"}");
                 return;
             }
             double mass1 = BioUtil.calculateMassWidthH2O(peptide);
@@ -130,7 +110,7 @@ public class SearchWebApp {
             searchByMass(http, mass1, mass2, page, pageSize);
         } catch (Exception e) {
             sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
-                  "{\"error\": \"" + e.getMessage() + "\"}");
+                    "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -152,10 +132,10 @@ public class SearchWebApp {
 
         try {
 
-            sendJsonResponse(exchange, StatusCodes.OK, toJson(config.getDbInfo()));
+            sendJsonResponse(exchange, StatusCodes.OK, toJson(getDbInfo()));
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
-                  "{\"error\": \"" + e.getMessage() + "\"}");
+                    "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -176,7 +156,7 @@ public class SearchWebApp {
 
             if (mass1 == 0 || mass2 == 0) {
                 sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-                      "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
+                        "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
                 return;
             }
 
@@ -189,10 +169,10 @@ public class SearchWebApp {
 
         } catch (NumberFormatException e) {
             sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-                  "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
+                    "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
-                  "{\"error\": \"" + e.getMessage() + "\"}");
+                    "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -223,6 +203,16 @@ public class SearchWebApp {
             result.add(new AbstractMap.SimpleEntry<>(e.getKey(), peptides));
         }
         return result;
+    }
+
+    public Properties getDbInfo() {
+        Properties prop = new Properties();
+        try (FileReader reader = new FileReader(dbDirPath + "/../db_info.properties")) {
+            prop.load(reader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return prop;
     }
 
 
@@ -304,43 +294,6 @@ public class SearchWebApp {
         }
         log.info("Server stopped and resources released");
     }
+
 }
 
-
-@Data
-class MassResult {
-    int totalResult = 0;
-    String duration = "";
-
-    List<SeqAcc> results;
-
-    public MassResult(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> entries, AccessionDbReader accDb, String currentDuration) {
-        results = new ArrayList<>(entries.size());
-        totalResult = entries.size();
-        duration = currentDuration;
-
-        entries.forEach(e -> {
-            Set<BinaryPeptideDbUtil.PeptideAcc> peptides = e.getValue();
-            for (BinaryPeptideDbUtil.PeptideAcc peptide : peptides) {
-                SeqAcc sa = new SeqAcc();
-                sa.mass = e.getKey();
-                int[] accessionsNum = peptide.getAcc();
-                sa.acc = new ArrayList<>(accessionsNum.length);
-                sa.seq = peptide.getSeq();
-                for (int accNum : accessionsNum) {
-                    String accession = accDb.getAccession(accNum);
-                    sa.acc.add(accession);
-                }
-                results.add(sa);
-            }
-
-        });
-    }
-
-    @Data
-    static class SeqAcc {
-        double mass;
-        String seq;
-        List<String> acc;
-    }
-}

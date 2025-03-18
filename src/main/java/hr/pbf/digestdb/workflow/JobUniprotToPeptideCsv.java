@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.workflow;
 
+import hr.pbf.digestdb.CreateDatabase;
 import hr.pbf.digestdb.exception.ValidationException;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 
 /**
@@ -31,7 +33,9 @@ public class JobUniprotToPeptideCsv {
     public long maxProteinCount = Long.MAX_VALUE - 1;
     public int minPeptideLength = 0;
     public int maxPeptideLength = 0;
-    public int missClevage = 1;
+    public int missedClevage = 1;
+    private CreateDatabase.CreateDatabaseConfig.Enzyme enzyme;
+
 
     @Data
     public static class Result {
@@ -45,12 +49,12 @@ public class JobUniprotToPeptideCsv {
         ValidatateUtil.fileMustExist(fromSwisprotPath);
         ValidatateUtil.fileMustNotExist(resultPeptideMassAccCsvPath);
 
-        if (missClevage != 1) {
-            throw new ValidationException("Miss clevage must be 1");
+        if (missedClevage != 1) {
+            throw new ValidationException("Miss clevage must be 1 curently.");
         }
         if (minPeptideLength < 1 || minPeptideLength > maxPeptideLength) {
             throw new ValidationException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
-                                          + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
+                    + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
         }
 
         UniprotXMLParser parser = new UniprotXMLParser();
@@ -67,13 +71,20 @@ public class JobUniprotToPeptideCsv {
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
                     if (counter > maxProteinCount) {
                         stopped = true;
-                        log.info("Max protein count reached: {}", maxProteinCount);
+                        log.info("Finish read proteins, max protein count reached: {}", maxProteinCount);
                         return;
                     }
                     proteinCount.increment();
                     saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
-                    BioUtil.tripsyn(p.getSequence(), minPeptideLength, maxPeptideLength).forEach(peptide -> {
+                    List<String> peptides;
+                    if (enzyme == CreateDatabase.CreateDatabaseConfig.Enzyme.Trypsin) {
+                        peptides = BioUtil.tripsyn(p.getSequence(), minPeptideLength, maxPeptideLength);
+                    } else {
+                        peptides = BioUtil.chymotrypsin1(p.getSequence(), minPeptideLength, maxPeptideLength);
+                    }
+
+                    peptides.forEach(peptide -> {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
                             return;
                         }
