@@ -46,38 +46,11 @@ Search example: masss from: `1900` Da to `1900.3`Da gives results like:
         "Q03WY1"
       ]
     },
-    {
-      "mass": 1900.0013,
-      "seq": "ETGITQVAIAGGVSANSGIR",
-      "acc": [
-        "A0M1X3"
-      ]
-    },
-    {
-      "mass": 1900.0013,
-      "seq": "ALGDRLIVAVNDDSSVTR",
-      "acc": [
-        "Q07Y78"
-      ]
-    },
-    {
-      "mass": 1900.0013,
-      "seq": "AALSQLDVGALSEQQKSR",
-      "acc": [
-        "D0KEP3"
-      ]
-    },
-    {
-      "mass": 1900.0014,
-      "seq": "AAKIAAIGAVSVSATAGDDGR",
-      "acc": [
-        "Q7VMD5"
-      ]
-    }
+    ...
     
   ] }
 ``` 
-
+**acc** - Uniprot accession number, **seq** - peptide sequence, **mass** - peptide mass.
 
 
 ## Key Features
@@ -97,15 +70,17 @@ The library provides a clean API for programmatic access to peptide data, making
 analysis tools or custom bioinformatics pipelines.
 
 
+#### New database creation
 
-`create-db` - for database creation with relevant options
-`server` - for web server with port and database location options
+`java -jar DigestedProteinDB-0.1-uber.jar create-db -c -d /path/to/db_bacteria_swisprot -u /path/to/uniprot_sprot_bacteria.xml.gz -n UniprotSwot_bacteria`
 
-`java -jar target/DigestedProteinDB-0.1-uber.jar create-db -c -d /path/to/db_bacteria_swisprot -u /path/to/uniprot_sprot_bacteria.xml.gz -n UniprotSwot_bacteria`
+#### Start web server for searching the database
+
+`java -jar DigestedProteinDB-0.1-uber.jar server --port 8080 --db-dir /path/to/db`
 
 
-
-`java -jar DigestedProteinDB-.jar server --port 8080 --db-dir /path/to/db`
+###
+Demo web: https://digestedproteindb.pbf.hr/
 
 
 ## Create database workflow
@@ -138,18 +113,6 @@ enzyme_name=Trypsine
 #sort_temp_dir=/tmp/temp_dir
 ```
 
-```bash
-java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.CreateDatabase -d /path/to/database/folder
-# or
-java -Xmx128g -cp "DigestedProteinDB-0.1-uber.jar" hr.pbf.digestdb.CreateDatabase -d /path/to/database/folder
-
-```
-
-## Example to run database and web server
-
-```bash
-java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.SearchWeb -d /path/to/database/folder
-```
 
 ## TODO
 
@@ -159,3 +122,6 @@ java -Xmx128g -cp "digestdb-0.1.jar:lib/*" hr.pbf.digestdb.SearchWeb -d /path/to
     - Documentation
     - Downloadable databases
     - Benchmarks
+
+
+### 

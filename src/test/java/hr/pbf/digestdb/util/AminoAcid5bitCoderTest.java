@@ -29,4 +29,13 @@ class AminoAcid5bitCoderTest {
         assertEquals(sequence, decoded);
     }
 
+    public static void main(String[] args) {
+        String sequence = "ACDEFGHIKLMNPQRSTVWY";
+        System.out.println(sequence.length());
+        byte[] encoded = AminoAcid5bitCoder.encodePeptide(sequence);
+        String decoded = AminoAcid5bitCoder.decodePeptide(encoded, sequence.length());
+        System.out.println("Encoded: " + encoded.length);
+        System.out.println("Decoded: " + decoded.length());
+    }
+
 }
