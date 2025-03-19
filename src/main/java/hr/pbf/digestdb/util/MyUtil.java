@@ -70,6 +70,7 @@ public class MyUtil {
         options.setTableFormatConfig(tableConfig);
         options.setAllowMmapReads(true);
 
+
         options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
         return RocksDB.openReadOnly(options, dbPath);
     }

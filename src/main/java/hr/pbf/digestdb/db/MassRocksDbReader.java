@@ -4,6 +4,7 @@ import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
@@ -37,26 +38,27 @@ public class MassRocksDbReader implements AutoCloseable {
         int end = page * pageSize;
         int totalCount = 0;
 
+        try (ReadOptions readOptions = new ReadOptions()) {
+            RocksIterator it = db.newIterator(readOptions);
+            it.seek(MyUtil.intToByteArray(mass1Int));
 
-        RocksIterator it = db.newIterator();
-        it.seek(MyUtil.intToByteArray(mass1Int));
+            while (it.isValid()) {
+                int massInt = MyUtil.byteArrayToInt(it.key());
+                double keyMass = massInt / 10_000.0;
 
-        while (it.isValid()) {
-            int massInt = MyUtil.byteArrayToInt(it.key());
-            double keyMass = massInt / 10_000.0;
+                if (keyMass > mass2) {
+                    break;
+                }
+                totalCount++;
 
-            if (keyMass > mass2) {
-                break;
+                if (count >= start && count < end) {
+                    Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+
+                    results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
+                }
+                count++;
+                it.next();
             }
-            totalCount++;
-
-            if (count >= start && count < end) {
-                Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
-
-                results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
-            }
-            count++;
-            it.next();
         }
 
         return new MassPageResult(totalCount, results);

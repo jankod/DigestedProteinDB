@@ -45,23 +45,6 @@ public class BioUtil {
 
     public static final double H2O = 18.0105646D;
 
-
-    public void readLargeFasta(String path, Callback callback) throws IOException {
-        readLargeFasta(path, callback, Long.MAX_VALUE);
-    }
-
-    public final static Pattern ctrlAPattern = Pattern.compile("\\p{Cntrl}");
-
-    /**
-     * Amino acid 'X' je wildcard, 'B' is asparagine or aspartic acid, 'Z' is glutamine or glutamic acid, 'J' is leucine or isoleucine, 'O' is selenocysteine.
-     */
-    public static final char[] NOT_GOOD_AA = new char[]{'X', 'B', 'Z', 'J', 'O'};
-
-    public BufferedReader newFileReader(String path) throws UnsupportedEncodingException, FileNotFoundException {
-        return newFileReader(path, null);
-    }
-
-
     public BufferedReader newFileReader(String path, String charset, int bufSize)
             throws UnsupportedEncodingException, FileNotFoundException {
         if (charset == null) {

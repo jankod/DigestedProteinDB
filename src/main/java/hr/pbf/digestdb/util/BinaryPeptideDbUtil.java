@@ -23,7 +23,7 @@ public class BinaryPeptideDbUtil {
 
     private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 32); // 32MB, prilagodite po potrebi
 
-    public void writeVarint(ByteBuffer buffer, int value) {
+    public void writeVarInt(ByteBuffer buffer, int value) {
         while (value >= 128) {
             buffer.put((byte) ((value & 0x7F) | 0x80));
             value >>>= 7;
@@ -55,7 +55,7 @@ public class BinaryPeptideDbUtil {
         }
     }
 
-    public int readVarint(ByteBuffer buffer) {
+    public int readVarInt(ByteBuffer buffer) {
         int result = 0;
         int shift = 0;
         while (buffer.hasRemaining()) {
@@ -79,17 +79,17 @@ public class BinaryPeptideDbUtil {
 
         while (buffer.hasRemaining()) {
             // Čitanje dužine sekvence
-            int seqLength = readVarint(buffer);
+            int seqLength = readVarInt(buffer);
             byte[] seqBytes = new byte[seqLength];
             buffer.get(seqBytes);
             //String sequence =AminoAcidCoder.decodePeptideByteBuffer(seqBytes, seqLength);
             String sequence = new String(seqBytes, StandardCharsets.UTF_8);
 
             // Čitanje broja akcesija
-            int accessionCount = readVarint(buffer);
+            int accessionCount = readVarInt(buffer);
             List<Integer> accessions = new ArrayList<>(accessionCount);
             for (int i = 0; i < accessionCount; i++) {
-                int accession = readVarint(buffer);
+                int accession = readVarInt(buffer);
                 accessions.add(accession);
             }
 
@@ -123,15 +123,15 @@ public class BinaryPeptideDbUtil {
                 byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
                 // large: TVDRPTK
                 ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
-                writeVarint(bufferCache, seq.length()); // 4 bajta za dužinu sekvence
+                writeVarInt(bufferCache, seq.length()); // 4 bajta za dužinu sekvence
 
                 bufferCache.put(seqBytes);
 
 
                 //buffer.put((byte) accessions.length); // 1 bajt za broj access
-                writeVarint(bufferCache, accessions.length); // 4 bajta za broj access
+                writeVarInt(bufferCache, accessions.length); // 4 bajta za broj access
                 for (String acc : accessions) {
-                    writeVarint(bufferCache, Integer.parseInt(acc));
+                    writeVarInt(bufferCache, Integer.parseInt(acc));
                 }
                 start = dashIndex + 1;
             }
