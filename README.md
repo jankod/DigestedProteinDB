@@ -9,6 +9,9 @@ performance.
 The database is designed to be a compact and efficient storage of in-silico digested peptides. The primary goal is to
 support rapid mass-based searches, even on less powerful desktop machines.
 
+https://digestedproteindb.pbf.hr
+
+
 This compact database layout enables fast peptide mass queries with minimal resource usage. For example, a Uniprot
 TrEMBL bacteria dataset (7 to 30 amino acids, 1 missed cleavage) occupies about 50 GB on disk and supports quick lookups
 by mass range on standard hardware.
