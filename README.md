@@ -1,5 +1,7 @@
 # Digested Peptide Database
 
+<span style="font-size: 20px;">This project is currently in active development.</span>
+
 ## Overview
 
 This is a Java library for creating and searching a digested peptide database with RocksDB key-value store.

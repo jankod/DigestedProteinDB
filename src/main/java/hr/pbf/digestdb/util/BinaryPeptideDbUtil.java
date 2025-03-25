@@ -78,14 +78,13 @@ public class BinaryPeptideDbUtil {
         Set<PeptideAcc> peptides = new HashSet<>();
 
         while (buffer.hasRemaining()) {
-            // Čitanje dužine sekvence
             int seqLength = readVarInt(buffer);
             byte[] seqBytes = new byte[seqLength];
             buffer.get(seqBytes);
             //String sequence =AminoAcidCoder.decodePeptideByteBuffer(seqBytes, seqLength);
             String sequence = new String(seqBytes, StandardCharsets.UTF_8);
 
-            // Čitanje broja akcesija
+
             int accessionCount = readVarInt(buffer);
             List<Integer> accessions = new ArrayList<>(accessionCount);
             for (int i = 0; i < accessionCount; i++) {
@@ -93,7 +92,7 @@ public class BinaryPeptideDbUtil {
                 accessions.add(accession);
             }
 
-            // Kreiranje PeptideAcc objekta i dodavanje u listu
+
             PeptideAcc acc = new PeptideAcc();
             acc.seq = sequence;
             acc.acc = new int[accessions.size()];
@@ -118,18 +117,15 @@ public class BinaryPeptideDbUtil {
                 String[] accessions = value.substring(colonIndex + 1, dashIndex).split(";");
 
 
-                // sequence
                // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
                 byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
-                // large: TVDRPTK
                 ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
-                writeVarInt(bufferCache, seq.length()); // 4 bajta za dužinu sekvence
+                writeVarInt(bufferCache, seq.length());
 
                 bufferCache.put(seqBytes);
 
 
-                //buffer.put((byte) accessions.length); // 1 bajt za broj access
-                writeVarInt(bufferCache, accessions.length); // 4 bajta za broj access
+                writeVarInt(bufferCache, accessions.length);
                 for (String acc : accessions) {
                     writeVarInt(bufferCache, Integer.parseInt(acc));
                 }
