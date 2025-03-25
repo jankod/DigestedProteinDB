@@ -97,14 +97,14 @@ public class MyUtil {
     public static RocksDB openWriteDB(String path) throws RocksDBException {
         RocksDB.loadLibrary();
         Options options = new Options().setCreateIfMissing(true);
-        options.setAllowMmapReads(true);
 
         options.setStrictBytesPerSync(false);
         options.setAllow2pc(false);
+        options.setAllowMmapReads(true);
         options.setAllowMmapWrites(true);
 
 
-        options.setCompactionStyle(CompactionStyle.UNIVERSAL);
+        options.setCompactionStyle(CompactionStyle.LEVEL);
         options.setWriteBufferSize(256 * 1024 * 1024); // 256 MB
         options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
 
