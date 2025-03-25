@@ -14,103 +14,101 @@ import java.util.zip.GZIPInputStream;
 @Getter
 public class UniprotXMLParser {
 
+	@Data
+	public abstract static class ProteinHandler {
 
-    @Data
-    public abstract static class ProteinHandler {
+		public boolean stopped = false;
 
-        public boolean stopped = false;
+		public long counter = 0;
 
-        public long counter = 0;
+		public abstract void gotProtein(ProteinInfo p) throws IOException;
+	}
 
-        public abstract void gotProtein(ProteinInfo p) throws IOException;
-    }
+	private long totalCount = 0;
 
-    private long totalCount = 0;
+	public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
+		ProteinInfo proteinInfo = null;
 
-    public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
-        ProteinInfo proteinInfo = null;
+		try {
+			XMLInputFactory factory = XMLInputFactory.newInstance();
+			factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+			XMLStreamReader reader;
 
-        try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            XMLStreamReader reader;
+			if(filePath.endsWith(".gz")) {
+				GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(filePath), 65536*2);
+				reader = factory.createXMLStreamReader(gzipInputStream);
+			} else {
+				reader = factory.createXMLStreamReader(new FileInputStream(filePath));
+			}
+			while(reader.hasNext()) {
+				int event = reader.next();
 
-            if (filePath.endsWith(".gz")) {
-                GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(filePath), 65536);
-                reader = factory.createXMLStreamReader(gzipInputStream);
-            } else {
-                reader = factory.createXMLStreamReader(new FileInputStream(filePath));
-            }
-            while (reader.hasNext()) {
-                int event = reader.next();
+				switch(event) {
+					case XMLStreamConstants.START_ELEMENT:
+						if("entry".equals(reader.getLocalName())) {
+							proteinInfo = new ProteinInfo();
+							if(proteinHandler.stopped) {
+								return;
+							}
+						} else if(proteinInfo != null) {
+							switch(reader.getLocalName()) {
+								case "accession":
+									// primary accession is first in the list
+									if(proteinInfo.getAccession() == null)
+										proteinInfo.setAccession(reader.getElementText());
+									break;
+								case "fullName":
+									proteinInfo.setProteinName(reader.getElementText());
+									break;
+								case "dbReference":
+									if("NCBI Taxonomy".equals(reader.getAttributeValue(null, "type"))) {
+										try {
+											proteinInfo.setTaxonomyId(Integer.parseInt(reader.getAttributeValue(null, "id")));
+										} catch(NumberFormatException e) {
+											proteinInfo.setTaxonomyId(-1);
+										}
+									}
+									break;
+								case "name":
+									if("scientific".equals(reader.getAttributeValue(null, "type"))) {
+										proteinInfo.setTaxonomyName(reader.getElementText());
+									}
+									break;
+								case "sequence":
+									proteinInfo.setSequence(reader.getElementText().trim());
+									break;
+							}
+						}
+						break;
 
-                switch (event) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        if ("entry".equals(reader.getLocalName())) {
-                            proteinInfo = new ProteinInfo();
-                            if (proteinHandler.stopped) {
-                                return;
-                            }
-                        } else if (proteinInfo != null) {
-                            switch (reader.getLocalName()) {
-                                case "accession":
-                                    proteinInfo.setAccession(reader.getElementText());
-                                    break;
-                                case "fullName":
-                                    proteinInfo.setProteinName(reader.getElementText());
-                                    break;
-                                case "dbReference":
-                                    if ("NCBI Taxonomy".equals(reader.getAttributeValue(null, "type"))) {
-                                        try {
-                                            proteinInfo.setTaxonomyId(Integer.parseInt(reader.getAttributeValue(null, "id")));
-                                        } catch (NumberFormatException e) {
-                                            proteinInfo.setTaxonomyId(-1);
-                                        }
-                                    }
-                                    break;
-                                case "name":
-                                    if ("scientific".equals(reader.getAttributeValue(null, "type"))) {
-                                        proteinInfo.setTaxonomyName(reader.getElementText());
-                                    }
-                                    break;
-                                case "sequence":
-                                    proteinInfo.setSequence(reader.getElementText().trim());
-                                    break;
-                            }
-                        }
-                        break;
+					case XMLStreamConstants.END_ELEMENT:
+						if("entry".equals(reader.getLocalName()) && proteinInfo != null) {
+							proteinHandler.counter++;
+							totalCount++;
+							proteinHandler.gotProtein(proteinInfo);
+						}
+						break;
+				}
+			}
 
-                    case XMLStreamConstants.END_ELEMENT:
-                        if ("entry".equals(reader.getLocalName()) && proteinInfo != null) {
-//                            proteinList.add(proteinInfo);
-                            proteinHandler.counter++;
-                            totalCount++;
-                            proteinHandler.gotProtein(proteinInfo);
-                        }
-                        break;
-                }
-            }
+			reader.close();
 
-            reader.close();
+		} catch(XMLStreamException | IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
-        }
+	}
 
+	static @Data
+	public class ProteinInfo {
+		String accession;
+		String proteinName;
+		int taxonomyId;
+		String taxonomyName;
 
-    }
-
-    static @Data
-    public class ProteinInfo {
-        String accession;
-        String proteinName;
-        int taxonomyId;
-        String taxonomyName;
-
-        @ToString.Exclude
-        String sequence;
-    }
-
+		@ToString.Exclude
+		String sequence;
+	}
 
 }
 

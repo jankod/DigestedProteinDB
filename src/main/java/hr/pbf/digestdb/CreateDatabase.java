@@ -132,7 +132,7 @@ public class CreateDatabase {
 
         long proteinCountResult = 0;
         { // 3.
-            MainCsvMassGrouperWithAccIds app3csvMassGroup = new MainCsvMassGrouperWithAccIds();
+            JobCsvMassGrouperWithAccIds app3csvMassGroup = new JobCsvMassGrouperWithAccIds();
             app3csvMassGroup.setInputCsvPeptideMassSorted(PEPTIDE_MASS_CSV_SORTED_PATH);
             app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
             app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
@@ -173,7 +173,7 @@ public class CreateDatabase {
         }
 
         { // 7. Properties
-            saveDbInfoToProperties(proteinCountResult, DB_INFO_PROPERTIES_PATH, readXmlResult.getPeptideCount());
+            saveDbInfoToProperties(readXmlResult.getProteinCount(), DB_INFO_PROPERTIES_PATH, readXmlResult.getPeptideCount());
         }
 
         log.info("Finished time: {}", DurationFormatUtils.formatDurationHMS(watch.getTime()));
@@ -182,7 +182,7 @@ public class CreateDatabase {
     private void saveDbInfoToProperties(long proteinCount, String dbInfoPropertiesPath, long peptideCount) {
 
         Properties prop = new Properties();
-        prop.setProperty("uniprot_xml_path", config.getUniprotXmlPath());
+  //      prop.setProperty("uniprot_xml_path", config.getUniprotXmlPath());
         prop.setProperty("min_peptide_length", String.valueOf(config.getMinPeptideLength()));
         prop.setProperty("max_peptide_length", String.valueOf(config.getMaxPeptideLength()));
         prop.setProperty("miss_cleavage", String.valueOf(config.getMissedCleavage()));
