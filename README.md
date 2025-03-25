@@ -1,6 +1,6 @@
-# Digested Peptide Database
+# **This project is currently in active development**
 
-<span style="font-size: 20px;">This project is currently in active development.</span>
+# Digested Peptide Database
 
 ## Overview
 
