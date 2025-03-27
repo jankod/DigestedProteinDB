@@ -145,6 +145,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
+                        <th>#</th>
                         <th>Mass (Da)</th>
                         <th>Peptide Sequence</th>
                         <th>Accession</th>
@@ -153,6 +154,7 @@
                     <tbody>
                     <template x-for="(item, index) in parsedResults" :key="index">
                         <tr>
+                            <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
                             <td x-text="item.mass"></td>
                             <td x-text="item.seq"></td>
                             <td>
@@ -336,6 +338,15 @@
                     this.totalItems = data.totalResult || 0;
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
+
+
+                    console.log("Data type ", typeof data);
+                    if(typeof data === 'string'){
+                        this.results = data;
+                        this.loading = false;
+                        this.error = data;
+                        return;
+                    }
 
                     // Flatten the 'result' array
                     const flattened = [];

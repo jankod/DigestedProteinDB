@@ -12,6 +12,12 @@ if ($pageSize < 1) $pageSize = 10;
 $mass1 = isset($_GET['mass1']) ? $_GET['mass1'] : '';
 $mass2 = isset($_GET['mass2']) ? $_GET['mass2'] : '';
 
+// if mass1 or mass2 are empty or not a number, return an error
+if (!is_numeric($mass1) || !is_numeric($mass2)) {
+    echo json_encode('Mass From and Mass To must be numbers');
+    return;
+}
+
 // Limit mass2 to be at most 0.3 greater than mass1
 $maxDifference = 0.301;
 if ($mass2 - $mass1 > $maxDifference) {
