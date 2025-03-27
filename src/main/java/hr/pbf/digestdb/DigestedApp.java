@@ -83,8 +83,8 @@ public class DigestedApp {
 
 	@Command(name = "server", description = "Run web server for database search")
 	static class WebServerCommand implements Callable<Integer> {
-		@Option(names = { "-p", "--port" }, description = "Port of web app")
-		int port = 7070;
+		@Option(names = { "-p", "--port" }, description = "Port of web app, default 7071", defaultValue = "7071")
+		int port = 7071;
 
 		@Option(names = { "-d", "--db-dir" }, description = "Path to the database directory", required = true)
 		String dbDir;
