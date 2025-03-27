@@ -32,6 +32,12 @@
                                 x-text="dbInfo.max_peptide_length"></span></p>
                 </div>
             </div>
+            <div>
+                Download: <a class="btn btn-link" href="https://digestedproteindb.pbf.hr/dow/trembl_bacteria.zip">trembl_bacteria.zip
+                    (50 GB)</a>
+            </div>
+
+
             <hr>
 
             <div class="row">
@@ -131,16 +137,52 @@
         <div class="col">
             <h2>Results</h2>
             <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
-            <pre x-text="results"></pre>
+            <!--            <pre x-text="results"></pre>-->
+
+
+            <!-- Table for displaying results instead of raw JSON -->
+            <div x-show="results && parsedResults.length > 0">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>Mass (Da)</th>
+                        <th>Peptide Sequence</th>
+                        <th>Accession</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template x-for="(item, index) in parsedResults" :key="index">
+                        <tr>
+                            <td x-text="item.mass"></td>
+                            <td x-text="item.seq"></td>
+                            <td>
+                                <template x-for="(accession, idx) in item.acc" :key="idx">
+    <span>
+      <a :href="`https://www.uniprot.org/uniprot/${accession.trim()}`" target="_blank" x-text="accession.trim()"></a>
+      <span x-show="idx < item.acc.length - 1">, </span>
+    </span>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="alert alert-info" x-show="parsedResults && parsedResults.length === 0">
+                No results found for the search criteria.
+            </div>
+
+
         </div>
     </div>
-
 
 
     <style>
         .card a {
             color: #0056b3 !important;
         }
+
         .card a:hover {
             color: #003580;
         }
@@ -198,6 +240,7 @@
             totalPages: 0,
 
             responseSize: "",
+            parsedResults: [],
 
             async init() {
                 try {
@@ -292,6 +335,26 @@
 
                     this.totalItems = data.totalResult || 0;
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+
+
+                    // Flatten the 'result' array
+                    const flattened = [];
+                    if (data.result && Array.isArray(data.result)) {
+                        data.result.forEach(item => {
+                            const massKey = Object.keys(item)[0];
+                            // each 'item' has a single key like '1500.6086'
+                            const entries = item[massKey];
+                            entries.forEach(entry => {
+                                flattened.push({
+                                    mass: massKey,
+                                    seq: entry.seq,
+                                    acc: entry.acc
+                                })
+                            });
+                        });
+                    }
+
+                    this.parsedResults = flattened;
 
 //                    const memoryUsage = data.memory;
 //                    const duration = data.duration;
