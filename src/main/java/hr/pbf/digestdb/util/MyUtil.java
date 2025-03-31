@@ -90,7 +90,7 @@ public class MyUtil {
         options.setTableFormatConfig(tableConfig);
         options.setAllowMmapReads(true);
 
-        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
+        options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
         return RocksDB.openReadOnly(options, dbPath);
     }
 
@@ -106,7 +106,7 @@ public class MyUtil {
 
         options.setCompactionStyle(CompactionStyle.LEVEL);
         options.setWriteBufferSize(256 * 1024 * 1024); // 256 MB
-        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
+        options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
 
         return RocksDB.open(options, path);
 

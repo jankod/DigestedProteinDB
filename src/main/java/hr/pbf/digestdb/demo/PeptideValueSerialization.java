@@ -54,7 +54,7 @@ public class PeptideValueSerialization {
             for (int i = 0; i < mapSize; i++) {
                 int peptideLength = dis.readInt();
                 // String peptide = new String(dis.readNBytes(peptideLength), 0, peptideLength, StandardCharsets.US_ASCII);
-                String peptide = AminoAcid5bitCoder.decodePeptide(dis.readNBytes(peptideLength), peptideLength);
+                String peptide = AminoAcid5bitCoder.decodePeptide(dis.readNBytes(peptideLength));
 
                 int positionsSize = dis.readInt();
                 Set<Long> positions = new HashSet<>();

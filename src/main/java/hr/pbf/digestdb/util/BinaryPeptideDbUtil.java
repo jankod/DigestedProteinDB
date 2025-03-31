@@ -10,7 +10,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -81,9 +80,8 @@ public class BinaryPeptideDbUtil {
             int seqLength = readVarInt(buffer);
             byte[] seqBytes = new byte[seqLength];
             buffer.get(seqBytes);
-            //String sequence =AminoAcidCoder.decodePeptideByteBuffer(seqBytes, seqLength);
-            String sequence = new String(seqBytes, StandardCharsets.UTF_8);
-
+            String sequence = AminoAcid5bitCoder.decodePeptide(seqBytes);
+            //String sequence = new String(seqBytes, StandardCharsets.UTF_8);
 
             int accessionCount = readVarInt(buffer);
             List<Integer> accessions = new ArrayList<>(accessionCount);
@@ -105,6 +103,10 @@ public class BinaryPeptideDbUtil {
         return peptides;
     }
 
+    /**
+     * @param value String in format like: SGAGAAA:15-SAAGGAA:14-TGAAAGG:16;12345
+     * @return byte[] in format: [length][data]
+     */
     public byte[] writeGroupedRow(String value) {
         try {
             bufferCache.clear();
@@ -117,10 +119,10 @@ public class BinaryPeptideDbUtil {
                 String[] accessions = value.substring(colonIndex + 1, dashIndex).split(";");
 
 
-               // byte[] seqBytes = AminoAcidCoder.encodePeptideByteBuffer(seq);
-                byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
+                byte[] seqBytes = AminoAcid5bitCoder.encodePeptide(seq);
+               // byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
                 ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
-                writeVarInt(bufferCache, seq.length());
+                writeVarInt(bufferCache, seqBytes.length);
 
                 bufferCache.put(seqBytes);
 

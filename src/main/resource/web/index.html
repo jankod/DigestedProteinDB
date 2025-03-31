@@ -8,12 +8,12 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-<h1>DigestedDB</h1>
+<h1 class="text-center">DigestedDB</h1>
 
 <div class="container" x-data="searchData()">
     <div class="row">
         <div class="col">
-            <h2>Search for mass </h2>
+
             <div x-show="dbInfo">
                 <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
                 <p class="mb-1"><strong>Miss Cleavage:</strong> <span x-text="dbInfo.miss_cleavage"></span></p>
@@ -24,6 +24,8 @@
                 <p class="mb-1"><strong>Protein count:</strong> <span x-text="dbInfo.protein_count"></span></p>
                 <p class="mb-3"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
             </div>
+
+             <h2 class="text-center">Search for mass </h2>
             <form @submit.prevent="search">
                 <div class="mb-3">
                     <label for="mass1" class="form-label">Mass from</label>

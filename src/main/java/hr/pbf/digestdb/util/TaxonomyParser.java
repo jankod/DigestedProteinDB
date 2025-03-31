@@ -164,7 +164,7 @@ public class TaxonomyParser {
     }
 
  public static void main(String[] args) {
-        String dir = ".../misc/ncbi_taxonomy/taxdump";
+        String dir = "/media/tag/D/digested-db/taxdump";
         String nodesPath = dir + "/nodes.dmp";
         String namesPath = dir + "/names.dmp";
         String divisionPath = dir + "/division.dmp";

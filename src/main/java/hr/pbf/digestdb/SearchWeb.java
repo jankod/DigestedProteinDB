@@ -45,7 +45,7 @@ public class SearchWeb {
 
     public void start() throws RocksDBException, IOException {
 
-        log.debug("Start web on port: " + port + " db dir: " + dbDirPath);
+		log.debug("Start web on port: {} db dir: {}", port, dbDirPath);
         try {
             long startTime = System.currentTimeMillis();
 
