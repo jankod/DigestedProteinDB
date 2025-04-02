@@ -156,13 +156,13 @@
                             <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
                             <td x-text="item.mass"></td>
                             <td>
-                                <template x-for="i in item.data" :key="i">
-                                    <div>
+                                <template x-for="i in item.data" :key="i.seq">
+                                    <div class="d-flex">
                                         <span class="font-monospace" x-text="i.seq"></span> &nbsp; &nbsp;
                                         <span class="">
-                                            <template x-for="acc in i.acc" :key="acc">
-                                                <span> &nbsp;<a :href="`https://www.uniprot.org/uniprot/${accession.trim()}`"
-                                                        target="_blank" x-text="acc"> </a> &nbsp;
+                                             <template x-for="acc in i.acc" :key="acc">
+                                                <span><a class="btn btn-link" x-bind:href="'https://www.uniprot.org/uniprot/'+acc.trim()"
+                                                        target="_blank" x-text="acc"> </a>
                                                 </span>
                                             </template>
                                         </span>
@@ -241,8 +241,6 @@
                 const entry = Object.entries(data);
                 const mass = entry[0][0];
                 const seqAcc = entry[0][1];
-                // console.log("mass", mass);
-                // console.log("acc", seqAcc);
                 const massValue = parseFloat(mass);
                 if (!isNaN(massValue)) {
                     parsedResults.push({
@@ -281,7 +279,6 @@
                         throw new Error('Failed to fetch database info');
                     }
                     this.dbInfo = await response.json();
-                    console.log("dbInfo", this.dbInfo);
                 } catch (error) {
                     console.error('Error fetching database info:', error);
                     this.dbInfo = 'Error fetching database info';
@@ -368,7 +365,6 @@
                     this.totalItems = data.totalResult || 0;
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
-                    console.log("Data type ", typeof data);
                     if (typeof data === 'string') {
                         this.results = data;
                         this.loading = false;
@@ -376,10 +372,7 @@
                         return;
                     }
 
-
                     this.parsedResults = toTableData(data.result);
-
-                    console.log("parsedResults", this.parsedResults);
 
 //                    const memoryUsage = data.memory;
 //                    const duration = data.duration;
