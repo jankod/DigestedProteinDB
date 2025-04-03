@@ -74,7 +74,7 @@ public class DigestedApp {
 			try {
 				createDatabase.start();
 			} catch(Throwable e) {
-				log.error("Error creating database", e);
+				log.error("Error creating 	database", e);
 				e.printStackTrace();
 			}
 			return 0;

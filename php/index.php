@@ -148,7 +148,6 @@
                         <th>#</th>
                         <th>Mass (Da)</th>
                         <th>Peptide Sequence</th>
-                        <th>Accession</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -156,15 +155,21 @@
                         <tr>
                             <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
                             <td x-text="item.mass"></td>
-                            <td x-text="item.seq"></td>
                             <td>
-                                <template x-for="(accession, idx) in item.acc" :key="idx">
-    <span>
-      <a :href="`https://www.uniprot.org/uniprot/${accession.trim()}`" target="_blank" x-text="accession.trim()"></a>
-      <span x-show="idx < item.acc.length - 1">, </span>
-    </span>
+                                <template x-for="i in item.data" :key="i.seq">
+                                    <div class="d-flex">
+                                        <span class="font-monospace" x-text="i.seq"></span> &nbsp; &nbsp;
+                                        <span class="">
+                                             <template x-for="acc in i.acc" :key="acc">
+                                                <span><a class="btn btn-link" x-bind:href="'https://www.uniprot.org/uniprot/'+acc.trim()"
+                                                        target="_blank" x-text="acc"> </a>
+                                                </span>
+                                            </template>
+                                        </span>
+                                    </div>
                                 </template>
                             </td>
+
                         </tr>
                     </template>
                     </tbody>
@@ -225,6 +230,29 @@
 <script>
 
     function searchData() {
+        function toTableData(result) {
+            if (result === null || result === undefined) {
+                return [];
+            }
+            // result is array of objects like this {"1500.6046":[{"seq":"TCDDECCPVNFKK","acc":["Q9YLG5","P03313"]},{"seq":"TCDEDCCPVNFKK","acc":["O91734"]}]} kako da
+            // pretvori ga u array of objects like this {mass:1500.6046, data: [{"seq":"TCDDECCPVNFKK","acc":["Q9YLG5","P03313"]},{"seq":"TCDEDCCPVNFKK","acc":["O91734"]}]}
+            const parsedResults = [];
+            for (const [num, data] of Object.entries(result)) {
+                const entry = Object.entries(data);
+                const mass = entry[0][0];
+                const seqAcc = entry[0][1];
+                const massValue = parseFloat(mass);
+                if (!isNaN(massValue)) {
+                    parsedResults.push({
+                        mass: massValue,
+                        data: seqAcc
+                    });
+                }
+            }
+
+            return parsedResults;
+        }
+
         return {
             calculatedMass: "",
             peptideSequence: "",
@@ -251,7 +279,6 @@
                         throw new Error('Failed to fetch database info');
                     }
                     this.dbInfo = await response.json();
-                    console.log("dbInfo", this.dbInfo);
                 } catch (error) {
                     console.error('Error fetching database info:', error);
                     this.dbInfo = 'Error fetching database info';
@@ -338,34 +365,14 @@
                     this.totalItems = data.totalResult || 0;
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
-
-
-                    console.log("Data type ", typeof data);
-                    if(typeof data === 'string'){
+                    if (typeof data === 'string') {
                         this.results = data;
                         this.loading = false;
                         this.error = data;
                         return;
                     }
 
-                    // Flatten the 'result' array
-                    const flattened = [];
-                    if (data.result && Array.isArray(data.result)) {
-                        data.result.forEach(item => {
-                            const massKey = Object.keys(item)[0];
-                            // each 'item' has a single key like '1500.6086'
-                            const entries = item[massKey];
-                            entries.forEach(entry => {
-                                flattened.push({
-                                    mass: massKey,
-                                    seq: entry.seq,
-                                    acc: entry.acc
-                                })
-                            });
-                        });
-                    }
-
-                    this.parsedResults = flattened;
+                    this.parsedResults = toTableData(data.result);
 
 //                    const memoryUsage = data.memory;
 //                    const duration = data.duration;
