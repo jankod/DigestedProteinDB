@@ -37,7 +37,15 @@ public class JobCsvMassGrouperWithAccIds {
 		return buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
 	}
 
+	/**
+	 * Read csv and remove double accession and sort with
+	 * @param inputCsvPath
+	 * @param outputGroupedCsvPath
+	 * @param bufferSize
+	 * @return
+	 */
 	private Object2IntMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
+		// Java heap space for TrEMLB od 32GB RAM
 		Object2IntMap<String> accessionToIdMap = new Object2IntOpenHashMap<>();
 
 		int nextAccNumId = 1;
