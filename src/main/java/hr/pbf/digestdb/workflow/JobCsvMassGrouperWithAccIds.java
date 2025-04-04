@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.workflow;
 
+import hr.pbf.digestdb.db.AccessionDbReader;
 import hr.pbf.digestdb.util.MyUtil;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -37,6 +38,7 @@ public class JobCsvMassGrouperWithAccIds {
 		return buildAccessionMap(inputCsvPeptideMassSorted, outputAccessionMapCsv, bufferSize);
 	}
 
+
 	/**
 	 * Read csv and remove double accession and sort with
 	 * @param inputCsvPath
@@ -46,9 +48,10 @@ public class JobCsvMassGrouperWithAccIds {
 	 */
 	private Object2IntMap<String> buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
 		// Java heap space for TrEMLB od 32GB RAM
+		// accession => accessionNum
 		Object2IntMap<String> accessionToIdMap = new Object2IntOpenHashMap<>();
 
-		int nextAccNumId = 1;
+		int nextAccNumId = 0;
 
 		try(BufferedReader reader = new BufferedReader(new FileReader(inputCsvPath), bufferSize)) {
 			String line;
@@ -94,8 +97,6 @@ public class JobCsvMassGrouperWithAccIds {
 		try(BufferedReader reader = new BufferedReader(new FileReader(inputCsv), bufferSize);
 				BufferedWriter writer = new BufferedWriter(new FileWriter(outputGroupedCsv), bufferSize)) {
 
-			//  reader.readLine(); // Preskoči header
-
 			String line = reader.readLine();
 			if(line == null || line.isBlank())
 				return;
@@ -110,8 +111,8 @@ public class JobCsvMassGrouperWithAccIds {
 			Map<String, IntOpenHashSet> seqIdsMap = new HashMap<>();
 
 			String sequence = parts[1];
-			int id = accessionToIdMap.getInt(parts[2]);
-			seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
+			int accNum = accessionToIdMap.getInt(parts[2]);
+			seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(accNum);
 
 			while((line = reader.readLine()) != null) {
 				parts = line.split(",");
@@ -123,15 +124,15 @@ public class JobCsvMassGrouperWithAccIds {
 
 				if(mass4.equals(prevMass4)) {
 					sequence = parts[1];
-					id = accessionToIdMap.getInt(parts[2]);
-					seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
+					accNum = accessionToIdMap.getInt(parts[2]);
+					seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(accNum);
 				} else {
 					writeMassToCsv(writer, prevMass4, seqIdsMap);
 					prevMass4 = mass4;
 					seqIdsMap.clear();
 					sequence = parts[1];
-					id = accessionToIdMap.getInt(parts[2]);
-					seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(id);
+					accNum = accessionToIdMap.getInt(parts[2]);
+					seqIdsMap.computeIfAbsent(sequence, k -> new IntOpenHashSet()).add(accNum);
 				}
 			}
 			writeMassToCsv(writer, prevMass4, seqIdsMap);

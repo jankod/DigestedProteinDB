@@ -19,6 +19,18 @@
     <dependencies>
 
         <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>dsiutils</artifactId>
+            <version>2.7.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.14.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.undertow</groupId>
             <artifactId>undertow-core</artifactId>
             <version>2.3.18.Final</version>

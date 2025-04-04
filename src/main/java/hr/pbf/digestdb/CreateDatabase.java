@@ -58,7 +58,7 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		steps = List.of( 3, 4, 5, 6, 7);
+	//	steps = List.of( 3, 4, 5, 6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -122,7 +122,8 @@ public class CreateDatabase {
 				}
 				cmdString += " export TMPDIR=${sort_temp_dir} && ";
 			}
-			cmdString += "sort -S 8G -t ',' -k1n ${peptide_mass_csv_path} -o ${peptide_mass_sorted_console}";
+			// -S 8G for memory
+			cmdString += "sort  -t',' -k1n ${peptide_mass_csv_path} -o ${peptide_mass_sorted_console}";
 
 			cmdString = new MyFormatter(cmdString)
 					.param("sort_temp_dir", sortTempDir)
@@ -141,7 +142,8 @@ public class CreateDatabase {
 
 		// create accession map
 		{
-
+			// export TMPDIR=
+			// sort -t',' -k2,2n tax_acc.csv -o tax_acc_sorted.csv
 		}
 
 
