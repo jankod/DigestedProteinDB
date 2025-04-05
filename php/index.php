@@ -141,12 +141,12 @@
 
 
             <!-- Table for displaying results instead of raw JSON -->
-            <div x-show="results && parsedResults.length > 0">
-                <table class="table table-striped table-hover">
+            <div x-show="results && parsedResults.length > 0" class="table-responsive">
+                <table class="table  table-hover">
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Mass (Da)</th>
+                        <th title="Mass monoisotopic (Da)" class="text-nowrap">Mass (Da)</th>
                         <th>Peptide Sequence</th>
                     </tr>
                     </thead>
@@ -156,18 +156,31 @@
                             <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
                             <td x-text="item.mass"></td>
                             <td>
-                                <template x-for="i in item.data" :key="i.seq">
-                                    <div class="d-flex">
-                                        <span class="font-monospace" x-text="i.seq"></span> &nbsp; &nbsp;
-                                        <span class="">
-                                             <template x-for="acc in i.acc" :key="acc">
-                                                <span><a class="btn btn-link" x-bind:href="'https://www.uniprot.org/uniprot/'+acc.trim()"
-                                                        target="_blank" x-text="acc"> </a>
-                                                </span>
-                                            </template>
-                                        </span>
-                                    </div>
-                                </template>
+                                <div class="">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                        <template x-for="i in item.data" :key="i.seq">
+                                            <tr>
+                                                <td x-text="i.seq" class="font-monospace align-top"></td>
+                                                <td class="align-top">
+                                                    <template x-for="(acc, index) in i.acc" :key="acc">
+                                                    <span><a class="btn-link pt-0 px-1 font-monospace"
+                                                             :href="'https://www.uniprot.org/uniprot/'+acc.trim()"
+                                                             target="_blank" x-text="acc"> </a>
+                                                          <template x-if="(index + 1) % 7 === 0">
+                                                            <br>
+                                                        </template>
+
+                                                    </span>
+
+                                                    </template>
+
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </td>
 
                         </tr>

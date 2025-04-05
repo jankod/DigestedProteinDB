@@ -59,7 +59,7 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		steps = List.of(  5, 6, 7);
+		steps = List.of( 6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -199,7 +199,7 @@ public class CreateDatabase {
 		if(steps.contains(6)) { // 6. Create custom accession db
 			AccessionDbCreator accDb = new AccessionDbCreator(ACCESSION_MAP_CSV_SORTED_PATH, CUSTOM_ACCESSION_DB_DIR_PATH);
 			accDb.startCreate();
-			log.info("Custom accession db is created: {}", CUSTOM_ACCESSION_DB_DIR_PATH);
+			log.info("Custom accession db is created: {}. File: size: {}", CUSTOM_ACCESSION_DB_DIR_PATH, MyUtil.getFileSize(CUSTOM_ACCESSION_DB_DIR_PATH));
 		} else {
 			log.info("Skip step 6");
 		}

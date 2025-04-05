@@ -7,6 +7,6 @@ package hr.pbf.digestdb.workflow.core;
  */
 public interface Job<R> {
 
-    R start(JobContext jobContext) throws Exception;
+    R start(JobWorkflowContext context) throws Exception;
 
 }

@@ -31,7 +31,7 @@ public class MassRocksDbCreator {
 
 	private final String fromCsvPath;
 	private final String toDbPath;
-	private int bufferSizeForReadCsv = 8192 * 128; // 128 KB
+	private int bufferSizeForReadCsv = 1024 * 1024 * 32; // 32 MB
 
 	public MassRocksDbCreator(String fromCsvPath, String toDbPath) {
 		this.fromCsvPath = fromCsvPath;

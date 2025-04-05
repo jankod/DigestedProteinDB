@@ -15,13 +15,6 @@ public class DemoJob {
         SimpleJob2 simpleJob2 = new SimpleJob2();
         simpleJob2.setParam22("param22");
 
-        JobLancher jobLancher = new JobLancher();
-        jobLancher.addJob(simpleJob1);
-        jobLancher.addJob(simpleJob2);
-
-        jobLancher.runAll();
-        boolean res = jobLancher.waitForAll();
-        log.debug("All jobs finished: {}", res);
     }
 
     @Slf4j
@@ -35,9 +28,11 @@ public class DemoJob {
         public final String PARAM3 = "param3";
 
         @Override
-        public Void start(JobContext jobContext) throws Exception {
+        public Void start(JobWorkflowContext context) throws Exception {
             log.info("Starting job SimpleJob1");
-            jobContext.setParam(PARAM3, param1);
+            context.setParam(PARAM3, param1);
+
+
             for (int i = 0; i < 10; i++) {
                 Thread.sleep(2000);
                 log.debug("Job SimpleJob1, iteration: {}", i);
@@ -54,7 +49,7 @@ public class DemoJob {
         String param22;
 
         @Override
-        public Void start(JobContext jobContext) throws Exception {
+        public Void start(JobWorkflowContext context) throws Exception {
             for (int i = 0; i < 10; i++) {
                 Thread.sleep(2000);
                 log.debug("Job SimpleJob2, iteration: {}", i);

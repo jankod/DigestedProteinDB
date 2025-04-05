@@ -1,7 +1,6 @@
 package hr.pbf.digestdb.workflow.core;
 
 import lombok.Data;
-import org.apache.commons.lang3.time.DurationFormatUtils;
 
 @Data
 public final class JobResult<R> {
@@ -10,7 +9,4 @@ public final class JobResult<R> {
     private long startTime;
     private long endTime;
 
-    public String duration() {
-        return DurationFormatUtils.formatDuration(endTime - startTime, "HH:mm:ss:SSS");
-    }
 }
