@@ -45,12 +45,12 @@ public class MyUtil {
 		return ByteBuffer.wrap(byteArray).getDouble();
 	}
 
-	public static long toBase36(String acc) {
-		return Long.parseLong(acc, 36);
+	public static long toAccessionLong36(String accession) {
+		return Long.parseLong(accession.toUpperCase(), 36);
 	}
 
-	public static String fromBase36(long accNum) {
-		return Long.toString(accNum, 36);
+	public static String fromAccessionLong36(long accession) {
+		return Long.toString(accession, 36).toUpperCase();
 	}
 
 	/**

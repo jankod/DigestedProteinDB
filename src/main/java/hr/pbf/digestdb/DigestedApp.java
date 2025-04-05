@@ -71,12 +71,8 @@ public class DigestedApp {
 			config.setEnzyme(enzyme);
 
 			CreateDatabase createDatabase = new CreateDatabase(config);
-			try {
-				createDatabase.start();
-			} catch(Throwable e) {
-				log.error("Error creating 	database", e);
-				e.printStackTrace();
-			}
+			createDatabase.start();
+
 			return 0;
 		}
 	}
@@ -101,7 +97,14 @@ public class DigestedApp {
 	}
 
 	public static void main(String[] args) {
-		int exitCode = new CommandLine(new RootCommand()).execute(args);
-		System.exit(exitCode);
+		try {
+			int exitCode = new CommandLine(new RootCommand()).execute(args);
+			log.info("Fininsh, exiting with code {}", exitCode);
+			System.exit(exitCode);
+		} catch(Throwable e) {
+			log.error("Error creating 	database", e);
+			e.printStackTrace();
+		}
+
 	}
 }

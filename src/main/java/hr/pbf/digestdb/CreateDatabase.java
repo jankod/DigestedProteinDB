@@ -5,6 +5,7 @@ import hr.pbf.digestdb.db.MassRocksDbCreator;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
 import hr.pbf.digestdb.workflow.BashCommand;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -54,11 +55,11 @@ public class CreateDatabase {
 		this.config = config;
 	}
 
-	public void start() throws Throwable {
+	public void start() throws Exception {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-	//	steps = List.of( 3, 4, 5, 6, 7);
+		steps = List.of(  5, 6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -140,23 +141,16 @@ public class CreateDatabase {
 			log.info("Skip step 2");
 		}
 
-		// create accession map
-		{
-			// export TMPDIR=
-			// sort -t',' -k2,2n tax_acc.csv -o tax_acc_sorted.csv
-		}
-
-
-		long proteinCountResult = 0;
 		if(steps.contains(3)) { // 3.
 			JobCsvMassGrouperWithAccIds app3csvMassGroup = new JobCsvMassGrouperWithAccIds();
 			app3csvMassGroup.setInputCsvPeptideMassSorted(PEPTIDE_MASS_CSV_SORTED_PATH);
 			app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
 			app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
-
-			Object2IntMap<String> accCustomDb = app3csvMassGroup.start();
-			proteinCountResult = accCustomDb.size();
+			app3csvMassGroup.setProteinCount(readXmlResult.getProteinCount());
+			app3csvMassGroup.setProteinCount(252633202); // TODO remove
+			Long2IntMap accCustomDb = app3csvMassGroup.start();
 			log.info("Grouped with ids: {}", GROUPED_WITH_IDS_CSV_PATH);
+			log.info("Protein count: {}", readXmlResult.getProteinCount());
 		} else {
 			log.info("Skip step 3");
 		}
@@ -164,11 +158,24 @@ public class CreateDatabase {
 		if(steps.contains(4)) { // 4.
 			//  sort -t',' -k1n accession_map.csv -o accession_map_sorted.csv
 			BashCommand cmd = new BashCommand();
-			String cmdSortAccession = " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
+			String cmdSortAccession = "";
+			String sortTempDir = config.getSortTempDir();
+			if(sortTempDir != null) {
+				if(!FileUtils.isDirectory(new File(sortTempDir))) {
+					log.info("Temp dir not exists, i will create.: {}", sortTempDir);
+					FileUtils.forceMkdir(new File(sortTempDir));
+				}
+				cmdSortAccession += " export TMPDIR=${sort_temp_dir} && ";
+			}
+
+			cmdSortAccession += " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
 			cmdSortAccession = new MyFormatter(cmdSortAccession)
+					.param("sort_temp_dir", sortTempDir)
 					.param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
 					.param("accession_map.csv.sorted", ACCESSION_MAP_CSV_SORTED_PATH)
 					.format();
+
+
 
 			log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
 			cmd.setCmd(cmdSortAccession);
