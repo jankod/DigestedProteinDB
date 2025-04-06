@@ -153,19 +153,22 @@
                     <tbody>
                     <template x-for="(item, index) in parsedResults" :key="index">
                         <tr>
+
                             <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
                             <td x-text="item.mass"></td>
                             <td>
                                 <div class="">
-                                    <table class="table table-hover">
+                                    <table class="table-sm table-hover">
                                         <tbody>
-                                        <template x-for="i in item.data" :key="i.seq">
+                                        <template x-for="(i, index2) in item.data">
                                             <tr>
+                                                <td class="align-top"><span x-text="index2+1"></span>.</td>
                                                 <td x-text="i.seq" class="font-monospace align-top"></td>
                                                 <td class="align-top">
                                                     <template x-for="(acc, index) in i.acc" :key="acc">
+<!--                                                         :href="'https://www.uniprot.org/uniprot/'+acc.trim()"-->
                                                     <span><a class="btn-link pt-0 px-1 font-monospace"
-                                                             :href="'https://www.uniprot.org/uniprot/'+acc.trim()"
+                                                             :href="'tool.php?accession='+acc.trim()"
                                                              target="_blank" x-text="acc"> </a>
                                                           <template x-if="(index + 1) % 7 === 0">
                                                             <br>

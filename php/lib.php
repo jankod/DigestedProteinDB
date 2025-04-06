@@ -11,7 +11,8 @@ const DIGESTED_DB_URL = 'http://localhost:7071';
  * @param array $headers Additional headers to send
  * @return array Associative array containing 'response' and 'status_code'
  */
-function sendRestRequest($url, $method = 'GET', $data = null, $headers = []) {
+function sendRestRequest($url, $method = 'GET', $data = null, $headers = [])
+{
     $ch = curl_init($url);
 
     // Set common options
@@ -43,9 +44,65 @@ function sendRestRequest($url, $method = 'GET', $data = null, $headers = []) {
     curl_close($ch);
 
     // Try to decode JSON response
-   // $decoded = json_decode($response, true);
-   // $result = $decoded !== null ? $decoded : $response;
+    // $decoded = json_decode($response, true);
+    // $result = $decoded !== null ? $decoded : $response;
 
-   // return ['response' => $result, 'status_code' => $statusCode];
+    // return ['response' => $result, 'status_code' => $statusCode];
     return $response;
 }
+
+
+function getCachedUniProtData(string $url, string $cacheKey, int $cacheExpiry = 3600): string
+{
+    $cacheFile = sys_get_temp_dir() . '/' . $cacheKey . '.cache';
+
+    // Check if the cache file exists and is still valid
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheExpiry)) {
+        return file_get_contents($cacheFile);
+    }
+
+    // Fetch data from the URL
+    $data = file_get_contents($url);
+
+    // If data was successfully fetched, cache it
+    if ($data !== false) {
+        file_put_contents($cacheFile, $data);
+    }
+
+    return $data;
+}
+
+
+class UniprotEntry
+{
+    public string $accession;
+    public string $proteinName;
+    public string $sequence = '';
+    public string $lineage = '';
+    public string $errors = '';
+
+    public function __construct(string $accession, string $proteinName, string $sequence)
+    {
+        $this->accession = $accession;
+        $this->proteinName = $proteinName;
+        $this->sequence = $sequence;
+    }
+}
+
+function parseUniProtData($jsonString): UniprotEntry
+{
+    $data = json_decode($jsonString, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        // Handle parse error if needed
+        $entry = new UniprotEntry('', '', '');
+        $entry->errors = 'Error parsing JSON: ' . json_last_error_msg();
+        return $entry;
+    }
+
+    return new UniprotEntry(
+        $data['primaryAccession'] ?? '',
+        $data['proteinDescription']['recommendedName']['fullName']['value'] ?? '',
+        $data['sequence']['value'] ?? ''
+    );
+}
+

@@ -59,3 +59,48 @@ function getMassFromAA(aa) {
             throw new Error("Wrong AA '" + aa + "'");
     }
 }
+
+function trypsinDigest(sequence, missedCleavages = 0) {
+    if (missedCleavages < 0 || missedCleavages > 2) {
+        throw new Error("Missed cleavages must be 0, 1, or 2.");
+    }
+
+    const trypsinRegex = /([KR](?!P))/g;
+    let peptides = [];
+    let cleaveSites = [];
+    let match;
+
+    // Find all potential cleavage sites
+    while ((match = trypsinRegex.exec(sequence)) !== null) {
+        cleaveSites.push(match.index + 1); // Store the index after K or R
+    }
+
+    if (cleaveSites.length === 0) {
+        return [sequence]; // No cleavage sites, return the original sequence
+    }
+
+    // Generate peptides based on missed cleavages
+    for (let i = 0; i < cleaveSites.length + 1 - missedCleavages; i++) {
+        let start = (i === 0) ? 0 : cleaveSites[i - 1];
+        let end;
+
+        if (i + missedCleavages < cleaveSites.length) {
+            end = cleaveSites[i + missedCleavages];
+        } else {
+            end = sequence.length;
+        }
+        peptides.push(sequence.substring(start, end));
+    }
+
+    // sort peptides by mass
+    peptides = peptides.sort((a, b) => {
+        return calculateMassWidthH2O(a) - calculateMassWidthH2O(b);
+    });
+
+    // remove small peptides
+    peptides = peptides.filter(peptide => {
+        return peptide.length >= 6 && peptide.length <= 130;
+    });
+
+    return peptides;
+}

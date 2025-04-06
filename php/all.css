@@ -1,0 +1,6 @@
+.external-link::after {
+  content: " ↗"; /* Unicode znak za vanjski link */
+  font-size: 1em; /* Prilagodite veličinu ikone */
+  margin-left: 0px; /* Dodajte razmak između teksta i ikone */
+
+}
