@@ -82,6 +82,11 @@ public class UniprotXMLParser {
 	private long totalCount = 0;
 
 	public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
+		String limit = String.valueOf(Integer.MAX_VALUE);
+		System.setProperty("jdk.xml.maxGeneralEntitySizeLimit", limit);
+		System.setProperty("jdk.xml.totalEntitySizeLimit", limit);
+		System.setProperty("jdk.xml.entityExpansionLimit", limit);
+
 		ProteinInfo proteinInfo = null;
 		boolean inLineage = false;
 

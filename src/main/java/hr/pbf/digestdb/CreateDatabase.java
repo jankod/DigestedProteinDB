@@ -4,6 +4,7 @@ import hr.pbf.digestdb.db.AccessionDbCreator;
 import hr.pbf.digestdb.db.MassRocksDbCreator;
 import hr.pbf.digestdb.model.Chymotrypsin;
 import hr.pbf.digestdb.model.Enzyme;
+import hr.pbf.digestdb.model.TaxonomyDivision;
 import hr.pbf.digestdb.model.Trypsine;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
@@ -41,6 +42,8 @@ public class CreateDatabase {
 		String sortTempDir;
 		String dbName;
 		SupportedEnzime enzymeType = SupportedEnzime.Trypsin;
+		TaxonomyDivision taxonomyDivision = TaxonomyDivision.ALL;
+
 
 		public enum SupportedEnzime {
 
@@ -64,7 +67,7 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		steps = List.of(6, 7);
+		//steps = List.of(6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -102,6 +105,8 @@ public class CreateDatabase {
 			app1UniprotToCsv.maxPeptideLength = config.getMaxPeptideLength();
 			app1UniprotToCsv.missedClevage = config.getMissedCleavage();
 			app1UniprotToCsv.fromSwisprotPath = config.getUniprotXmlPath();
+			app1UniprotToCsv.setTaxonomyDivision(config.getTaxonomyDivision());
+
 			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
 			app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
 			app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);

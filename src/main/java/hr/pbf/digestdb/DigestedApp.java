@@ -1,5 +1,6 @@
 package hr.pbf.digestdb;
 
+import hr.pbf.digestdb.model.TaxonomyDivision;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -54,6 +55,11 @@ public class DigestedApp {
 		@Option(names = { "-e", "--enzyme" }, description = "Enzyme used for digestion, default trypsin", defaultValue = "Trypsin")
 		CreateDatabase.CreateDatabaseConfig.SupportedEnzime enzyme = CreateDatabase.CreateDatabaseConfig.SupportedEnzime.Trypsin;
 
+		@Option(
+				names = { "-t", "--taxonomy-division" },
+				description = "If not set, all proteins will be used. Set taxonomy division to use only specific proteins.", defaultValue = "ALL")
+		TaxonomyDivision taxonomyDivision;
+
 		@Override
 		public Integer call() throws Exception {
 			System.out.println("Creating database in: " + dbDir);
@@ -68,6 +74,7 @@ public class DigestedApp {
 			config.setSortTempDir(sortTempDir);
 			config.setDbName(dbName);
 			config.setEnzymeType(enzyme);
+			config.setTaxonomyDivision(taxonomyDivision);
 
 			CreateDatabase createDatabase = new CreateDatabase(config);
 			createDatabase.start();

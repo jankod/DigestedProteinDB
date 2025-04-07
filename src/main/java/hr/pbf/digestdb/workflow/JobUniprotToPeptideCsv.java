@@ -3,11 +3,13 @@ package hr.pbf.digestdb.workflow;
 import hr.pbf.digestdb.CreateDatabase;
 import hr.pbf.digestdb.exception.ValidationException;
 import hr.pbf.digestdb.model.Enzyme;
+import hr.pbf.digestdb.model.TaxonomyDivision;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -34,8 +36,9 @@ public class JobUniprotToPeptideCsv {
 	public int minPeptideLength = 0;
 	public int maxPeptideLength = 0;
 	public int missedClevage = 1;
-	//private CreateDatabase.CreateDatabaseConfig.Enzyme enzyme;
 	private Enzyme enzyme;
+
+	private TaxonomyDivision taxonomyDivision = TaxonomyDivision.ALL;
 
 	@Data
 	public static class Result {
@@ -73,6 +76,12 @@ public class JobUniprotToPeptideCsv {
 						log.info("Finish read proteins, max protein count reached: {}", maxProteinCount);
 						return;
 					}
+					if(taxonomyDivision != TaxonomyDivision.ALL) {
+						if(p.getDivisionId() != taxonomyDivision.getId()) {
+							return;
+						}
+					}
+
 					proteinCount.increment();
 					saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
