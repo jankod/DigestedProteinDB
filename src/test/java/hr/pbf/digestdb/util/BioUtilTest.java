@@ -27,6 +27,6 @@ class BioUtilTest {
     }
 
     @Test
-    void tripsyn() {
+    void tripsyn1mc() {
     }
 }

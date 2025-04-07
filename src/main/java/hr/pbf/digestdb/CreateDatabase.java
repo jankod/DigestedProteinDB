@@ -2,12 +2,15 @@ package hr.pbf.digestdb;
 
 import hr.pbf.digestdb.db.AccessionDbCreator;
 import hr.pbf.digestdb.db.MassRocksDbCreator;
+import hr.pbf.digestdb.model.Chymotrypsin;
+import hr.pbf.digestdb.model.Enzyme;
+import hr.pbf.digestdb.model.Trypsine;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.workflow.*;
 import hr.pbf.digestdb.workflow.BashCommand;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -17,7 +20,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -38,16 +40,19 @@ public class CreateDatabase {
 		String uniprotXmlPath;
 		String sortTempDir;
 		String dbName;
-		Enzyme enzyme = Enzyme.Trypsin;
+		SupportedEnzime enzymeType = SupportedEnzime.Trypsin;
 
-		public enum Enzyme {
-			Trypsin,
-			Chymotrypsin,
-//            LysC,
-//            GluC,
-//            AspN,
-//            ArgC,
-//            LysN
+		public enum SupportedEnzime {
+
+			Trypsin(new Trypsine()),
+			Chymotrypsin(new Chymotrypsin());
+
+			@Getter
+			private final Enzyme enzyme;
+
+			SupportedEnzime(Enzyme enzyme) {
+				this.enzyme = enzyme;
+			}
 		}
 	}
 
@@ -59,7 +64,7 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		steps = List.of( 6, 7);
+		steps = List.of(6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -97,7 +102,7 @@ public class CreateDatabase {
 			app1UniprotToCsv.maxPeptideLength = config.getMaxPeptideLength();
 			app1UniprotToCsv.missedClevage = config.getMissedCleavage();
 			app1UniprotToCsv.fromSwisprotPath = config.getUniprotXmlPath();
-			app1UniprotToCsv.setEnzyme(config.getEnzyme());
+			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
 			app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
 			app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
 
@@ -175,8 +180,6 @@ public class CreateDatabase {
 					.param("accession_map.csv.sorted", ACCESSION_MAP_CSV_SORTED_PATH)
 					.format();
 
-
-
 			log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
 			cmd.setCmd(cmdSortAccession);
 			cmd.setDir(genDir);
@@ -221,7 +224,7 @@ public class CreateDatabase {
 		prop.setProperty("max_peptide_length", String.valueOf(config.getMaxPeptideLength()));
 		prop.setProperty("miss_cleavage", String.valueOf(config.getMissedCleavage()));
 		prop.setProperty("db_name", config.getDbName());
-		prop.setProperty("enzyme_name", config.getEnzyme().name());
+		prop.setProperty("enzyme_name", config.getEnzymeType().name());
 		prop.setProperty("protein_count", proteinCount + "");
 		prop.setProperty("peptide_count", peptideCount + "");
 

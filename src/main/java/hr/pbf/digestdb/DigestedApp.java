@@ -1,6 +1,5 @@
 package hr.pbf.digestdb;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -53,7 +52,7 @@ public class DigestedApp {
 		String sortTempDir;
 
 		@Option(names = { "-e", "--enzyme" }, description = "Enzyme used for digestion, default trypsin", defaultValue = "Trypsin")
-		CreateDatabase.CreateDatabaseConfig.Enzyme enzyme = CreateDatabase.CreateDatabaseConfig.Enzyme.Trypsin;
+		CreateDatabase.CreateDatabaseConfig.SupportedEnzime enzyme = CreateDatabase.CreateDatabaseConfig.SupportedEnzime.Trypsin;
 
 		@Override
 		public Integer call() throws Exception {
@@ -68,7 +67,7 @@ public class DigestedApp {
 			config.setUniprotXmlPath(uniprotXmlPath);
 			config.setSortTempDir(sortTempDir);
 			config.setDbName(dbName);
-			config.setEnzyme(enzyme);
+			config.setEnzymeType(enzyme);
 
 			CreateDatabase createDatabase = new CreateDatabase(config);
 			createDatabase.start();

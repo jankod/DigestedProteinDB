@@ -2,6 +2,7 @@ package hr.pbf.digestdb.workflow;
 
 import hr.pbf.digestdb.CreateDatabase;
 import hr.pbf.digestdb.exception.ValidationException;
+import hr.pbf.digestdb.model.Enzyme;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
 import lombok.Data;
@@ -33,7 +34,8 @@ public class JobUniprotToPeptideCsv {
 	public int minPeptideLength = 0;
 	public int maxPeptideLength = 0;
 	public int missedClevage = 1;
-	private CreateDatabase.CreateDatabaseConfig.Enzyme enzyme;
+	//private CreateDatabase.CreateDatabaseConfig.Enzyme enzyme;
+	private Enzyme enzyme;
 
 	@Data
 	public static class Result {
@@ -75,11 +77,13 @@ public class JobUniprotToPeptideCsv {
 					saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
 					List<String> peptides;
-					if(enzyme == CreateDatabase.CreateDatabaseConfig.Enzyme.Trypsin) {
-						peptides = BioUtil.tripsyn(p.getSequence(), minPeptideLength, maxPeptideLength);
-					} else {
-						peptides = BioUtil.chymotrypsin1(p.getSequence(), minPeptideLength, maxPeptideLength);
-					}
+					peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
+
+//					if(enzyme == CreateDatabase.CreateDatabaseConfig.Enzyme.Trypsin) {
+//						peptides = BioUtil.tripsyn1mc(p.getSequence(), minPeptideLength, maxPeptideLength);
+//					} else {
+//						peptides = BioUtil.chymotrypsin1(p.getSequence(), minPeptideLength, maxPeptideLength);
+//					}
 
 					peptides.forEach(peptide -> {
 						if(peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {

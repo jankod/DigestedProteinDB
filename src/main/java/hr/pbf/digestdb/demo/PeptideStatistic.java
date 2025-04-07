@@ -47,7 +47,7 @@ public class PeptideStatistic {
         parser.parseProteinsFromXMLstream(unprotFile, new UniprotXMLParser.ProteinHandler() {
             @Override
             public void gotProtein(UniprotXMLParser.ProteinInfo p) throws IOException {
-                List<String> peptides = BioUtil.tripsyn(p.getSequence(), 7, 300_000);
+                List<String> peptides = BioUtil.tripsyn1mc(p.getSequence(), 7, 300_000);
 
                 // Count proteins
                 stats.setTotalProteins(stats.getTotalProteins() + 1);

@@ -41,7 +41,7 @@ class AminoAcid5BitCoderTest {
 	}
 
 	public static void main(String[] args) {
-		List<String> peptides = BioUtil.tripsyn(sequenceLong, 7, 30);
+		List<String> peptides = BioUtil.tripsyn1mc(sequenceLong, 7, 30);
 
 		for(String peptide : peptides) {
 			byte[] encoded = AminoAcid5bitCoder.encodePeptide(peptide);

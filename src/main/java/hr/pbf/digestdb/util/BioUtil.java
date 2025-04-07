@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -99,7 +98,7 @@ public class BioUtil {
     }
 
     public Map<String, Double> getMassesDigest(String seq, int minAa, int maxAa, double maxMass) {
-        final List<String> peptides = tripsyn(seq, minAa, maxAa);
+        final List<String> peptides = tripsyn1mc(seq, minAa, maxAa);
         // 57 ~ 110 aminoki kis.
 
         Map<String, Double> cepaniceMasa = new HashMap<String, Double>(peptides.size());
@@ -203,7 +202,7 @@ public class BioUtil {
 
     /**
      * (C-term to F/Y/W, not before P).
-     * 1 missed cleavage. Cleaves after F, W, or Y if next is not P. All chars must be upper case!
+     * 1 missed cleavage only. Cleaves after F, W, or Y if next is not P. All chars must be upper case!
      */
     public List<String> chymotrypsin1(String prot, int min, int max) {
 
@@ -247,14 +246,14 @@ public class BioUtil {
 
 
     /**
-     * Fast method for cleaving with 1 miss clevage. Cleaves after R or K if next. All chars must be upper case!
+     * Fast method for trypsin cleaving with 1 miss clevage. Cleaves after R or K if next. All chars must be upper case!
      *
      * @param prot protein sequence
      * @param min  minimal length of peptide
      * @param max  maximal length of peptide
      * @return list of peptides
      */
-    public List<String> tripsyn(String prot, int min, int max) {
+    public List<String> tripsyn1mc(String prot, int min, int max) {
         final int numberOfRandK = StringUtils.countMatches(prot, "R") + StringUtils.countMatches(prot, "K");
         if (numberOfRandK == 0) {
             List<String> result = new ArrayList<String>(1);
