@@ -99,7 +99,7 @@ function trypsinDigest(sequence, missedCleavages = 0) {
 
     // remove small peptides
     peptides = peptides.filter(peptide => {
-        return peptide.length >= 6 && peptide.length <= 130;
+        return peptide.length >= 6 && peptide.length <= 30;
     });
 
     return peptides;

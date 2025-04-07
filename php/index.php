@@ -1,11 +1,12 @@
+<?php
+const HEAD_TITLE = "Digested Protein DB";
+include_once 'lib.php';
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Digested Protein DB</title>
-    <link href="bootstrap-sandstone.min.css" rel="stylesheet">
-
+  <?php include_once "inc/html_head.php"; ?>
 </head>
 <body>
 <h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">

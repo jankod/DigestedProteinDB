@@ -68,7 +68,7 @@ include_once 'lib.php';
         </table>
     </div>
 
-    <div>Digestion</div>
+    <h2>Digestion</h2>
 
     <div class="mb-3">
         <label for="digestEnzyme" class="form-label">Select Enzyme:</label>
@@ -80,17 +80,17 @@ include_once 'lib.php';
 
     <div class="mb-3">
         <label class="form-label">Missed Cleavages:</label>
-        <div class="form-check">
+        <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="missedCleavages" id="missedCleavages0" value="0"
                    x-model="missedCleavages" @change="digestSequence()">
             <label class="form-check-label" for="missedCleavages0">0</label>
         </div>
-        <div class="form-check">
+        <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="missedCleavages" id="missedCleavages1" value="1"
                    x-model="missedCleavages" @change="digestSequence()">
             <label class="form-check-label" for="missedCleavages1">1</label>
         </div>
-        <div class="form-check">
+        <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="missedCleavages" id="missedCleavages2" value="2"
                    x-model="missedCleavages" @change="digestSequence()">
             <label class="form-check-label" for="missedCleavages2">2</label>
@@ -104,8 +104,8 @@ include_once 'lib.php';
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Peptide Sequence</th>
                 <th>Mass (Da)</th>
+                <th>Peptide Sequence</th>
             </tr>
             </thead>
             <tbody>
