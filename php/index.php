@@ -9,9 +9,11 @@ include_once 'lib.php';
   <?php include_once "inc/html_head.php"; ?>
 </head>
 <body>
-<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">
-    Digested Protein DB
-</h1>
+<!--<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">-->
+<!--    Digested Protein DB-->
+<!--</h1>-->
+
+<?php include_once "inc/html_navbar.php"; ?>
 
 <div class="container" x-data="searchData()">
     <div class="row">

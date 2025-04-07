@@ -7,11 +7,16 @@ include_once 'lib.php';
 <html lang="en">
 <head>
     <?php include_once "inc/html_head.php"; ?>
+
 </head>
 <body>
-<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">
-    Digested Protein DB - tool
-</h1>
+<!--<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">-->
+<!--    Digested Protein DB - tool-->
+<!--</h1>-->
+
+<?php include_once "inc/html_navbar.php"; ?>
+
+
 
 <div class="container" x-data="init()">
     <?php
@@ -74,6 +79,7 @@ include_once 'lib.php';
         <label for="digestEnzyme" class="form-label">Select Enzyme:</label>
         <select class="form-select" id="digestEnzyme" x-model="digestEnzyme" @change="digestSequence()">
             <option value="trypsin">Trypsin</option>
+            <option value="chymotrypsin">Chymotrypsin (C-term to F/Y/W, not before P)</option>
             <!-- Add other enzymes here -->
         </select>
     </div>
@@ -98,20 +104,22 @@ include_once 'lib.php';
     </div>
 
 
-    <button type="button" class="btn btn-primary" @click="digestSequence()">Digest</button>
+<!--    <button type="button" class="btn btn-primary" @click="digestSequence()">Digest</button>-->
 
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Mass (Da)</th>
+                <th class="" style="width: 1%; white-space: nowrap;">#</th>
+                <th style="width: 1%; white-space: nowrap;">Mass (Da)</th>
                 <th>Peptide Sequence</th>
             </tr>
             </thead>
             <tbody>
             <template x-for="(peptide, index) in peptides" :key="index">
                 <tr>
-                    <td x-text="calculateMassWidthH2O(peptide).toFixed(4)"></td>
+                    <td x-text="index + 1" style="width: 1%; white-space: nowrap;"></td>
+                    <td x-text="calculateMassWidthH2O(peptide).toFixed(4)" style="width: 1%; white-space: nowrap;"></td>
                     <td x-text="peptide"></td>
                 </tr>
             </template>
@@ -133,17 +141,24 @@ include_once 'lib.php';
 
             digestPeptide: "",
             digestEnzyme: "trypsin",
-            digestEnzymeList: ["trypsin", "chymotrypsin", "pepsin", "elastase", "lysC", "aspN", "gluC", "argC"],
             missedCleavages: 0,
             peptides: [],
             digestSequence() {
                 if (this.digestEnzyme === 'trypsin') {
                     this.peptides = trypsinDigest(this.sequence, parseInt(this.missedCleavages));
+
+                } else if (this.digestEnzyme === 'chymotrypsin') {
+                    this.peptides = chymotrypsin1Digest(this.sequence, parseInt(this.missedCleavages));
+
                 } else {
                     // Handle other enzymes
                     this.peptides = [];
                 }
-            },
+            }
+            ,
+            init() {
+                this.digestSequence();
+            }
         }
     }
 </script>

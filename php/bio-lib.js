@@ -60,6 +60,112 @@ function getMassFromAA(aa) {
     }
 }
 
+/**
+ * Digests a peptide sequence using chymotrypsin cleavage rules.
+ * Cleaves after F, Y, W (C-terminus), unless immediately followed by P.
+ * Supports a specified number of missed cleavage sites.
+ * All characters in the sequence must be uppercase English alphabet letters.
+ *
+ * @param {string} sequence Input peptide sequence (uppercase only).
+ * @param {number} [missedCleavages=0] Maximum allowed number of missed cleavage sites (0 or more).
+ * @param {number} [minLength=6] Minimum length of peptides to include in the result.
+ * @param {number} [maxLength=30] Maximum length of peptides to include in the result.
+ * @returns {string[]} Array of resulting peptides, sorted by length.
+ * @throws {TypeError} If the sequence is not a string.
+ * @throws {Error} If the sequence contains non-uppercase characters.
+ * @throws {RangeError} If the parameters `missedCleavages`, `minLength`, `maxLength` are invalid.
+ */
+function chymotrypsin1Digest(sequence, missedCleavages = 0, minLength = 6, maxLength = 30) {
+    if (typeof sequence !== 'string') {
+        throw new TypeError("Sequence must be a string.");
+    }
+    // Allows empty string, but checks for uppercase if not empty
+    if (sequence !== "" && !/^[A-Z]+$/.test(sequence)) {
+        throw new Error("Sequence must contain only uppercase letters (A-Z).");
+    }
+    if (typeof missedCleavages !== 'number' || !Number.isInteger(missedCleavages) || missedCleavages < 0) {
+        throw new RangeError("Missed cleavages must be a non-negative integer.");
+    }
+    if (typeof minLength !== 'number' || !Number.isInteger(minLength) || minLength < 0) {
+        throw new RangeError("Minimum length must be a non-negative integer.");
+    }
+    if (typeof maxLength !== 'number' || !Number.isInteger(maxLength) || maxLength < 0) {
+        throw new RangeError("Maximum length must be a non-negative integer.");
+    }
+    if (minLength > maxLength) {
+        throw new RangeError("Minimum length cannot be greater than maximum length.");
+    }
+
+    if (sequence === "") {
+        return [];
+    }
+
+    // --- Finding Cleavage Sites ---
+    const chymotrypsinRegex = /([FYW])(?!P)/g; // Cleaves AFTER F, Y, W if NOT followed by P
+    const cleaveSites = [];
+    let match;
+    // Regex looks for F/Y/W NOT followed by P. match.index is the index of F/Y/W.
+    // The cleavage site is AFTER that character, hence `match.index + 1`.
+    while ((match = chymotrypsinRegex.exec(sequence)) !== null) {
+        cleaveSites.push(match.index + 1);
+    }
+
+    // --- Defining Peptide Boundaries ---
+    // Boundaries are the start (0), all cleavage sites, and the end of the sequence.
+    const boundaries = [0, ...cleaveSites, sequence.length];
+    // Remove duplicates if they exist (e.g., cleavage at the very end of the sequence)
+    // and ensure boundaries are sorted (though they should be already)
+    const uniqueSortedBoundaries = [...new Set(boundaries)].sort((a, b) => a - b);
+    // Filter out boundaries that would create zero-length peptides (e.g., if there are duplicate boundaries)
+    const effectiveBoundaries = uniqueSortedBoundaries.filter((val, idx, arr) => idx === 0 || val > arr[idx - 1]);
+
+
+    // --- Generating Peptides ---
+    const peptidesSet = new Set(); // Use a Set for automatic duplicate removal
+
+    // Iterate through all possible start boundaries
+    // Loop goes up to the second-to-last boundary, as each boundary defines a start
+    for (let i = 0; i < effectiveBoundaries.length - 1; i++) {
+        // For each start boundary, iterate through possible end boundaries
+        // considering the number of missed cleavages (k)
+        // k=0 means no missed cleavages (ends at the next boundary)
+        // k=1 means 1 missed cleavage (ends at the second next boundary), etc.
+        for (let k = 0; k <= missedCleavages; k++) {
+            const startIndex = i;
+            const endIndex = i + k + 1; // Index of the end boundary in `effectiveBoundaries`
+
+            // Check if this end boundary exists
+            if (endIndex < effectiveBoundaries.length) {
+                const startPosition = effectiveBoundaries[startIndex];
+                const endPosition = effectiveBoundaries[endIndex];
+                // Add peptide to the Set (substring does not include the character at endPosition)
+                peptidesSet.add(sequence.substring(startPosition, endPosition));
+            } else {
+                // If we have exceeded the number of available boundaries for this `k`,
+                // there's no point continuing for this starting point (`startIndex`)
+                break;
+            }
+        }
+    }
+
+    // --- Filtering and Sorting ---
+    // Convert Set to array
+    let peptides = Array.from(peptidesSet);
+
+    // Filter by length
+    peptides = peptides.filter(peptide => {
+        const len = peptide.length;
+        return len >= minLength && len <= maxLength;
+    });
+
+    // Sort by length (optional, could also sort by mass or alphabetically)
+    peptides.sort((a, b) => a.length - b.length);
+
+    return peptides;
+}
+
+
+
 function trypsinDigest(sequence, missedCleavages = 0) {
     if (missedCleavages < 0 || missedCleavages > 2) {
         throw new Error("Missed cleavages must be 0, 1, or 2.");
@@ -103,4 +209,12 @@ function trypsinDigest(sequence, missedCleavages = 0) {
     });
 
     return peptides;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    // Node.js or CommonJS
+    module.exports = {
+        chymotrypsin1Digest,
+        trypsinDigest
+    };
 }
