@@ -32,7 +32,7 @@ public class MassRocksDbReader implements AutoCloseable {
 
     public MassPageResult searchByMassPaginated(double mass1, double mass2, int page, int pageSize) {
         List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results = new ArrayList<>();
-        int mass1Int = (int) Math.round(mass1 * 10_000);
+        int mass1Int = MyUtil.toInt(mass1); //(int) Math.round(mass1 * 10_000);
         int count = 0;
         int start = (page - 1) * pageSize;
         int end = page * pageSize;

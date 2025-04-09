@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import sun.misc.Signal;
 
 import java.util.concurrent.Callable;
 
@@ -104,6 +105,10 @@ public class DigestedApp {
 
 	public static void main(String[] args) {
 		try {
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				log.info("Application is shutting down, possibly due to SIGINT");
+			}));
+
 			int exitCode = new CommandLine(new RootCommand()).execute(args);
 			log.info("Fininsh, exiting with code {}", exitCode);
 			System.exit(exitCode);

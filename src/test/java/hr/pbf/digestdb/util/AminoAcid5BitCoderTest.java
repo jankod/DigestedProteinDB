@@ -1,5 +1,7 @@
 package hr.pbf.digestdb.util;
 
+import it.unimi.dsi.fastutil.ints.Int2LongMap;
+import it.unimi.dsi.fastutil.ints.Int2LongMaps;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

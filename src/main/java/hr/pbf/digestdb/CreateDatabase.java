@@ -67,7 +67,7 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		//steps = List.of(6, 7);
+	//	steps = List.of(5, 6, 7);
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -157,7 +157,6 @@ public class CreateDatabase {
 			app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
 			app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
 			app3csvMassGroup.setProteinCount(readXmlResult.getProteinCount());
-			app3csvMassGroup.setProteinCount(252633202); // TODO remove
 			Long2IntMap accCustomDb = app3csvMassGroup.start();
 			log.info("Grouped with ids: {}", GROUPED_WITH_IDS_CSV_PATH);
 			log.info("Protein count: {}", readXmlResult.getProteinCount());

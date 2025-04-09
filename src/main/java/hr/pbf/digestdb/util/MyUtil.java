@@ -149,4 +149,11 @@ public class MyUtil {
 		return FileUtils.byteCountToDisplaySize(size);
 	}
 
+	public static int toInt(double mass) {
+		return (int) (mass * 10_000.0);
+	}
+
+	public static int toInt(float mass) {
+		return (int) (mass * 10_000.0f);
+	}
 }
