@@ -30,4 +30,8 @@ public class AccessionDbReader {
 		accList = AccessionDbCreator.readBinaryDb(dbPath);
 
 	}
+
+	public int getAccessionCount() {
+		return accList.length;
+	}
 }

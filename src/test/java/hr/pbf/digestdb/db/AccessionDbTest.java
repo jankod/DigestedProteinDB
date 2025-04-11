@@ -21,6 +21,7 @@ public class AccessionDbTest {
 
         // create CSV in temp dir
         String csv = """
+              0,B4IPW1
               1,B8IPW1
               2,A7IJ80
               3,A8INZ3
@@ -39,9 +40,19 @@ public class AccessionDbTest {
         creator.startCreate();
         // read DB
         AccessionDbReader reader = new AccessionDbReader(dbPath);
+        assertEquals("B4IPW1", reader.getAccession(0));
         assertEquals("B8IPW1", reader.getAccession(1));
         assertEquals("A7IJ80", reader.getAccession(2));
-        assertEquals("0", reader.getAccession(0));
+        assertEquals("A8INZ3", reader.getAccession(3));
+        assertEquals("A1WLI5", reader.getAccession(4));
+        assertEquals("Q1IQ54", reader.getAccession(5));
+        assertEquals("Q3AW77", reader.getAccession(6));
+        assertEquals("Q48E63", reader.getAccession(7));
+        assertEquals("Q87WP1", reader.getAccession(8));
+        assertEquals("A5IBB3", reader.getAccession(9));
+        assertEquals(10, reader.getAccessionCount());
+
+
 
     }
 

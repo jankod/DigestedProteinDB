@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.workflow;
 
+import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.MyStopWatch;
 import hr.pbf.digestdb.util.MyUtil;
 import it.unimi.dsi.fastutil.ints.IntIterator;
@@ -164,7 +165,14 @@ public class JobCsvMassGrouperWithAccIds {
 		log.debug("Finished writing grouped CSV file: {}", outputGroupedCsv);
 	}
 
-	private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, IntOpenHashSet> sequenceMap)
+	private void writeMassToCsv(BufferedWriter writer, String mass, Map<String, IntOpenHashSet> sequenceMap) throws IOException {
+		BinaryPeptideDbUtil.writeMassToCsvRow(sb,sequenceMap);
+
+		writer.write(mass + "," + sb);
+		writer.newLine();
+	}
+
+	private void writeMassToCsvOld(BufferedWriter writer, String mass, Map<String, IntOpenHashSet> sequenceMap)
 			throws IOException {
 		sb.setLength(0);
 		Set<Map.Entry<String, IntOpenHashSet>> entries = sequenceMap.entrySet();

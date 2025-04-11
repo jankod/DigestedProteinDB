@@ -11,7 +11,7 @@ public class Trypsine implements Enzyme {
 		if(missedCleavage != 1) {
 			throw new IllegalArgumentException("Missed cleavage must be 1 for trypsine.");
 		}
-		return BioUtil.tripsyn1mc(prot, missedCleavage, maxLength);
+		return BioUtil.tripsyn1mc(prot, minLength, maxLength);
 	}
 
 	@Override

@@ -1,14 +1,16 @@
 package hr.pbf.digestdb.util;
 
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.io.FastByteArrayInputStream;
 import lombok.Data;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.wildfly.common.annotation.NotNull;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -20,15 +22,18 @@ import java.util.*;
 @UtilityClass
 public class BinaryPeptideDbUtil {
 
-	private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 32); // 32MB, prilagodite po potrebi
+	private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 36); // 36MB
 
 	public void writeVarInt(ByteBuffer buffer, int value) {
-		while(value >= 128) {
-			ensureCapacity(buffer, 1); // Ensure there is space for at least 1 byte
+		// VarInt use unsigned int, so we need to make sure we are working with positive values
+		while((value & 0xFFFFFF80) != 0) {
+			// Use the first 7 bits and set the highest bit to 1 (continuation)
 			buffer.put((byte) ((value & 0x7F) | 0x80));
+			// Move the value 7 bits to the right
 			value >>>= 7;
 		}
-		buffer.put((byte) value);
+		// Last byte, the highest bit is 0 (end)
+		buffer.put((byte) (value & 0x7F));
 	}
 
 	public void writeVarInt(DataOutputStream dos, int value) throws IOException {
@@ -58,18 +63,50 @@ public class BinaryPeptideDbUtil {
 	public int readVarInt(ByteBuffer buffer) {
 		int result = 0;
 		int shift = 0;
-		while(buffer.hasRemaining()) {
-			byte b = buffer.get();
-			result |= (b & 0x7F) << shift;
-			shift += 7;
-			if((b & 0x80) == 0) {
-				return result;
+
+		while(true) {
+			if(!buffer.hasRemaining()) {
+				throw new IllegalArgumentException("Buffer underflow: incomplete VarInt");
 			}
-			if(shift >= 32) {
-				throw new IllegalStateException("Varint to large!");
+
+			byte currentByte = buffer.get();
+			// Use the first 7 bits and set the highest bit to 1 (continuation)
+			result |= (currentByte & 0x7F) << shift;
+
+			// If the highest bit is not 1, we are done
+			if((currentByte & 0x80) == 0) {
+				break;
+			}
+
+			// Move the value 7 bits to the right
+			shift += 7;
+
+			// Check for too large VarInt (maximum 5 bytes)
+			if(shift > 35) {
+				throw new IllegalArgumentException("VarInt too large");
 			}
 		}
-		throw new IllegalStateException("Incomplete varint in buffer! Buffer: " + buffer);
+
+		return result;
+	}
+
+	public Set<PeptideAcc> readGroupedRowNew(byte[] value) {
+		FastByteArrayInputStream bin = new FastByteArrayInputStream(new byte[(int) (value.length * 1.3)]);
+		DataInputStream in = new DataInputStream(bin);
+
+		Set<PeptideAcc> peptides = new HashSet<>();
+
+		// must got SGAGAAA:15-SAAGGAA:14-TGAAAGG:16;12345
+		try {
+			readVarInt(in);
+
+		} catch(IOException e) {
+			log.error("Error reading varint", e);
+			throw new RuntimeException(e);
+		}
+
+		return peptides;
+
 	}
 
 	public Set<PeptideAcc> readGroupedRow(byte[] value) {
@@ -81,25 +118,49 @@ public class BinaryPeptideDbUtil {
 			byte[] seqBytes = new byte[seqLength];
 			buffer.get(seqBytes);
 			String sequence = AminoAcid5bitCoder.decodePeptide(seqBytes);
-			//String sequence = new String(seqBytes, StandardCharsets.UTF_8);
 
 			int accessionCount = readVarInt(buffer);
-			List<Integer> accessions = new ArrayList<>(accessionCount);
-			for(int i = 0; i < accessionCount; i++) {
-				int accession = readVarInt(buffer);
-				accessions.add(accession);
-			}
 
 			PeptideAcc acc = new PeptideAcc();
 			acc.seq = sequence;
-			acc.acc = new int[accessions.size()];
-			for(int i = 0; i < accessions.size(); i++) {
-				acc.acc[i] = accessions.get(i);
+			acc.acc = new int[accessionCount];
+			for(int i = 0; i < accessionCount; i++) {
+				//acc.acc[i] = accessions.get(i);
+				acc.acc[i] = readVarInt(buffer);
 			}
 			peptides.add(acc);
 		}
 
 		return peptides;
+	}
+
+	/**
+	 * Writes a mass and its corresponding sequences to a CSV row.
+	 * The format is: mass, sequence1:ids1-sequence2:ids2-...
+	 * @param buffer
+	 * @param sequenceMap
+	 */
+	public void writeMassToCsvRow(StringBuilder buffer, Map<String, IntOpenHashSet> sequenceMap) {
+		buffer.setLength(0);
+		Set<Map.Entry<String, IntOpenHashSet>> entries = sequenceMap.entrySet();
+		for(Map.Entry<String, IntOpenHashSet> entry : entries) {
+			String sequence = entry.getKey();
+			IntOpenHashSet ids = entry.getValue();
+
+			StringBuilder idsStr = new StringBuilder(ids.size() * 6);
+			for(IntIterator it = ids.iterator(); it.hasNext(); ) {
+				idsStr.append(it.nextInt()).append(";");
+			}
+			if(!idsStr.isEmpty())
+				idsStr.setLength(idsStr.length() - 1);
+
+			buffer.append(sequence).append(":").append(idsStr).append("-");
+		}
+		if(!buffer.isEmpty())
+			buffer.setLength(buffer.length() - 1);
+
+		//	writer.write(mass + "," + buffer);
+		//	writer.newLine();
 	}
 
 	/**
@@ -140,7 +201,8 @@ public class BinaryPeptideDbUtil {
 
 	private void ensureCapacity(ByteBuffer buff, int additionalCapacity) {
 		if(buff.remaining() < additionalCapacity) {
-			ByteBuffer newBuffer = ByteBuffer.allocate((int) (buff.capacity() * 1.2 + additionalCapacity));
+			int newCapacity = Math.max((int) (buff.capacity() * 2), buff.capacity() + additionalCapacity);
+			ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
 			buff.flip();
 			newBuffer.put(buff);
 			bufferCache = newBuffer;

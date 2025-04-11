@@ -5,6 +5,7 @@ import hr.pbf.digestdb.util.MyUtil;
 import hr.pbf.digestdb.util.ValidatateUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
@@ -47,6 +48,7 @@ public class MassRocksDbCreator {
 	public DbInfo startCreate() throws RocksDBException {
 
 		int countMasses = 0;
+		long lineCount = 0;
 
 		log.debug("Start creating RocksDB from CSV file: {} and write DB to: {}", fromCsvPath, toDbPath);
 		try(RocksDB db = MyUtil.openWriteDB(toDbPath)) {
@@ -65,11 +67,19 @@ public class MassRocksDbCreator {
 					double mass = Double.parseDouble(parts[0]);
 					int massInt = (int) Math.round(mass * 10_000);
 					String seqAccs = parts[1];
+					if(seqAccs.startsWith("GK:")) {
+						log.debug("Skipping GK: {}", seqAccs);
+					}
 
-					byte[] seqAccsBytes = BinaryPeptideDbUtil.writeGroupedRow(seqAccs);
-					byte[] massIntBytes = MyUtil.intToByteArray(massInt);
-					db.put(massIntBytes, seqAccsBytes);
-					countMasses++;
+					try {
+						byte[] seqAccsBytes = BinaryPeptideDbUtil.writeGroupedRow(seqAccs);
+						byte[] massIntBytes = MyUtil.intToByteArray(massInt);
+						db.put(massIntBytes, seqAccsBytes);
+						countMasses++;
+					} catch(Exception e) {
+						log.error("Error on line: "+ lineCount+ ": " + StringUtils.truncate(line, 200), e);
+					}
+					lineCount++;
 				}
 			}
 		} catch(IOException | RocksDBException e) {

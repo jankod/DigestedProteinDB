@@ -171,6 +171,7 @@ public class SearchWeb {
             sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
                     "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
         } catch (Exception e) {
+            log.error("Error on search", e);
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
                     "{\"error\": \"" + e.getMessage() + "\"}");
         }
