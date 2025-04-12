@@ -204,7 +204,7 @@ public class BioUtil {
      * (C-term to F/Y/W, not before P).
      * 1 missed cleavage only. Cleaves after F, W, or Y if next is not P. All chars must be upper case!
      */
-    public List<String> chymotrypsin1(String prot, int min, int max) {
+    public List<String> chymotrypsin1mc(String prot, int min, int max) {
 
         // sites is the list of positions where the cleavage occurs
         List<Integer> sites = new ArrayList<>();
