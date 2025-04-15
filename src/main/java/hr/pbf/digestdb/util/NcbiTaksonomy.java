@@ -17,8 +17,12 @@ public class NcbiTaksonomy {
     @Getter
     private final AbstractInt2IntMap childParrents;
 
-    public NcbiTaksonomy(String pathToCsv) throws NcbiTaxonomyException {
-        childParrents = loadTaxonomy(pathToCsv);
+    private NcbiTaksonomy(String pathToCsv) throws NcbiTaxonomyException {
+        childParrents = loadTaxonomyFromPath(pathToCsv);
+    }
+
+    public static NcbiTaksonomy loadTaxonomy(String ncbiTaxonomyPath) throws NcbiTaxonomyException {
+        return new NcbiTaksonomy(ncbiTaxonomyPath);
     }
 
     /**
@@ -27,7 +31,7 @@ public class NcbiTaksonomy {
      * @param pathToNodesDmp File path to nodes.dmp
      * @return A map (TadID => ParrentTaxID) of tax IDs to their parent tax IDs
      */
-    public AbstractInt2IntMap loadTaxonomy(String pathToNodesDmp) throws NcbiTaxonomyException {
+    private AbstractInt2IntMap loadTaxonomyFromPath(String pathToNodesDmp) throws NcbiTaxonomyException {
         AbstractInt2IntMap relations = new Int2IntRBTreeMap();
         try (BufferedReader br = new BufferedReader(new FileReader(pathToNodesDmp))) {
             String line;

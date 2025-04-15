@@ -43,6 +43,8 @@ public class CreateDatabase {
 		String dbName;
 		SupportedEnzime enzymeType = SupportedEnzime.Trypsin;
 		TaxonomyDivision taxonomyDivision = TaxonomyDivision.ALL;
+		int[] taxonomyParentsIds;
+		String ncbiTaxonomyPath = null;
 
 
 		public enum SupportedEnzime {
@@ -106,6 +108,7 @@ public class CreateDatabase {
 			app1UniprotToCsv.missedClevage = config.getMissedCleavage();
 			app1UniprotToCsv.fromSwisprotPath = config.getUniprotXmlPath();
 			app1UniprotToCsv.setTaxonomyDivision(config.getTaxonomyDivision());
+			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
 
 			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
 			app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);

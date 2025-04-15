@@ -20,7 +20,7 @@ class NcbiTaksonomyTest {
         URL resource = classLoader.getResource("nodes_test.dmp");
         assertNotNull(resource, "Test file not found!");
         pathToCsv = new File(resource.getFile()).getAbsolutePath();
-        taxonomy = new NcbiTaksonomy(pathToCsv);
+        taxonomy =  NcbiTaksonomy.loadTaxonomy(pathToCsv);
         assertNotNull(taxonomy.getChildParrents());
         assertFalse(taxonomy.getChildParrents().isEmpty(), "Taxonomy should not be empty");
     }
