@@ -98,13 +98,20 @@ public class JobUniprotToPeptideCsv {
                             return;
                         }
                     }
+//                    if("Q9UKP3".equals(p.getAccession())) {
+//                        System.out.println("Q9UKP3");
+//                    }
                     if (finalNcbiTaksonomy != null) {
                         boolean hasParent = false;
+
                         for (int parentsId : taxonomyParentsIds) {
-                            if (finalNcbiTaksonomy.isAncestor(p.getTaxonomyId(), parentsId)) {
-                                hasParent = true;
-                                break;
+                            for (Integer taxonomyId : p.getTaxonomyIds()) {
+                                if (finalNcbiTaksonomy.isAncestor(taxonomyId, parentsId)) {
+                                    hasParent = true;
+                                    break;
+                                }
                             }
+
                         }
                         if (!hasParent) {
                             return;
@@ -113,7 +120,7 @@ public class JobUniprotToPeptideCsv {
 
 
                     proteinCount.increment();
-                    saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
+                    saveTaxonomy(p.getAccession(), p.getTaxonomyIds(), outTaxonomy);
 
                     List<String> peptides;
                     peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
@@ -157,8 +164,8 @@ public class JobUniprotToPeptideCsv {
     }
 
     @SneakyThrows
-    private void saveTaxonomy(String accession, int taxonomyId, BufferedOutputStream outTaxonomy) {
-        outTaxonomy.write((accession + "," + taxonomyId + "\n").getBytes(StandardCharsets.UTF_8));
+    private void saveTaxonomy(String accession, List<Integer> taxonomyIds, BufferedOutputStream outTaxonomy) {
+        outTaxonomy.write((accession + "," + taxonomyIds + "\n").getBytes(StandardCharsets.UTF_8));
     }
 
 }

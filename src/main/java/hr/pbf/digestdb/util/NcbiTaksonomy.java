@@ -65,6 +65,9 @@ public class NcbiTaksonomy {
     }
 
     public boolean isAncestor(int taxIdDescendant, int taxIdAncestor, Integer maxDepth) {
+        if(taxIdDescendant == taxIdAncestor) {
+            return true; // Same ID
+        }
         Integer currentId = taxIdDescendant;
         int depth = 0;
         while (childParrents.containsKey(currentId.intValue())) {

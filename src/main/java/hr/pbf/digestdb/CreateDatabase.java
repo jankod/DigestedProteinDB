@@ -113,6 +113,8 @@ public class CreateDatabase {
 			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
 			app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
 			app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
+			app1UniprotToCsv.setNcbiTaxonomyPath(config.getNcbiTaxonomyPath());
+			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
 
 			readXmlResult = app1UniprotToCsv.start();
 			log.info("Uniprot extracted. Protein count: {}, Peptide count: {}", readXmlResult.getProteinCount(), readXmlResult.getPeptideCount());
