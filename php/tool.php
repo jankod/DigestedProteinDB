@@ -17,61 +17,92 @@ include_once 'lib.php';
 <?php include_once "inc/html_navbar.php"; ?>
 
 
-
 <div class="container" x-data="init()">
     <?php
 
-    $accession = $_GET["accession"];
-    // https://rest.uniprot.org/uniprotkb/A0A085MEL6.fasta
-    // https://rest.uniprot.org/uniprotkb/A0A085MEL6?fields=protein_name,lineage,sequence
-    //https://rest.uniprot.org/uniprotkb/A0A085MEL6?fields=protein_name,sequence
-    // get peptide sequence from uniprot wrebsite
-    $url = "https://rest.uniprot.org/uniprotkb/" . $accession;
-    $url .= "?fields=protein_name,sequence";
+    if (isset($_GET["accession"])) {
+        $accession = $_GET["accession"];
+        // https://rest.uniprot.org/uniprotkb/A0A085MEL6.fasta
+        // https://rest.uniprot.org/uniprotkb/A0A085MEL6?fields=protein_name,lineage,sequence
+        //https://rest.uniprot.org/uniprotkb/A0A085MEL6?fields=protein_name,sequence
+        // get peptide sequence from uniprot wrebsite
+        $url = "https://rest.uniprot.org/uniprotkb/" . $accession;
+        $url .= "?fields=protein_name,sequence";
 
 
-    // Use a cache key that includes the accession to make it unique
-    $cacheKey = 'uniprot_' . $accession;
+        // Use a cache key that includes the accession to make it unique
+        $cacheKey = 'uniprot_' . $accession;
 
-    // Get the JSON data, either from the cache or the URL
-    $json = getCachedUniProtData($url, $cacheKey, 3600); // Cache for 1 hour
-
-    //    $json = file_get_contents($url);
-    $entry = parseUniProtData($json);
-    $sequence = $entry->sequence;
-    $proteinName = $entry->proteinName;
-    $uniprotErrors = $entry->errors;
+        // Get the JSON data, either from the cache or the URL
+        $json = getCachedUniProtData($url, $cacheKey, 3600); // Cache for 1 hour
+        if ($json != false) {
+            //    $json = file_get_contents($url);
+            $entry = parseUniProtData($json);
+            $sequence = $entry->sequence;
+            $proteinName = $entry->proteinName;
+            $uniprotErrors = $entry->errors;
+        } else {
+            $sequence = '';
+            $proteinName = '';
+            $uniprotErrors = 'Error fetching data from UniProt';
+            $accession = '';
+        }
+    } else {
+        $sequence = '';
+        $proteinName = '';
+        $uniprotErrors = null;
+        $accession = '';
+    }
 
 
     ?>
-    <div class="alert alert-danger" x-show="uniprotErrors.length > 0">
+
+    <div class="alert alert-danger hiding" x-show="uniprotErrors.length > 0" style="display: none;">
         <strong>Error:</strong> <span x-text="uniprotErrors"></span>
     </div>
-    <div class="table-responsive">
-        <table class="table">
-            <tr>
-                <td>Accession</td>
-                <td>
-                    <a href="https://www.uniprot.org/uniprot/<?php echo $accession; ?>" class="btn-link external-link"
-                       target="_blank"><?php echo $accession; ?></a>
 
-                </td>
-            </tr>
-            <tr>
-                <td>Protein Name</td>
-                <td><span x-text="proteinName"></span></td>
-            </tr>
-            <tr>
-                <td>Sequence</td>
-                <td class="align-top">
-                    <div class="overflow-x-auto" style="max-width: 100%;">
+    <?php if ($accession === ""): ?>̣
+        <div>
+            <form class="mb-3" method="get" action="tool.php">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="accession" placeholder="Enter UniProt Accession"
+                           aria-label="Enter UniProt Accession" x-model="accession">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+
+        </div>
+
+    <?php else: ?>
+
+
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <td>Accession</td>
+                    <td>
+                        <a href="https://www.uniprot.org/uniprot/<?php echo $accession; ?>"
+                           class="btn-link external-link"
+                           target="_blank">Uniprot <?php echo $accession; ?></a>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>Protein Name</td>
+                    <td><span x-text="proteinName"></span></td>
+                </tr>
+                <tr>
+                    <td>Sequence</td>
+                    <td class="align-top">
+                        <div class="overflow-x-auto" style="max-width: 100%;">
                         <pre class="mb-0 text-break" style="white-space: pre-wrap; word-wrap: break-word;"
                              x-text="sequence"></pre>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    <?php endif; ?>
 
     <h2>Digestion</h2>
 
@@ -104,7 +135,7 @@ include_once 'lib.php';
     </div>
 
 
-<!--    <button type="button" class="btn btn-primary" @click="digestSequence()">Digest</button>-->
+    <!--    <button type="button" class="btn btn-primary" @click="digestSequence()">Digest</button>-->
 
     <div class="table-responsive">
         <table class="table table-striped">
@@ -126,6 +157,9 @@ include_once 'lib.php';
             </tbody>
         </table>
     </div>
+
+
+    <?php include_once "inc/html_footer.php"; ?>
 
 
 </div>

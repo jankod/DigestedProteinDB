@@ -30,71 +30,72 @@ import java.nio.file.Path;
 @Data
 public class MassRocksDbCreator {
 
-	private final String fromCsvPath;
-	private final String toDbPath;
-	private int bufferSizeForReadCsv = 1024 * 1024 * 32; // 32 MB
+    private final String fromCsvPath;
+    private final String toDbPath;
+    private int bufferSizeForReadCsv = 1024 * 1024 * 32; // 32 MB
 
-	public MassRocksDbCreator(String fromCsvPath, String toDbPath) {
-		this.fromCsvPath = fromCsvPath;
-		this.toDbPath = toDbPath;
-		ValidatateUtil.fileMustExist(fromCsvPath);
-		ValidatateUtil.fileMustNotExist(toDbPath);
-	}
+    public MassRocksDbCreator(String fromCsvPath, String toDbPath) {
+        this.fromCsvPath = fromCsvPath;
+        this.toDbPath = toDbPath;
+        ValidatateUtil.fileMustExist(fromCsvPath);
+        ValidatateUtil.fileMustNotExist(toDbPath);
+    }
 
-	public static class DbInfo {
-		public int countMasses;
-	}
+    public static class DbInfo {
+        public int countMasses;
+    }
 
-	public DbInfo startCreate() throws RocksDBException {
+    public DbInfo startCreate() throws RocksDBException {
 
-		int countMasses = 0;
-		long lineCount = 0;
+        int countMasses = 0;
+        long lineCount = 0;
 
-		log.debug("Start creating RocksDB from CSV file: {} and write DB to: {}", fromCsvPath, toDbPath);
-		try(RocksDB db = MyUtil.openWriteDB(toDbPath)) {
+        log.debug("Start creating RocksDB from CSV file: {} and write DB to: {}", fromCsvPath, toDbPath);
+        try (RocksDB db = MyUtil.openWriteDB(toDbPath)) {
 
-			try(BufferedReader reader = new BufferedReader(Files.newBufferedReader(Path.of(fromCsvPath)), bufferSizeForReadCsv)) {
+            try (BufferedReader reader = new BufferedReader(Files.newBufferedReader(Path.of(fromCsvPath)), bufferSizeForReadCsv)) {
 
-				String line;
+                String line;
 
-				while((line = reader.readLine()) != null) {
-					// 503.234,SGAGAAA:15-SAAGGAA:14-TGAAAGG:16
-					String[] parts = line.split(",", 2);
+                while ((line = reader.readLine()) != null) {
+                    // 503.234,SGAGAAA:15-SAAGGAA:14-TGAAAGG:16
+                    String[] parts = line.split(",", 2);
 
-					if(parts.length < 2)
-						throw new IllegalArgumentException("Invalid input CSV format " + line);
+                    if (parts.length < 2)
+                        throw new IllegalArgumentException("Invalid input CSV format " + line);
 
-					double mass = Double.parseDouble(parts[0]);
-					int massInt = (int) Math.round(mass * 10_000);
-					String seqAccs = parts[1];
-					if(seqAccs.startsWith("GK:")) {
-						log.debug("Skipping GK: {}", seqAccs);
-					}
+                    double mass = Double.parseDouble(parts[0]);
+                    int massInt = (int) Math.round(mass * 10_000);
+                    String seqAccs = parts[1];
 
-					try {
-						byte[] seqAccsBytes = BinaryPeptideDbUtil.writeGroupedRow(seqAccs);
-						byte[] massIntBytes = MyUtil.intToByteArray(massInt);
-						db.put(massIntBytes, seqAccsBytes);
-						countMasses++;
-					} catch(Exception e) {
-						log.error("Error on line: "+ lineCount+ ": " + StringUtils.truncate(line, 200), e);
-					}
-					lineCount++;
-				}
-			}
-		} catch(IOException | RocksDBException e) {
-			log.error("Error: ", e);
-			throw new RuntimeException(e);
-		}
-		DbInfo dbInfo = new DbInfo();
-		dbInfo.countMasses = countMasses;
-		log.debug("RocksDB created successfully with {} masses.", countMasses);
+                    try {
+                        byte[] seqAccsBytes = BinaryPeptideDbUtil.writeGroupedRow(seqAccs);
+                        byte[] massIntBytes = MyUtil.intToByteArray(massInt);
+                        writeRocksDb(db, massIntBytes, seqAccsBytes);
+                        countMasses++;
+                    } catch (Exception e) {
+                        log.error("Error on line: " + lineCount + ": " + StringUtils.truncate(line, 200), e);
+                    }
+                    lineCount++;
+                }
+            }
+        } catch (IOException | RocksDBException e) {
+            log.error("Error: ", e);
+            throw new RuntimeException(e);
+        }
+        DbInfo dbInfo = new DbInfo();
+        dbInfo.countMasses = countMasses;
+        log.debug("RocksDB created successfully with {} masses.", countMasses);
 
-		try {
-			log.debug("RocksDB file size: {} bytes", Files.size(Path.of(toDbPath)));
-		} catch(IOException ignore) {
-		}
-		return dbInfo;
-	}
+        try {
+            log.debug("RocksDB file size: {} bytes", Files.size(Path.of(toDbPath)));
+        } catch (IOException ignore) {
+        }
+        return dbInfo;
+    }
+
+    protected void writeRocksDb(RocksDB db, byte[] massIntBytes, byte[] seqAccsBytes) throws RocksDBException {
+        db.put(massIntBytes, seqAccsBytes);
+    }
 
 }

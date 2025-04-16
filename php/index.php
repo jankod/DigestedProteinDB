@@ -6,7 +6,7 @@ include_once 'lib.php';
 <!doctype html>
 <html lang="en">
 <head>
-  <?php include_once "inc/html_head.php"; ?>
+    <?php include_once "inc/html_head.php"; ?>
 </head>
 <body>
 <!--<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">-->
@@ -71,6 +71,17 @@ include_once 'lib.php';
                             <label for="sequence" class="form-label">Sequence</label>
                             <input x-model="peptideSequence" @input="calculatePeptideMass" type="text"
                                    class="form-control" id="sequence" name="sequence">
+                        </div>
+                        <!--                        add select for mass type-->
+                        <div class="mb-3">
+                            <label for="floatingSelect">Add Post translation Modification (PTM)</label>
+                            <select @change="calculatePeptideMass" class="form-select" id="floatingSelect"
+                                    aria-label="Add PTM" x-model="ptmType">
+                                <option value="none">none</option>
+                                <option value="phosphorylation">Phosphorylation (+79.9663 Da)</option>
+                                <option value="oxidation">Oxidation (+15.9949 Da)</option>
+                            </select>
+
                         </div>
                     </form>
 
@@ -169,10 +180,10 @@ include_once 'lib.php';
                                                 <td x-text="i.seq" class="font-monospace align-top"></td>
                                                 <td class="align-top">
                                                     <template x-for="(acc, index) in i.acc" :key="acc">
-<!--                                                         :href="'https://www.uniprot.org/uniprot/'+acc.trim()"-->
-                                                    <span><a class="btn-link pt-0 px-1 font-monospace"
-                                                             :href="'tool.php?accession='+acc.trim()"
-                                                             target="_blank" x-text="acc"> </a>
+                                                        <!--                                                         :href="'https://www.uniprot.org/uniprot/'+acc.trim()"-->
+                                                        <span><a class="btn-link pt-0 px-1 font-monospace"
+                                                                 :href="'tool.php?accession='+acc.trim()"
+                                                                 target="_blank" x-text="acc"> </a>
                                                           <template x-if="(index + 1) % 7 === 0">
                                                             <br>
                                                         </template>
@@ -204,43 +215,7 @@ include_once 'lib.php';
     </div>
 
 
-    <style>
-        .card a {
-            color: #0056b3 !important;
-        }
-
-        .card a:hover {
-            color: #003580;
-        }
-    </style>
-    <div class="row mt-5 mb-4">
-        <div class="col">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h4 class="card-title text-center mb-3">Contact</h4>
-                    <p class="card-text ">
-
-                        <strong>Department:</strong> <a
-                                href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
-                                class="href"> Bioinformatics Laboratory</a><br>
-                        <strong>Institute:</strong>
-                        <a href="https://www.pbf.unizg.hr/en/departments/department_of_biochemical_engineering/laboratory_for_bioinformatics/bioinformatics"
-                           class="btn-link" target="_blank">
-                            Faculty of Food Technology and Biotechnology
-                            University of Zagreb, Croatia
-                        </a>
-                        <br>
-                        <strong>GitHub:</strong> <a href="https://github.com/jankod/DigestedProteinDB" class="btn-link"
-                                                    target="_blank">Digested Protein DB</a>
-                        <br>
-                        <strong>Email:</strong> <a href="mailto:jdiminic@pbf.hr">jdiminic@pbf.hr</a><br>
-
-                    </p>
-
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include_once "inc/html_footer.php"; ?>
 
 
 </div>
@@ -273,11 +248,17 @@ include_once 'lib.php';
         }
 
         return {
+            ptms: {
+                phosphorylation: 79.9663,
+                oxidation: 15.9949
+            },
+            ptmType: null,
+
             calculatedMass: "",
             peptideSequence: "",
 
-            mass1: "1500.6",
-            mass2: "1500.8",
+            mass1: 1500.6,
+            mass2: 1500.8,
             results: "",
             error: "",
             loading: false,
@@ -303,14 +284,27 @@ include_once 'lib.php';
                     this.dbInfo = 'Error fetching database info';
                 }
             },
+
             calculatePeptideMass() {
                 try {
+
+                    if (this.ptmType !== 'none' && this.ptmType && this.ptms[this.ptmType]) {
+                        let mass = this.ptms[this.ptmType];
+                        // convert mass1 to float
+                        this.mass1 = parseFloat(this.mass1);
+                        this.mass2 = parseFloat(this.mass2);
+                        this.mass1 += mass;
+                        this.mass2 += mass;
+                    }
+
                     if (this.peptideSequence.trim() === '') {
                         this.calculatedMass = '';
                         return;
                     }
 
-                    const mass = calculateMassWidthH2O(this.peptideSequence.toUpperCase());
+                    let mass = calculateMassWidthH2O(this.peptideSequence.toUpperCase());
+                    console.log("this.ptmType", this.ptmType)
+
                     this.calculatedMass = mass.toFixed(4);
                     this.mass1 = this.calculatedMass;
                     this.mass2 = this.calculatedMass;

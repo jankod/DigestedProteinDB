@@ -62,7 +62,12 @@ function getCachedUniProtData(string $url, string $cacheKey, int $cacheExpiry = 
     }
 
     // Fetch data from the URL
-    $data = file_get_contents($url);
+    $data = @file_get_contents($url);
+
+    if ($data === false) {
+        // Handle error if needed
+       return false;
+    }
 
     // If data was successfully fetched, cache it
     if ($data !== false) {
@@ -87,6 +92,11 @@ class UniprotEntry
         $this->proteinName = $proteinName;
         $this->sequence = $sequence;
     }
+}
+
+function isActive(string $page): string
+{
+    return basename($_SERVER['PHP_SELF']) === $page ? 'active' : '';
 }
 
 function parseUniProtData($jsonString): UniprotEntry
