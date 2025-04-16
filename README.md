@@ -75,15 +75,17 @@ Search example: masses from: `1900` Da to `1900.3`Da gives JSON results like:
         }
       ]
     },
-...
+    ...
 ``` 
 
-**acc** - Uniprot accession number, **seq** - peptide sequence, **mass** - peptide mass.
+**acc** - Uniprot accession number,
+**seq** - peptide sequence,
+**mass** - peptide mass.
 
 ## Key Features
 
-- **Minimal and Fast database**: Database of digested peptides designed for a small on\-disk footprint
-- **Mass\-Oriented Search**: Stores peptide data keyed by mass to expedite lookups based on precise mass ranges
+- **Minimal and fast database**: Database of digested peptides designed for a small on\-disk footprint
+- **Mass\-oriented search**: Stores peptide data keyed by mass to expedite lookups based on precise mass ranges
 
 ## Library Integration
 
@@ -91,15 +93,6 @@ This database is designed as a Java library that can be easily embedded into exi
 The library provides a clean API for programmatic access to peptide data, making it ideal for integration with mass
 spectrometry
 analysis tools or custom bioinformatics pipelines.
-
-#### New database creation
-
-How to Run
-Build the Project
-
-Use Maven:
-mvn clean package
-Create the Database
 
 ## Command-Line Parameters
 
@@ -125,7 +118,8 @@ This command is used to create a digested peptide database.
 | `-e`, `--enzyme`                | Enzyme used for digestion (e.g., Trypsin).                            | No       | `Trypsin`     |
 | `-t`, `--taxonomy-division`     | Taxonomy division to filter proteins (e.g., Bacteria, Viruses, etc.). | No       | `ALL`         |
 
-### Example Usage 
+### Example Usage
+
 Run the compiled JAR with the create-db subcommand:
 
 ```bash
@@ -144,7 +138,9 @@ java -jar digestdb.jar create-db
 ```
 
 ### Run the Web Server
+
 Start a simple web server for searching:
+
 ```bash
 java -jar digestdb.jar server 
 -p 8080 
@@ -165,15 +161,16 @@ Steps to create the database:
 3. **Organize Data**: Sort and group peptides by mass for easy storage.
 4. **Build Database**: Generate a mass\-indexed key\-value engine (RocksDB) and custom solution for quick searches.
 
+Many optimizations are used to speed up the process, including:
 
+- **Custom Data Structures**: Use specialized data structures for storing data. Sequences are stored as 5-bit encoded
+  strings, masses are stored as 4-byte integers, and accession numbers are 36-base encoded strings stored in 64-bit
+  data (long) and mapped to 4-byte integers.
 
 ## TODO
 
-- Implement a simple command line interface for querying the database.
 - Create new database for additional proteins, enzymes and missed cleavages.
-- Create website for the project with:
-    - Documentation
-    - Downloadable databases
-    - Benchmarks
-
-###  
+- Documentation updates
+- More downloadable databases with different enzymes and taxonomy
+- Benchmarks
+- Native version for Windows, MacOS and Linux without Java and RockDB
