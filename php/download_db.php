@@ -19,10 +19,10 @@ include_once 'lib.php';
     <p>
         The database is available for download
     </p>
-    <ul class="list-group">
-        <li class="list-group-item"><a href='dow/disk3_download/db_swisprot_chymotrypsin.zip' download>db_swisprot_chymotrypsin.zip (208 MB)</a></li>
-        <li class="list-group-item"><a href='dow/disk3_download/db_swisprot_trypsin.zip' download>db_swisprot_trypsin.zip (263 MB)</a></li>
-        <li class="list-group-item"><a href='trembl_bacteria_trypsin.zip' download>trembl_bacteria_trypsin.zip (50 GB)</a></li>
+    <ul class="list-group ">
+        <li class="list-group-item"><a class=" link-info" href='dow/disk3_download/db_swisprot_chymotrypsin.zip' download>db_swisprot_chymotrypsin.zip (208 MB)</a></li>
+        <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_swisprot_trypsin.zip' download>db_swisprot_trypsin.zip (263 MB)</a></li>
+        <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_trembl_bacteria_trypsin.zip' download>trembl_bacteria_trypsin.zip (50 GB)</a></li>
     </ul>
 
 </div>

@@ -113,7 +113,7 @@ This command is used to create a digested peptide database.
 | `-M`, `--max-length`            | Maximum peptide length.                                               | No       | `30`          |
 | `-mc`, `--missed-cleavage`      | Number of missed cleavages.                                           | No       | `1`           |
 | `-s`, `--sort-temp-dir`         | Path to the temporary directory used for sorting.                     | No       | None          |
-| `-ncbi`, `--ncbi-taxonomy-path` | Path to the NCBI taxonomy file (`nodes.dmp`).                         | No       | None          |
+| `-ncbi`, `--ncbi-taxonomy-path` | Path to the NCBI taxonomy file (`nodes.dmp`). https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz                        | No       | None          |
 | `-p`, `--taxonomy-parents`      | Taxonomy parent (ancestor) IDs.                                       | No       | All           |
 | `-e`, `--enzyme`                | Enzyme used for digestion (e.g., Trypsin).                            | No       | `Trypsin`     |
 | `-t`, `--taxonomy-division`     | Taxonomy division to filter proteins (e.g., Bacteria, Viruses, etc.). | No       | `ALL`         |

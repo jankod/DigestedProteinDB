@@ -4,3 +4,12 @@
   margin-left: 0px; /* Dodajte razmak između teksta i ikone */
 
 }
+
+
+.my-link a{
+  color: blue !important;
+}
+
+.my-link a:hover {
+  color: darkblue !important;
+}
