@@ -94,6 +94,12 @@ The library provides a clean API for programmatic access to peptide data, making
 spectrometry
 analysis tools or custom bioinformatics pipelines.
 
+## Requirements
+- Java 24 or higher
+- Maven 3.8 or higher for building the project from source
+- Linux, MacOS for build database
+- Linux, MacOS, Windows for running the server
+
 ## Command-Line Parameters
 
 The application provides two main commands: `create-db` for creating the database and `server` for running the web
