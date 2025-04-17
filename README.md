@@ -4,9 +4,9 @@
 
 ## Overview
 
-This is a Java library for creating and searching a digested peptide database with RocksDB key-value store.
+A Java library for creating and searching a digested peptide database with RocksDB key-value store.
 Digested peptides are generated from protein sequences using a specific enzyme (e.g., trypsin) and are stored in a
-database for rapid mass-based searches. This library is designed to be efficient and easy to use, with a focus on
+database for rapid mass-based searches. This library is designed to be efficient to use, with a focus on
 performance.
 The database is designed to be a compact and efficient storage of in-silico digested peptides. The primary goal is to
 support rapid mass-based searches, even on less powerful desktop machines.
@@ -17,7 +17,7 @@ This compact database layout enables fast peptide mass queries with minimal reso
 TrEMBL bacteria dataset (7 to 30 amino acids, 1 missed cleavage) occupies about 50 GB on disk and supports quick lookups
 by mass range on standard hardware.
 
-Search example: masses from: `1500.6` Da to `1500.8`Da gives JSON results like:
+For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON results like:
 
 ```json
 {
@@ -75,7 +75,7 @@ Search example: masses from: `1500.6` Da to `1500.8`Da gives JSON results like:
         }
       ]
     },
-    ...
+    ... 
 ``` 
 
 **acc** - Uniprot accession number,
@@ -97,8 +97,8 @@ analysis tools or custom bioinformatics pipelines.
 ## Requirements
 - Java 24 or higher
 - Maven 3.8 or higher for building the project from source
-- Linux, MacOS for build database
-- Linux, MacOS, Windows for running the server
+- Linux, MacOS for database building
+- Linux, MacOS, Windows for running the database search server
 
 ## Command-Line Parameters
 
@@ -107,22 +107,23 @@ server. Below is a detailed explanation of the parameters for each command.
 
 ### `create-db` Command
 
-This command is used to create a digested peptide database.
+This command is used to create a digested peptide database. 
+The following table describes the available parameters:
 
-| Parameter                       | Description                                                           | Required | Default Value |
-|---------------------------------|-----------------------------------------------------------------------|----------|---------------|
-| `-d`, `--db-dir`                | Path to the database directory.                                       | Yes      | None          |
-| `-u`, `--uniprot-xml`           | Path to the Uniprot XML file (`.xml.gz` or `.xml`).                   | Yes      | None          |
-| `-n`, `--db-name`               | Name of the database.                                                 | Yes      | None          |
-| `-c`, `--clean`                 | Clean all files in the database directory before creating.            | No       | `false`       |
-| `-m`, `--min-length`            | Minimum peptide length.                                               | No       | `7`           |
-| `-M`, `--max-length`            | Maximum peptide length.                                               | No       | `30`          |
-| `-mc`, `--missed-cleavage`      | Number of missed cleavages.                                           | No       | `1`           |
-| `-s`, `--sort-temp-dir`         | Path to the temporary directory used for sorting.                     | No       | None          |
-| `-ncbi`, `--ncbi-taxonomy-path` | Path to the NCBI taxonomy file (`nodes.dmp`). https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz                        | No       | None          |
-| `-p`, `--taxonomy-parents`      | Taxonomy parent (ancestor) IDs.                                       | No       | All           |
-| `-e`, `--enzyme`                | Enzyme used for digestion (e.g., Trypsin).                            | No       | `Trypsin`     |
-| `-t`, `--taxonomy-division`     | Taxonomy division to filter proteins (e.g., Bacteria, Viruses, etc.). | No       | `ALL`         |
+| Parameter                       | Description                                                                                            | Required | Default Value |
+|---------------------------------|--------------------------------------------------------------------------------------------------------|----------|---------------|
+| `-d`, `--db-dir`                | Path to the database directory.                                                                        | Yes      | None          |
+| `-u`, `--uniprot-xml`           | Path to the Uniprot XML file (`.xml.gz` or `.xml`).                                                    | Yes      | None          |
+| `-n`, `--db-name`               | Name of the database.                                                                                  | Yes      | None          |
+| `-c`, `--clean`                 | Clean all files in the database directory before creating.                                             | No       | `false`       |
+| `-m`, `--min-length`            | Minimum peptide length.                                                                                | No       | `7`           |
+| `-M`, `--max-length`            | Maximum peptide length.                                                                                | No       | `30`          |
+| `-mc`, `--missed-cleavage`      | Number of missed cleavages.                                                                            | No       | `1`           |
+| `-s`, `--sort-temp-dir`         | Path to the temporary directory used for sorting.                                                      | No       | None          |
+| `-ncbi`, `--ncbi-taxonomy-path` | Path to the NCBI taxonomy file (`nodes.dmp`). https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump.tar.gz | No       | None          |
+| `-p`, `--taxonomy-parents`      | NCBI Taxonomy parent (ancestor) IDs.                                                                   | No       | All           |
+| `-e`, `--enzyme`                | Enzyme used for digestion (e.g., Trypsin, Chymotrypsin).                                               | No       | `Trypsin`     |
+| `-t`, `--taxonomy-division`     | NCBI Taxonomy division to filter proteins (e.g., Bacteria, Viruses, etc.).                             | No       | `ALL`         |
 
 ### Example Usage
 
@@ -153,19 +154,19 @@ java -jar digestdb.jar server
 -d "/path/to/db/dir"
 ```
 
-Demoonstration search web: https://digestedproteindb.pbf.hr/
+Demonstration search web: https://digestedproteindb.pbf.hr
 
 ## Create database workflow
 
-The database is created from the uniprot .xml.gz or .xml file.
+The database creation process start with uniprot .xml.gz or .xml file.
 Example class `hr.pbf.digestdb.CreateDatabase` is used to create the database.
 
-Steps to create the database:
+The process consists of the following steps:
 
 1. **Parse Uniprot Data**: Extract sequences and relevant metadata from uniprot .xml.gz database and NCBI Taxonomy.
 2. **Digest Proteins**: Cleave the protein with a specific enzyme (trypsin, for example).
 3. **Organize Data**: Sort and group peptides by mass for easy storage.
-4. **Build Database**: Generate a mass\-indexed key\-value engine (RocksDB) and custom solution for quick searches.
+4. **Build Database**: Generate a mass\-indexed key\-value engine (RocksDB) and custom array list index for quick searches.
 
 Many optimizations are used to speed up the process, including:
 
@@ -175,8 +176,7 @@ Many optimizations are used to speed up the process, including:
 
 ## TODO
 
-- Create new database for additional proteins, enzymes and missed cleavages.
-- Documentation updates
-- More downloadable databases with different enzymes and taxonomy
-- Benchmarks
-- Native version for Windows, MacOS and Linux without Java and RockDB
+- Python code for searching the database
+- Expand and improve documentation
+- Create more downloadable databases with different enzymes and taxonomy units
+- Develop native version for Windows, MacOS, and Linux without Java and RockDB dependencies
