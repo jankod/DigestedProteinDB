@@ -61,7 +61,8 @@ include_once 'lib.php';
         <strong>Error:</strong> <span x-text="uniprotErrors"></span>
     </div>
 
-    <?php if ($accession === ""): ?>̣
+
+    <?php if ($accession === ""):     ?>
         <div>
             <form class="mb-3" method="get" action="tool.php">
                 <div class="input-group">
@@ -178,6 +179,12 @@ include_once 'lib.php';
             missedCleavages: 0,
             peptides: [],
             digestSequence() {
+                console.log("seq", this.sequence);
+                if(this.sequence.trim() === "") {
+                    this.peptides =[];
+                    console.log("No sequence to digest");
+                    return;
+                }
                 if (this.digestEnzyme === 'trypsin') {
                     this.peptides = trypsinDigest(this.sequence, parseInt(this.missedCleavages));
 

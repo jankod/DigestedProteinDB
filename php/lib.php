@@ -109,9 +109,18 @@ function parseUniProtData($jsonString): UniprotEntry
         return $entry;
     }
 
+    // Get protein name from either recommendedName or submissionNames
+    $proteinName = '';
+    if (isset($data['proteinDescription']['recommendedName']['fullName']['value'])) {
+        $proteinName = $data['proteinDescription']['recommendedName']['fullName']['value'];
+    } elseif (isset($data['proteinDescription']['submissionNames'][0]['fullName']['value'])) {
+        $proteinName = $data['proteinDescription']['submissionNames'][0]['fullName']['value'];
+    }
+
+
     return new UniprotEntry(
         $data['primaryAccession'] ?? '',
-        $data['proteinDescription']['recommendedName']['fullName']['value'] ?? '',
+        $proteinName,
         $data['sequence']['value'] ?? ''
     );
 }

@@ -56,7 +56,7 @@ public class DigestedApp {
 		@Option(names = { "-ncbi", "--ncbi-taxonomy-path" }, description = "Path to the NCBI taxonomy file (nodes.dmp)")
 		String ncbiTaxonomyPath = null;
 
-		@Option(names = { "-p", "--taxonomy-parents" }, description = "Taxonomy parents (ancestors) ids, default all")
+		@Option(names = { "-p", "--taxonomy-parents" }, description = "Taxonomy parents (ancestors) ids, default all. Use -p taxID1, taxID2 ... for filtering by taxonomy.", split = ",")
 		int[] taxonomyParentsIds = null;
 
 		@Option(names = { "-e", "--enzyme" }, description = "Enzyme used for digestion, default trypsin", defaultValue = "Trypsin")
@@ -69,7 +69,7 @@ public class DigestedApp {
 
 		@Override
 		public Integer call() throws Exception {
-			System.out.println("Creating database in: " + dbDir);
+			System.out.println("Start creating database in dir: " + dbDir);
 
 			CreateDatabase.CreateDatabaseConfig config = new CreateDatabase.CreateDatabaseConfig();
 			config.setDbDir(dbDir);

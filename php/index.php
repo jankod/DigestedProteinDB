@@ -20,6 +20,7 @@ include_once 'lib.php';
         <div class="col">
 
             <div class="row">
+                <h4>Current digested protein database</h4>
                 <div class="col-md-6">
                     <p class="mb-1"><strong>DB name:</strong> <span x-text="dbInfo.db_name"></span></p>
                     <p class="mb-1"><strong>Enzyme:</strong> <span x-text="dbInfo.enzyme_name"></span></p>
@@ -35,11 +36,6 @@ include_once 'lib.php';
                                 x-text="dbInfo.max_peptide_length"></span></p>
                 </div>
             </div>
-            <div>
-                Download: <a class="btn btn-link" href="https://digestedproteindb.pbf.hr/dow/trembl_bacteria.zip">trembl_bacteria.zip
-                    (50 GB)</a>
-            </div>
-
 
             <hr>
 
@@ -64,25 +60,24 @@ include_once 'lib.php';
                     </form>
                 </div>
 
-                <div class="col">
-                    <h3>Search by sequence</h3>
+                <div class="col mt-2">
                     <form method="get" @submit.prevent="search">
                         <div class="mb-3">
-                            <label for="sequence" class="form-label">Sequence</label>
+                            <label for="sequence" class="form-label">Calculate mass by sequence</label>
                             <input x-model="peptideSequence" @input="calculatePeptideMass" type="text"
                                    class="form-control" id="sequence" name="sequence">
                         </div>
                         <!--                        add select for mass type-->
-                        <div class="mb-3">
-                            <label for="floatingSelect">Add Post translation Modification (PTM)</label>
-                            <select @change="calculatePeptideMass" class="form-select" id="floatingSelect"
-                                    aria-label="Add PTM" x-model="ptmType">
-                                <option value="none">none</option>
-                                <option value="phosphorylation">Phosphorylation (+79.9663 Da)</option>
-                                <option value="oxidation">Oxidation (+15.9949 Da)</option>
-                            </select>
-
-                        </div>
+<!--                        <div class="mb-3">-->
+<!--                            <label for="floatingSelect">Add Post translation Modification (PTM)</label>-->
+<!--                            <select @change="calculatePeptideMass" class="form-select" id="floatingSelect"-->
+<!--                                    aria-label="Add PTM" x-model="ptmType">-->
+<!--                                <option value="none">none</option>-->
+<!--                                <option value="phosphorylation">Phosphorylation (+79.9663 Da)</option>-->
+<!--                                <option value="oxidation">Oxidation (+15.9949 Da)</option>-->
+<!--                            </select>-->
+<!---->
+<!--                        </div>-->
                     </form>
 
                 </div>
@@ -147,7 +142,7 @@ include_once 'lib.php';
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-2">
         <div class="col">
             <h2>Results</h2>
             <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
@@ -168,7 +163,7 @@ include_once 'lib.php';
                     <template x-for="(item, index) in parsedResults" :key="index">
                         <tr>
 
-                            <td x-text="(index + 1) + ((currentPage - 1) * pageSize)"></td>
+                            <td x-text="((index + 1) + ((currentPage - 1) * pageSize)) + '.' "></td>
                             <td x-text="item.mass"></td>
                             <td>
                                 <div class="">

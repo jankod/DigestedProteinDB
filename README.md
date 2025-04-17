@@ -17,60 +17,60 @@ This compact database layout enables fast peptide mass queries with minimal reso
 TrEMBL bacteria dataset (7 to 30 amino acids, 1 missed cleavage) occupies about 50 GB on disk and supports quick lookups
 by mass range on standard hardware.
 
-Search example: masses from: `1900` Da to `1900.3`Da gives JSON results like:
+Search example: masses from: `1500.6` Da to `1500.8`Da gives JSON results like:
 
 ```json
 {
-  "totalResult": 645,
-  "memory": "300 MB",
-  "duration": "00:00:00.000",
+  "totalResult": 1543,
+  "memory": "2016 MB",
+  "duration": "00:00:00.031",
   "page": 1,
   "pageSize": 10,
   "result": [
     {
-      "1500.6014": [
+      "1500.6": [
         {
-          "seq": "QADNFPFAMCDDK",
+          "seq": "SSNESGSSGSMTNEK",
           "acc": [
-            "Q1RIV2"
-          ]
-        }
-      ]
-    },
-    {
-      "1500.6038": [
-        {
-          "seq": "DSEDMDDTLASFR",
-          "acc": [
-            "F4JLS1"
-          ]
-        }
-      ]
-    },
-    {
-      "1500.6039": [
-        {
-          "seq": "GDSCFEESESGNLK",
-          "acc": [
-            "B4NSS7",
-            "B4IMH3"
-          ]
-        }
-      ]
-    },
-    {
-      "1500.6046": [
-        {
-          "seq": "TCDDECCPVNFKK",
-          "acc": [
-            "P03313",
-            "Q9YLG5"
+            "A0A085MEL6"
           ]
         },
         {
-          "seq": "TCDEDCCPVNFKK",
+          "seq": "CSGSTSESEGSQTNK",
           "acc": [
-            "O91734"
+            "A0AAD6LB27",
+            "A0AAD6L9P6",
+            "A0A4U5R0T2",
+            "A0A8X8BWN4",
+            "A0A8X8C0W2"
+          ]
+        },
+        {
+          "seq": "NSCSASESQSDTGTK",
+          "acc": [
+            "A0A3P9Q6N9"
+          ]
+        },
+        {
+          "seq": "EDNSCSSSAGSTQTK",
+          "acc": [
+            "A0AAV4GC55"
+          ]
+        }
+      ]
+    },
+    {
+      "1500.6002": [
+        {
+          "seq": "VEIEYDDEDMMI",
+          "acc": [
+            "A0A1Y2LUM3"
+          ]
+        },
+        {
+          "seq": "CHGWGGSQCHHHR",
+          "acc": [
+            "A0A8B9NSG9"
           ]
         }
       ]
@@ -138,7 +138,7 @@ java -jar digestdb.jar create-db
 -M 30 
 -s path/to/sort/temp/dir 
 -ncbi "path/to/ncbi/taxonomy/file" 
--p 10239,33090 
+-p 10239 -p 33090 
 -e Trypsin 
 -t ALL
 ```
