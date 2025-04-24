@@ -1,0 +1,45 @@
+Kontekst iz MS spektra:
+
+Kada maseni spektrometar analizira peptide, on mjeri omjer mase i naboja (m/z), a ne čistu masu (M). Peptidi često nose više pozitivnih naboja (npr. +1, +2, +3, +4), obično na amino kraju i na bočnim lancima arginina, lizina i histidina.
+
+Formula koja povezuje m/z, pravu masu (M) peptida i njegov naboj (z) je:
+
+m/z=zM+z⋅H+
+
+Gdje je H+ masa jednog protona (približno 1.0078 Da).
+
+Da bi se iz izmjerenog m/z i poznatog naboja (z) dobila prava masa (M), koristi se prerađena formula:
+
+M=(m/z⋅z)−(z⋅H+)
+
+Što korisnik (maseni spektrometrist) vidi i ima:
+
+Kada gleda svoj MS spektar, korisnik vidi pikove. Za svaki pik, softver spektrometra obično daje dvije ključne informacije:
+
+Izmjereni m/z vrijednost pika.
+Procijenjenu ili određenu vrijednost naboja (z) za taj pik (npr. +1, +2, +3, +4).
+Kako bi pretraživanje u vašoj bazi trebalo izgledati:
+
+Da biste podržali zahtjev korisnika, na svojoj web stranici za pretraživanje biste trebali dodati ili modificirati obrazac za unos tako da korisnik može unijeti sljedeće:
+
+Polje za unos m/z vrijednosti: Ovo je brojčana vrijednost koju korisnik pročita iz svog spektra.
+Primjer unosa: 756.41
+Polje za unos vrijednosti naboja (z): Ovo je cijeli broj koji predstavlja naboj iona. Najpraktičnije je ponuditi padajući izbornik s najčešćim opcijama (+1, +2, +3, +4) ili jednostavno brojčano polje gdje korisnik unosi broj (1, 2, 3...).
+Primjer unosa: +2 (ili samo 2)
+(Vrlo preporučeno) Polje za masenu toleranciju: U masenoj spektrometriji uvijek postoji određena nepreciznost mjerenja. Pretraživanje se nikad ne radi na egzaktnu izračunatu masu, već unutar dopuštenog odstupanja (tolerancije). Ovo polje bi trebalo omogućiti korisniku da unese toleranciju, obično u jedinicama Da (Daltonima) ili ppm (parts per million). Ovisno o preciznosti njihovog instrumenta.
+Primjer unosa: 0.02 Da ili 10 ppm
+Kako bi pretraživanje radilo "ispod haube" (što vaša baza radi s unosom korisnika):
+
+Kada korisnik unese m/z i z, vaš backend kod (Symfony aplikacija) bi trebao:
+Izračunati pravu masu (M) tog peptida koristeći formulu: M=(m/z⋅z)−(z⋅1.0078).
+Npr., ako korisnik unese m/z = 756.41 i z = +2:
+M=(756.41⋅2)−(2⋅1.0078)
+M=1512.82−2.0156
+M≈1510.8044 Da
+Pretražiti vašu bazu podataka (koja vjerojatno sadrži izračunate mase peptida bez naboja) za unose koji imaju masu blizu izračunate M.
+Prilikom pretraživanja, primijeniti masenu toleranciju koju je korisnik unio oko izračunate mase M. Na primjer, ako je tolerancija 0.02 Da, tražili biste peptide s masom između (M−0.02) i (M+0.02). Ako je tolerancija 10 ppm, raspon bi se izračunao na temelju M i te vrijednosti u ppm.
+Vratiti korisniku sve peptide iz vaše baze čija izračunata masa odgovara unutar zadane tolerancije.
+Zaključak:
+
+Za implementaciju ovog poboljšanja, trebate proširiti svoju formu za pretraživanje kako bi prihvaćala m/z i naboj (z) (te po mogućnosti masenu toleranciju) kao ulazne parametre umjesto samo mase. Vaš backend kod će zatim koristiti ove parametre za izračun prave mase (M) i provesti pretragu u vašoj postojećoj bazi podataka masa peptida, uzimajući u obzir toleranciju. Ovo će biti izuzetno korisno za korisnike koji dolaze s podacima iz masenog spektrometra
+

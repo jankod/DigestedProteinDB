@@ -45,14 +45,12 @@ include_once 'lib.php';
                     <form @submit.prevent="searchNew">
                         <div class="mb-3">
                             <label for="mass1" class="form-label">Mass from (Da)</label>
-                            <input x-model="mass1" type="text" class="form-control w-50" id="mass1" name="mass1"
-                                   required
+                            <input x-model="mass1" type="text" class="form-control" id="mass1" name="mass1" required
                                    value="1500.6">
                         </div>
                         <div class="mb-3">
                             <label for="mass2" class="form-label">Mass to (Da)</label>
-                            <input x-model="mass2" type="text" class="form-control w-50" id="mass2" name="mass2"
-                                   required
+                            <input x-model="mass2" type="text" class="form-control" id="mass2" name="mass2" required
                                    value="1500.8">
                         </div>
                         <button type="submit" class="btn btn-primary" :disabled="loading">
@@ -63,50 +61,24 @@ include_once 'lib.php';
                 </div>
 
                 <div class="col mt-2">
-
-
-                    <h4>Calculate by m/z</h4>
-
-                    <form @submit.prevent="addByMZ">
-
+                    <form method="get" @submit.prevent="search">
                         <div class="mb-3">
-                            <label for="mz" class="form-label">m/z value</label>
-                            <input x-model="mzValue" type="text" class="form-control w-50" id="mz" name="mz"
-                                   placeholder="756.41" @input="addByMZ">
+                            <label for="sequence" class="form-label">Calculate mass by sequence</label>
+                            <input x-model="peptideSequence" @input="calculatePeptideMass" type="text"
+                                   class="form-control" id="sequence" name="sequence">
                         </div>
-                        <div class="mb-3">
-                            <label for="charge" class="form-label">Charge (z)</label>
-                            <select x-model.number="charge" class="form-select w-50" id="charge" name="charge"
-                                    @change="addByMZ">
-                                <option value="1">+1</option>
-                                <option value="2">+2</option>
-                                <option value="3">+3</option>
-                                <option value="4">+4</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tolerance" class="form-label">Mass tolerance</label>
-                            <div class="input-group w-50">
-                                <input x-model="tolerance" type="text" class="form-control" id="tolerance"
-                                       name="tolerance" placeholder="0.02" @input="addByMZ">
-                                <select x-model="toleranceUnit" class="form-select" style="max-width: 100px;"
-                                        @change="addByMZ">
-                                    <option value="Da">Da</option>
-                                    <option value="ppm">ppm</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="text-danger" x-show="mzError" x-text=" mzError "></div>
-
+                        <!--                        add select for mass type-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="floatingSelect">Add Post translation Modification (PTM)</label>-->
+<!--                            <select @change="calculatePeptideMass" class="form-select" id="floatingSelect"-->
+<!--                                    aria-label="Add PTM" x-model="ptmType">-->
+<!--                                <option value="none">none</option>-->
+<!--                                <option value="phosphorylation">Phosphorylation (+79.9663 Da)</option>-->
+<!--                                <option value="oxidation">Oxidation (+15.9949 Da)</option>-->
+<!--                            </select>-->
+<!---->
+<!--                        </div>-->
                     </form>
-                    <div class="mb-3">
-                        <h4>Calulcate mass by sequence</h4>
-                        <input x-model="peptideSequence" @input="calculatePeptideMass" type="text"
-                               class="form-control" id="sequence" name="sequence">
-                        <div class="text-danger" x-show="calculatedMass && calculatedMass.includes('Error:')"
-                             x-text="calculatedMass"></div>
-
-                    </div>
 
                 </div>
             </div>
@@ -271,12 +243,11 @@ include_once 'lib.php';
         }
 
         return {
-
-            mzValue: 1500,
-            charge: 1,
-            tolerance: 0.1,
-            toleranceUnit: "Da",
-            mzError: "",
+            ptms: {
+                phosphorylation: 79.9663,
+                oxidation: 15.9949
+            },
+            ptmType: null,
 
             calculatedMass: "",
             peptideSequence: "",
@@ -309,70 +280,18 @@ include_once 'lib.php';
                 }
             },
 
-            addByMZ() {
-                this.mzError = "";
-                let result = this.calculateMassFromMZ();
-                if (result.error) {
-                    this.mzError = result.error;
-                    return;
-                }
-
-                this.error = "";
-                const exactMass = result.mass;
-
-                let toleranceValue = parseFloat(this.tolerance);
-
-                if (isNaN(toleranceValue) || toleranceValue <= 0) {
-                    this.mzError = "Tolerance must be a positive number";
-                    return;
-                }
-
-                let massFrom, massTo;
-
-                if (this.toleranceUnit === "ppm") {
-                    const absoluteTolerance = (exactMass * toleranceValue) / 1000000;
-                    console.log("absoluteTolerance ppm", absoluteTolerance)
-                    massFrom = exactMass - absoluteTolerance;
-                    massTo = exactMass + absoluteTolerance;
-                } else {
-                    massFrom = exactMass - toleranceValue;
-                    massTo = exactMass + toleranceValue;
-                }
-
-                this.mass1 = massFrom.toFixed(4);
-                this.mass2 = massTo.toFixed(4);
-
-
-                //this.search();
-            },
-
-            calculateMassFromMZ() {
-                try {
-                    if (!this.mzValue || isNaN(this.mzValue) || !this.charge || isNaN(this.charge)) {
-                        return {error: "m/z and charge must be valid numbers"};
-                    }
-
-                    const mz = parseFloat(this.mzValue);
-                    const z = parseInt(this.charge);
-                    const protonMass = 1.0078;
-
-                    // Old Formula: M = (m/z * z) - (z * H+)
-                    const calculatedMass = (mz * z) - (z * protonMass);
-
-                    console.log("calculatedMass", calculatedMass);
-
-                    return {
-                        mass: calculatedMass,
-                        error: null
-                    };
-                } catch (error) {
-                    console.error('Error calculating mass from m/z:', error);
-                    return {error: error.message};
-                }
-            },
-
             calculatePeptideMass() {
                 try {
+
+                    if (this.ptmType !== 'none' && this.ptmType && this.ptms[this.ptmType]) {
+                        let mass = this.ptms[this.ptmType];
+                        // convert mass1 to float
+                        this.mass1 = parseFloat(this.mass1);
+                        this.mass2 = parseFloat(this.mass2);
+                        this.mass1 += mass;
+                        this.mass2 += mass;
+                    }
+
                     if (this.peptideSequence.trim() === '') {
                         this.calculatedMass = '';
                         return;
