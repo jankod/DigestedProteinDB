@@ -197,7 +197,7 @@ include_once 'lib.php';
                                 <div class="">
                                     <table class="table-sm table-hover">
                                         <tbody>
-                                        <template x-for="(i, index2) in item.data">
+                                        <template x-for="(i, index2) in item.data" x-key="index2">
                                             <tr>
                                                 <td class="align-top"><span x-text="index2+1"></span>.</td>
                                                 <td x-text="i.seq" class="font-monospace align-top"></td>
@@ -335,6 +335,7 @@ include_once 'lib.php';
                     massFrom = exactMass - absoluteTolerance;
                     massTo = exactMass + absoluteTolerance;
                 } else {
+                    console.log("toleranceValue Da", toleranceValue)
                     massFrom = exactMass - toleranceValue;
                     massTo = exactMass + toleranceValue;
                 }
