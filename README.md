@@ -1,4 +1,3 @@
-# **This project is currently in active development**
 
 # Digested Peptide Database
 
@@ -6,8 +5,9 @@
 
 A Java library for creating and searching a digested peptide database with RocksDB key-value store.
 Digested peptides are generated from protein sequences using a specific enzyme (e.g., trypsin) and are stored in a
-database for rapid mass-based searches. This library is designed to be efficient to use, with a focus on
-performance.
+database for rapid mass-based searches. This library is designed to be a compact and efficient storage of 
+in-silico digested peptides.
+
 The database is designed to be a compact and efficient storage of in-silico digested peptides. The primary goal is to
 support rapid mass-based searches, even on less powerful desktop machines.
 
@@ -18,6 +18,10 @@ TrEMBL bacteria dataset (7 to 30 amino acids, 1 missed cleavage) occupies about 
 by mass range on standard hardware.
 
 For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON results like:
+
+**acc** — Uniprot accession number
+**seq** - peptide sequence,
+**mass** - peptide mass.
 
 ```json
 {
@@ -78,14 +82,12 @@ For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON re
     ... 
 ``` 
 
-**acc** - Uniprot accession number,
-**seq** - peptide sequence,
-**mass** - peptide mass.
+
 
 ## Key Features
 
-- **Minimal and fast database**: Database of digested peptides designed for a small on\-disk footprint
-- **Mass\-oriented search**: Stores peptide data keyed by mass to expedite lookups based on precise mass ranges
+**Minimal and fast database**: Database of digested peptides designed for a small on\-disk footprint
+**Mass\-oriented search**: Stores peptide data keyed by mass to expedite lookups based on precise mass ranges
 
 ## Library Integration
 
@@ -93,6 +95,16 @@ This database is designed as a Java library that can be easily embedded into exi
 The library provides a clean API for programmatic access to peptide data, making it ideal for integration with mass
 spectrometry
 analysis tools or custom bioinformatics pipelines.
+
+## Installation
+The project can be built using Maven and Java 24. 
+To build the project, navigate to the root directory of the project and run:
+```bash
+mvn clean package
+```
+This will create a JAR file in the `target` directory. 
+
+
 
 ## Requirements
 - Java 24 or higher
@@ -156,9 +168,9 @@ java -jar digestdb.jar server
 
 Demonstration search web: https://digestedproteindb.pbf.hr
 
-## Create database workflow
+## Create database steps
 
-The database creation process start with uniprot .xml.gz or .xml file.
+The database creation process starts with the uniprot.xml.gz (or .xml) file.
 Example class `hr.pbf.digestdb.CreateDatabase` is used to create the database.
 
 The process consists of the following steps:
