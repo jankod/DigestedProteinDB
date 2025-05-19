@@ -9,21 +9,30 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo isActive('index.php')?>" href="index.php" aria-current="page">Search</a>
+                    <a class="nav-link <?php echo isActive('index.php') ?>" href="index.php"
+                       aria-current="page">Search</a>
                 </li>
 
 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo isActive('tool.php')?>" href="tool.php" aria-current="page">Tool</a>
+                    <a class="nav-link <?php echo isActive('tool.php') ?>" href="tool.php" aria-current="page">Tool</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link <?php echo isActive('download_db.php')?>" href="download_db.php" aria-current="page">Downloads</a>
+                    <a class="nav-link <?php echo isActive('download_db.php') ?>" href="download_db.php"
+                       aria-current="page">Downloads</a>
                 </li>
 
-<!--                <li class="nav-item">-->
-<!--                    <a class="nav-link active" aria-current="page" href="index.php">Home</a>-->
-<!--                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link <?php echo isActive('rest.php') ?>" href="rest.php" aria-current="page">REST
+                        API</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo isActive('about.php') ?>" href="about.php"
+                       aria-current="page">About</a>
+                </li>
+
 
             </ul>
 
