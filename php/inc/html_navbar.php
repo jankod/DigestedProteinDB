@@ -14,9 +14,7 @@
                 </li>
 
 
-                <li class="nav-item">
-                    <a class="nav-link <?php echo isActive('tool.php') ?>" href="tool.php" aria-current="page">Tool</a>
-                </li>
+
 
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('download_db.php') ?>" href="download_db.php"
@@ -26,6 +24,11 @@
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('rest.php') ?>" href="rest.php" aria-current="page">REST
                         API</a>
+                </li>
+
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo isActive('tool.php') ?>" href="tool.php" aria-current="page">Digestion Tool</a>
                 </li>
 
                 <li class="nav-item">

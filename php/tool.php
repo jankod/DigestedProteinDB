@@ -57,6 +57,23 @@ include_once 'lib.php';
 
     ?>
 
+
+    <div class="alert alert-info mt-3">
+        <h4 class="alert-heading">Protein Digestion Analysis Tool</h4>
+        <p>
+            This tool enables users to retrieve protein sequences from the UniProt database using accession numbers and perform in silico digestion using trypsin and chymotrypsin enzymes. It is designed to assist researchers in proteomics by providing insights into potential peptide fragments resulting from enzymatic digestion.
+        </p>
+        <p>
+            <strong>How to use:</strong>
+        <ul>
+            <li>Enter a valid UniProt accession number in the input field below.</li>
+            <li>Click on <strong>Search</strong> to fetch the corresponding protein sequence.</li>
+            <li>The tool will display the original sequence along with the predicted cleavage sites and resulting peptide fragments for both trypsin and chymotrypsin.</li>
+        </ul>
+        For more information on UniProt accession numbers, visit the <a href="https://www.uniprot.org/" target="_blank">UniProt website</a>.
+
+    </div>
+
     <div class="alert alert-danger hiding" x-show="uniprotErrors.length > 0" style="display: none;">
         <strong>Error:</strong> <span x-text="uniprotErrors"></span>
     </div>
