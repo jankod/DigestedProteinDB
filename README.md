@@ -1,11 +1,13 @@
-
 # Digested Peptide Database
 
 ## Overview
 
+DigestedProteinDB is a database that enables researchers in the field of proteomics to search for enzymatically digested
+peptides by mass, sequence, and m/z values.
+
 A Java library for creating and searching a digested peptide database with RocksDB key-value store.
 Digested peptides are generated from protein sequences using a specific enzyme (e.g., trypsin) and are stored in a
-database for rapid mass-based searches. This library is designed to be a compact and efficient storage of 
+database for rapid mass-based searches. This library is designed to be a compact and efficient storage of
 in-silico digested peptides.
 
 The database is designed to be a compact and efficient storage of in-silico digested peptides. The primary goal is to
@@ -82,8 +84,6 @@ For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON re
     ... 
 ``` 
 
-
-
 ## Key Features
 
 **Minimal and fast database**: Database of digested peptides designed for a small on\-disk footprint
@@ -97,16 +97,18 @@ spectrometry
 analysis tools or custom bioinformatics pipelines.
 
 ## Installation
-The project can be built using Maven and Java 24. 
+
+The project can be built using Maven and Java 24.
 To build the project, navigate to the root directory of the project and run:
+
 ```bash
 mvn clean package
 ```
-This will create a JAR file in the `target` directory. 
 
-
+This will create a JAR file in the `target` directory.
 
 ## Requirements
+
 - Java 24 or higher
 - Maven 3.8 or higher for building the project from source
 - Linux, MacOS for database building
@@ -119,7 +121,7 @@ server. Below is a detailed explanation of the parameters for each command.
 
 ### `create-db` Command
 
-This command is used to create a digested peptide database. 
+This command is used to create a digested peptide database.
 The following table describes the available parameters:
 
 | Parameter                       | Description                                                                                            | Required | Default Value |
@@ -178,7 +180,8 @@ The process consists of the following steps:
 1. **Parse Uniprot Data**: Extract sequences and relevant metadata from uniprot .xml.gz database and NCBI Taxonomy.
 2. **Digest Proteins**: Cleave the protein with a specific enzyme (trypsin, for example).
 3. **Organize Data**: Sort and group peptides by mass for easy storage.
-4. **Build Database**: Generate a mass\-indexed key\-value engine (RocksDB) and custom array list index for quick searches.
+4. **Build Database**: Generate a mass\-indexed key\-value engine (RocksDB) and custom array list index for quick
+   searches.
 
 Many optimizations are used to speed up the process, including:
 

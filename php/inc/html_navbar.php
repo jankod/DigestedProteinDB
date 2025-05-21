@@ -13,9 +13,6 @@
                        aria-current="page">Search</a>
                 </li>
 
-
-
-
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('download_db.php') ?>" href="download_db.php"
                        aria-current="page">Downloads</a>
@@ -26,7 +23,6 @@
                         API</a>
                 </li>
 
-
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('tool.php') ?>" href="tool.php" aria-current="page">Digestion Tool</a>
                 </li>
@@ -35,10 +31,7 @@
                     <a class="nav-link <?php echo isActive('about.php') ?>" href="about.php"
                        aria-current="page">About</a>
                 </li>
-
-
             </ul>
-
         </div>
     </div>
 </nav>
