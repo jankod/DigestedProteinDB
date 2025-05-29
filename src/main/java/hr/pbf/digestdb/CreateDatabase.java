@@ -29,6 +29,8 @@ public class CreateDatabase {
 
 	public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
 	public static final String DEFAULT_DB_FILE_NAME = "custom_accession.db";
+	public static final String DEFAULT_DB_ACC_TAX= "accession_tax.db";
+
 	private final CreateDatabaseConfig config;
 
 	@Data
@@ -115,6 +117,8 @@ public class CreateDatabase {
 			app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
 			app1UniprotToCsv.setNcbiTaxonomyPath(config.getNcbiTaxonomyPath());
 			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
+
+			// TODO: add acc tax db to create
 
 			readXmlResult = app1UniprotToCsv.start();
 			log.info("Uniprot extracted. Protein count: {}, Peptide count: {}", readXmlResult.getProteinCount(), readXmlResult.getPeptideCount());

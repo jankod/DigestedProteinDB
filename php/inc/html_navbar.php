@@ -12,11 +12,12 @@
                     <a class="nav-link <?php echo isActive('index.php') ?>" href="index.php"
                        aria-current="page">Search</a>
                 </li>
-
                 <li class="nav-item">
-                    <a class="nav-link <?php echo isActive('download_db.php') ?>" href="download_db.php"
-                       aria-current="page">Downloads</a>
+                    <a class="nav-link <?php echo isActive('analyze_ms1.php') ?>" href="analyze_ms1.php"
+                       aria-current="page">Analyze</a>
                 </li>
+
+
 
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('rest.php') ?>" href="rest.php" aria-current="page">REST
@@ -25,6 +26,11 @@
 
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('tool.php') ?>" href="tool.php" aria-current="page">Digestion Tool</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link <?php echo isActive('download_db.php') ?>" href="download_db.php"
+                       aria-current="page">Downloads</a>
                 </li>
 
                 <li class="nav-item">

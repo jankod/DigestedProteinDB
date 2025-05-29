@@ -21,8 +21,8 @@ public class NcbiTaksonomy {
         childParrents = loadTaxonomyFromPath(pathToCsv);
     }
 
-    public static NcbiTaksonomy loadTaxonomy(String ncbiTaxonomyPath) throws NcbiTaxonomyException {
-        return new NcbiTaksonomy(ncbiTaxonomyPath);
+    public static NcbiTaksonomy loadTaxonomy(String pathToNodesDmp) throws NcbiTaxonomyException {
+        return new NcbiTaksonomy(pathToNodesDmp);
     }
 
     /**

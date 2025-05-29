@@ -96,4 +96,29 @@ public class MassRocksDbReader implements AutoCloseable {
 
     }
 
+    @Data
+    @RequiredArgsConstructor
+    public static class MassPageResultTax {
+        private final int totalCount;
+        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results;
+    }
+
+//    public static class PeptideAccTax {
+//        String seq;
+//        int[] acc;
+//        int taxId;
+//
+//    }
+//
+//    public static class AccTaxs {
+//        String seq;
+//        List<PeptideAccTax> accs = new ArrayList<>();
+//
+//        public void addAcc(PeptideAccTax acc) {
+//            this.accs.add(acc);
+//        }
+//    }
+
+
+
 }

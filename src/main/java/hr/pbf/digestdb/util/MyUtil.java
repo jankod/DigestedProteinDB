@@ -156,4 +156,15 @@ public class MyUtil {
 	public static int toInt(float mass) {
 		return (int) (mass * 10_000.0f);
 	}
+
+	public static byte[] longToBytes(Long key) {
+		return ByteBuffer.allocate(Long.BYTES).putLong(key).rewind().array();
+	}
+
+	public static long bytesToLong(byte[] buffer) {
+		if (buffer.length != Long.BYTES) {
+			throw new IllegalArgumentException("Byte array must be exactly " + Long.BYTES + " bytes long.");
+		}
+		return ByteBuffer.wrap(buffer).getLong();
+	}
 }

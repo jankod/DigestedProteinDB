@@ -2,55 +2,10 @@
 const HEAD_TITLE = "Digested Protein DB REST API";
 include_once 'lib.php';
 ?>
-
 <!doctype html>
 <html lang="en">
 <head>
     <?php include_once "inc/html_head.php"; ?>
-
-    <style>
-        body {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-
-        pre {
-            background-color: #f8f9fa;
-            padding: 1em;
-            border-radius: .5rem;
-            overflow-x: auto;
-        }
-
-        code {
-            background: #eef;
-            padding: 2px 5px;
-            border-radius: 4px;
-        }
-
-        .table td, .table th {
-            vertical-align: middle;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: #212529;
-                color: #f8f9fa;
-            }
-
-            .table {
-                color: #f8f9fa;
-            }
-
-            pre, code {
-                background: #23272b;
-                color: #f8f9fa;
-            }
-
-            .card {
-                background: #23272b;
-            }
-        }
-    </style>
 </head>
 <body>
 

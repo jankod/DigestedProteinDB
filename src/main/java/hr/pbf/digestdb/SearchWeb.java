@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hr.pbf.digestdb.db.AccessionDbReader;
 import hr.pbf.digestdb.db.MassRocksDbReader;
+import hr.pbf.digestdb.util.AccTaxDB;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.BioUtil;
 import hr.pbf.digestdb.util.MyStopWatch;
@@ -16,6 +17,7 @@ import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 import org.wildfly.common.annotation.NotNull;
@@ -28,6 +30,7 @@ import java.util.*;
 @Data
 public class SearchWeb {
     private String dbDirPath;
+    private String dbAccTaxPath;
     private final int port;
 
     private String accDbPath;
@@ -35,17 +38,19 @@ public class SearchWeb {
     private MassRocksDbReader massDb;
     private AccessionDbReader accDb;
 
+    private AccTaxDB accTaxDb;
 
     public SearchWeb(String dbDirPath, int port) {
         this.dbDirPath = dbDirPath;
         this.port = port;
         setDbDirPath(dbDirPath + "/" + CreateDatabase.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
         setAccDbPath(dbDirPath + "/" + CreateDatabase.DEFAULT_DB_FILE_NAME);
+        setDbAccTaxPath(dbDirPath + "/" + CreateDatabase.DEFAULT_DB_ACC_TAX);
     }
 
     public void start() throws RocksDBException, IOException {
 
-		log.debug("Start web on port: {} db dir: {}", port, dbDirPath);
+        log.debug("Start web on port: {} db dir: {}", port, dbDirPath);
         try {
             long startTime = System.currentTimeMillis();
 
@@ -66,7 +71,8 @@ public class SearchWeb {
                     .addPrefixPath("/", homeHtmlPageHandler)
                     .addExactPath("/db-info", this::handleDbInfo)
                     .addExactPath("/search", this::handleSearch)
-                    .addExactPath("/search-peptide", this::handleBySearch);
+                    .addExactPath("/search-peptide", this::handleSearchByPeptide)
+                    .addExactPath("/search-taxonomy", this::handleSearchTaxonomy);
 
 
             server = Undertow.builder()
@@ -87,14 +93,96 @@ public class SearchWeb {
         }
     }
 
-    private void handleBySearch(HttpServerExchange http) {
+    private void handleSearchTaxonomy(HttpServerExchange http) {
         if (http.isInIoThread()) {
-            http.dispatch(this::handleBySearch);
+            http.dispatch(this::handleSearchTaxonomy);
             return;
         }
 
         Map<String, String> params = createParam(http);
+        log.debug("search by taxonomy: {}", params);
 
+        try {
+
+            double mass1 = Double.parseDouble(params.getOrDefault("mass1", "0"));
+            double mass2 = Double.parseDouble(params.getOrDefault("mass2", "0"));
+
+            int page = Integer.parseInt(params.getOrDefault("page", "1"));
+            int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "1000"));
+
+            if (mass1 == 0 || mass2 == 0) {
+                sendJsonResponse(http, StatusCodes.BAD_REQUEST,
+                        "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
+                return;
+            }
+
+
+            MyStopWatch watch = new MyStopWatch();
+            MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
+            long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            String memory = l / 1024 / 1024 + " MB";
+            PageResult pageResult = new PageResult(result.getTotalCount(), toAccession(result.getResults()), memory, watch.getCurrentDuration(), page, pageSize);
+
+
+            PageResultTax pageResultTax = toTaxonomy(pageResult);
+            String jsonResult = toJson(pageResultTax);
+
+            sendJsonResponse(http, StatusCodes.OK, jsonResult);
+
+
+        } catch (Exception e) {
+            log.error("Error searching taxonomy", e);
+            sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
+                    "{\"error\": \"" + e.getMessage() + "\"}");
+        }
+    }
+
+    private PageResultTax toTaxonomy(PageResult pageResult) {
+        if (accTaxDb == null) {
+            accTaxDb = new AccTaxDB();
+            accTaxDb.readFromDisk(dbAccTaxPath);
+            log.debug("Taxonomy read from disk: {}", accTaxDb);
+        }
+
+        PageResultTax pageResultTax = new PageResultTax();
+        pageResultTax.setTotalResult(pageResult.getTotalResult());
+        pageResultTax.setMemory(pageResult.getMemory());
+        pageResultTax.setDuration(pageResult.getDuration());
+        pageResultTax.setPage(pageResult.getPage());
+        pageResultTax.setPageSize(pageResult.getPageSize());
+        List<Map.Entry<Double, Set<PeptideAccTax>>> result = new ArrayList<>(pageResult.getResult().size());
+        for (Map.Entry<Double, Set<PeptideAccText>> e : pageResult.getResult()) {
+            Set<PeptideAccTax> peptides = new HashSet<>();
+            for (PeptideAccText acc : e.getValue()) {
+                PeptideAccTax accTax = new PeptideAccTax();
+                accTax.setSeq(acc.getSeq());
+                List<AccTaxs> accsTaxs = new ArrayList<>(acc.getAcc().length);
+                for (String accText : acc.getAcc()) {
+                    AccTaxs accTaxs = new AccTaxs();
+                    accTaxs.setAcc(accText);
+                    accTaxs.setTaxIds(accTaxDb.getTaxonomyIds(accText));
+                    accsTaxs.add(accTaxs);
+                }
+                accTax.setAccsTax(accsTaxs);
+                peptides.add(accTax);
+            }
+            result.add(new AbstractMap.SimpleEntry<>(e.getKey(), peptides));
+        }
+        pageResultTax.setResult(result);
+        return pageResultTax;
+
+    }
+
+    private void handleSearchByPeptide(HttpServerExchange http) {
+        if (http.isInIoThread()) {
+            http.dispatch(this::handleSearchByPeptide);
+            return;
+        }
+
+
+        Map<String, String> params = createParam(http);
+
+        log.debug("search by peptide: {}", params);
         try {
             String peptide = params.getOrDefault("peptide", "");
             if (peptide.isEmpty()) {
@@ -131,7 +219,6 @@ public class SearchWeb {
         }
 
         try {
-
             sendJsonResponse(exchange, StatusCodes.OK, toJson(getDbInfo()));
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
@@ -160,11 +247,6 @@ public class SearchWeb {
                 return;
             }
 
-//            if (Math.abs(mass1 - mass2) > 100) {
-//                sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-//                      "{\"error\": \"Mass1 and Mass2 must be close 100 Da\"}");
-//                return;
-//            }
             searchByMass(exchange, mass1, mass2, page, pageSize);
 
         } catch (NumberFormatException e) {
@@ -216,6 +298,19 @@ public class SearchWeb {
         return prop;
     }
 
+    @Data
+    @RequiredArgsConstructor
+    public static class PeptideAccTax {
+        private String seq;
+        private List<AccTaxs> accsTax;
+
+    }
+
+    @Data
+    static class AccTaxs {
+        String acc;
+        List<Integer> taxIds = new ArrayList<>();
+    }
 
     @Data
     public static class PeptideAccText implements Comparable<BinaryPeptideDbUtil.PeptideAcc> {
@@ -267,6 +362,29 @@ public class SearchWeb {
             this.page = page;
             this.pageSize = pageSize;
         }
+    }
+
+//    @Data
+//    @RequiredArgsConstructor
+//    class PageResult {
+//        private final int totalResult;
+//        private final String memory;
+//        private final String duration;
+//        private final int page;
+//        private final int pageSize;
+//        private final List<Map.Entry<Double, Set<PeptideAcc>>> result;
+//    }
+
+    @Data
+    static
+    class PageResultTax {
+        private int totalResult;
+        private String memory;
+        private String duration;
+        private int page;
+        private int pageSize;
+        private List<Map.Entry<Double, Set<PeptideAccTax>>> result;
+
     }
 
     private void sendJsonResponse(HttpServerExchange exchange, int statusCode, String response) {
