@@ -37,9 +37,11 @@ public class MyUtil {
 		return ByteBuffer.wrap(byteArray).getFloat();
 	}
 
-	public static byte[] doubleToByteArray(double mass) {
-		return ByteBuffer.allocate(Double.BYTES).putDouble(mass).rewind().array();
-	}
+        public static byte[] doubleToByteArray(double mass) {
+                ByteBuffer buffer = ByteBuffer.allocate(Double.BYTES);
+                buffer.putDouble(mass);
+                return buffer.array();
+        }
 
 	public static double byteArrayToDouble(byte[] byteArray) {
 		return ByteBuffer.wrap(byteArray).getDouble();
@@ -157,9 +159,11 @@ public class MyUtil {
 		return (int) (mass * 10_000.0f);
 	}
 
-	public static byte[] longToBytes(Long key) {
-		return ByteBuffer.allocate(Long.BYTES).putLong(key).rewind().array();
-	}
+        public static byte[] longToBytes(Long key) {
+                ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+                buffer.putLong(key);
+                return buffer.array();
+        }
 
 	public static long bytesToLong(byte[] buffer) {
 		if (buffer.length != Long.BYTES) {
