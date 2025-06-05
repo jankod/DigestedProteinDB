@@ -15,160 +15,160 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MyUtil {
-	private static final DecimalFormat df4 = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.US));
+    private static final DecimalFormat df4 = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.US));
 
-	public static double roundTo4(double value) {
-		return Math.round(value * 10000.0) / 10000.0;
-	}
+    public static double roundTo4(double value) {
+        return Math.round(value * 10000.0) / 10000.0;
+    }
 
-	public static double roundTo5(double value) {
-		return Math.round(value * 100000.0) / 100000.0;
-	}
+    public static double roundTo5(double value) {
+        return Math.round(value * 100000.0) / 100000.0;
+    }
 
-	public static String discretizedTo4(double mass) {
-		return df4.format(mass);
-	}
+    public static String discretizedTo4(double mass) {
+        return df4.format(mass);
+    }
 
-	public static byte[] floatToByteArray(float floatValue) {
-		return ByteBuffer.allocate(4).putFloat(floatValue).array();
-	}
+    public static byte[] floatToByteArray(float floatValue) {
+        return ByteBuffer.allocate(4).putFloat(floatValue).array();
+    }
 
-	public static float byteArrayToFloat(byte[] byteArray) {
-		return ByteBuffer.wrap(byteArray).getFloat();
-	}
+    public static float byteArrayToFloat(byte[] byteArray) {
+        return ByteBuffer.wrap(byteArray).getFloat();
+    }
 
-        public static byte[] doubleToByteArray(double mass) {
-                ByteBuffer buffer = ByteBuffer.allocate(Double.BYTES);
-                buffer.putDouble(mass);
-                return buffer.array();
+    public static byte[] doubleToByteArray(double mass) {
+        ByteBuffer buffer = ByteBuffer.allocate(Double.BYTES);
+        buffer.putDouble(mass);
+        return buffer.array();
+    }
+
+    public static double byteArrayToDouble(byte[] byteArray) {
+        return ByteBuffer.wrap(byteArray).getDouble();
+    }
+
+    public static long toAccessionLong36(String accession) {
+        return Long.parseLong(accession.toUpperCase(), 36);
+    }
+
+    public static String fromAccessionLong36(long accession) {
+        return Long.toString(accession, 36).toUpperCase();
+    }
+
+    /**
+     * Optimized for point read
+     *
+     * @param dbPath
+     * @return
+     * @throws RocksDBException
+     */
+    public static RocksDB openPointReadDB(String dbPath) throws RocksDBException {
+        RocksDB.loadLibrary();
+        Options options = new Options();
+        BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+        Cache cache = new LRUCache(32L * 1024L * 1024L * 1024L);
+        tableConfig.setBlockCache(cache);
+        tableConfig.setCacheIndexAndFilterBlocks(true);
+        tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
+
+        //  Optimization for point read
+        options.optimizeForPointLookup(32 * 1024 * 1024);
+
+        options.setTableFormatConfig(tableConfig);
+        options.setAllowMmapReads(true);
+
+        options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
+        return RocksDB.openReadOnly(options, dbPath);
+    }
+
+    public static RocksDB openReadDB(String dbPath) throws RocksDBException {
+        RocksDB.loadLibrary();
+        Options options = new Options();
+        BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
+        Cache cache = new LRUCache(64L * 1024L * 1024L * 1024L); // 64GB cache
+        tableConfig.setBlockCache(cache);
+        tableConfig.setCacheIndexAndFilterBlocks(true);
+        tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
+
+        // Optimization for point read
+        // options.optimizeForPointLookup(32  * 1024 * 1024); // 512 MB block cache
+
+        options.setTableFormatConfig(tableConfig);
+        options.setAllowMmapReads(true);
+
+        options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
+        return RocksDB.openReadOnly(options, dbPath);
+    }
+
+    public static RocksDB openWriteDB(String path) throws RocksDBException {
+        RocksDB.loadLibrary();
+        Options options = new Options().setCreateIfMissing(true);
+
+        options.setStrictBytesPerSync(false);
+        options.setAllow2pc(false);
+        options.setAllowMmapReads(true);
+        options.setAllowMmapWrites(true);
+
+        options.setCompactionStyle(CompactionStyle.LEVEL);
+        options.setWriteBufferSize(256 * 1024 * 1024); // 256 MB
+        options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
+
+        return RocksDB.open(options, path);
+
+    }
+
+    public static byte[] intToByteArray(int someInt) {
+        return ByteBuffer.allocate(4).putInt(someInt).array();
+    }
+
+    public static int byteArrayToInt(byte[] key) {
+        return ByteBuffer.wrap(key).getInt();
+    }
+
+    public static List<byte[]> intListToByteList(List<Integer> accs) {
+        ArrayList<byte[]> list = new ArrayList<>(accs.size());
+        for (Integer acc : accs) {
+            list.add(intToByteArray(acc));
         }
+        return list;
+    }
 
-	public static double byteArrayToDouble(byte[] byteArray) {
-		return ByteBuffer.wrap(byteArray).getDouble();
-	}
+    public static String stopAndShowTime(StopWatch watch, String msg) {
+        watch.stop();
+        long nanoTime = watch.getNanoTime();
+        long millis = TimeUnit.NANOSECONDS.toMillis(nanoTime);
+        return (msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
 
-	public static long toAccessionLong36(String accession) {
-		return Long.parseLong(accession.toUpperCase(), 36);
-	}
+    }
 
-	public static String fromAccessionLong36(long accession) {
-		return Long.toString(accession, 36).toUpperCase();
-	}
+    public static String getFileSize(String filePath) {
+        long size = FileUtils.sizeOf(new File(filePath));
+        return FileUtils.byteCountToDisplaySize(size);
+    }
 
-	/**
-	 * Optimized for point read
-	 *
-	 * @param dbPath
-	 * @return
-	 * @throws RocksDBException
-	 */
-	public static RocksDB openPointReadDB(String dbPath) throws RocksDBException {
-		RocksDB.loadLibrary();
-		Options options = new Options();
-		BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
-		Cache cache = new LRUCache(32L * 1024L * 1024L * 1024L);
-		tableConfig.setBlockCache(cache);
-		tableConfig.setCacheIndexAndFilterBlocks(true);
-		tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
+    public static String getDirSize(String dirPath) {
+        long size = FileUtils.sizeOfDirectory(new File(dirPath));
+        return FileUtils.byteCountToDisplaySize(size);
+    }
 
-		//  Optimization for point read
-		options.optimizeForPointLookup(32 * 1024 * 1024);
+    public static int toInt(double mass) {
+        return (int) (mass * 10_000.0);
+    }
 
-		options.setTableFormatConfig(tableConfig);
-		options.setAllowMmapReads(true);
+    public static int toInt(float mass) {
+        return (int) (mass * 10_000.0f);
+    }
 
-		options.setCompressionType(CompressionType.ZLIB_COMPRESSION);
-		return RocksDB.openReadOnly(options, dbPath);
-	}
+    public static byte[] longToBytes(Long key) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+        buffer.putLong(key);
+        return buffer.array();
+    }
 
-	public static RocksDB openReadDB(String dbPath) throws RocksDBException {
-		RocksDB.loadLibrary();
-		Options options = new Options();
-		BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
-		Cache cache = new LRUCache(64L * 1024L * 1024L * 1024L); // 64GB cache
-		tableConfig.setBlockCache(cache);
-		tableConfig.setCacheIndexAndFilterBlocks(true);
-		tableConfig.setPinL0FilterAndIndexBlocksInCache(true);
-
-		// Optimization for point read
-		// options.optimizeForPointLookup(32  * 1024 * 1024); // 512 MB block cache
-
-		options.setTableFormatConfig(tableConfig);
-		options.setAllowMmapReads(true);
-
-		options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
-		return RocksDB.openReadOnly(options, dbPath);
-	}
-
-	public static RocksDB openWriteDB(String path) throws RocksDBException {
-		RocksDB.loadLibrary();
-		Options options = new Options().setCreateIfMissing(true);
-
-		options.setStrictBytesPerSync(false);
-		options.setAllow2pc(false);
-		options.setAllowMmapReads(true);
-		options.setAllowMmapWrites(true);
-
-		options.setCompactionStyle(CompactionStyle.LEVEL);
-		options.setWriteBufferSize(256 * 1024 * 1024); // 256 MB
-		options.setCompressionType(CompressionType.SNAPPY_COMPRESSION);
-
-		return RocksDB.open(options, path);
-
-	}
-
-	public static byte[] intToByteArray(int someInt) {
-		return ByteBuffer.allocate(4).putInt(someInt).array();
-	}
-
-	public static int byteArrayToInt(byte[] key) {
-		return ByteBuffer.wrap(key).getInt();
-	}
-
-	public static List<byte[]> intListToByteList(List<Integer> accs) {
-		ArrayList<byte[]> list = new ArrayList<>(accs.size());
-		for(Integer acc : accs) {
-			list.add(intToByteArray(acc));
-		}
-		return list;
-	}
-
-	public static String stopAndShowTime(StopWatch watch, String msg) {
-		watch.stop();
-		long nanoTime = watch.getNanoTime();
-		long millis = TimeUnit.NANOSECONDS.toMillis(nanoTime);
-		return (msg + " " + DurationFormatUtils.formatDuration(millis, "HH:mm:ss,SSS"));
-
-	}
-
-	public static String getFileSize(String filePath) {
-		long size = FileUtils.sizeOf(new File(filePath));
-		return FileUtils.byteCountToDisplaySize(size);
-	}
-
-	public static String getDirSize(String dirPath) {
-		long size = FileUtils.sizeOfDirectory(new File(dirPath));
-		return FileUtils.byteCountToDisplaySize(size);
-	}
-
-	public static int toInt(double mass) {
-		return (int) (mass * 10_000.0);
-	}
-
-	public static int toInt(float mass) {
-		return (int) (mass * 10_000.0f);
-	}
-
-        public static byte[] longToBytes(Long key) {
-                ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
-                buffer.putLong(key);
-                return buffer.array();
+    public static long bytesToLong(byte[] buffer) {
+        if (buffer.length != Long.BYTES) {
+            throw new IllegalArgumentException("Byte array must be exactly " + Long.BYTES + " bytes long.");
         }
-
-	public static long bytesToLong(byte[] buffer) {
-		if (buffer.length != Long.BYTES) {
-			throw new IllegalArgumentException("Byte array must be exactly " + Long.BYTES + " bytes long.");
-		}
-		return ByteBuffer.wrap(buffer).getLong();
-	}
+        return ByteBuffer.wrap(buffer).getLong();
+    }
 }

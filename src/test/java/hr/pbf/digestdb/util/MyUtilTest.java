@@ -15,6 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class MyUtilTest {
 
 	@Test
+	void doubleToByteArray() {
+		double value = 123.456;
+		byte[] byteArray = MyUtil.doubleToByteArray(value);
+		assertEquals(value, MyUtil.byteArrayToDouble(byteArray));
+
+	}
+
+	@Test
 	void roundTo4() {
 		assertEquals(123.4567, MyUtil.roundTo4(123.45674));
 		assertEquals(123.4568, MyUtil.roundTo4(123.45676));
