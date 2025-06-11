@@ -12,18 +12,20 @@ import java.io.IOException;
 
 
 @Slf4j
-public class NcbiTaksonomy {
+public class NcbiTaksonomyRelations {
 
     @Getter
     private final AbstractInt2IntMap childParrents;
 
-    private NcbiTaksonomy(String pathToCsv) throws NcbiTaxonomyException {
-        childParrents = loadTaxonomyFromPath(pathToCsv);
+    private NcbiTaksonomyRelations(String pathToNodesDmp) throws NcbiTaxonomyException {
+        childParrents = loadTaxonomyFromPath(pathToNodesDmp);
     }
 
-    public static NcbiTaksonomy loadTaxonomy(String pathToNodesDmp) throws NcbiTaxonomyException {
-        return new NcbiTaksonomy(pathToNodesDmp);
+    public static NcbiTaksonomyRelations loadTaxonomyNodes(String pathToNodesDmp) throws NcbiTaxonomyException {
+        return new NcbiTaksonomyRelations(pathToNodesDmp);
     }
+
+
 
     /**
      * Load taxonomy from a file nodes.dmp of NCBI taxonomy database.

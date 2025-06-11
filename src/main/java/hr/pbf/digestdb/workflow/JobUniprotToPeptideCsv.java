@@ -60,11 +60,11 @@ public class JobUniprotToPeptideCsv {
             throw new ValidationException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
                     + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
         }
-        NcbiTaksonomy ncbiTaksonomy = null;
+        NcbiTaksonomyRelations ncbiTaksonomyRelations = null;
         if (ncbiTaxonomyPath != null) {
             ValidatateUtil.fileMustExist(ncbiTaxonomyPath);
             try {
-                ncbiTaksonomy = NcbiTaksonomy.loadTaxonomy(ncbiTaxonomyPath);
+                ncbiTaksonomyRelations = NcbiTaksonomyRelations.loadTaxonomyNodes(ncbiTaxonomyPath);
             } catch (NcbiTaxonomyException e) {
                 throw new RuntimeException(e);
             }
@@ -84,7 +84,7 @@ public class JobUniprotToPeptideCsv {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16);
              BufferedOutputStream outTaxonomy = new BufferedOutputStream(new FileOutputStream(resultTaxAccCsvPath), 4 * 1024 * 16)) {
 
-            NcbiTaksonomy finalNcbiTaksonomy = ncbiTaksonomy;
+            NcbiTaksonomyRelations finalNcbiTaksonomyRelations = ncbiTaksonomyRelations;
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
@@ -101,12 +101,12 @@ public class JobUniprotToPeptideCsv {
 //                    if("Q9UKP3".equals(p.getAccession())) {
 //                        System.out.println("Q9UKP3");
 //                    }
-                    if (finalNcbiTaksonomy != null) {
+                    if (finalNcbiTaksonomyRelations != null) {
                         boolean hasParent = false;
 
                         for (int parentsId : taxonomyParentsIds) {
                             for (Integer taxonomyId : p.getTaxonomyIds()) {
-                                if (finalNcbiTaksonomy.isAncestor(taxonomyId, parentsId)) {
+                                if (finalNcbiTaksonomyRelations.isAncestor(taxonomyId, parentsId)) {
                                     hasParent = true;
                                     break;
                                 }

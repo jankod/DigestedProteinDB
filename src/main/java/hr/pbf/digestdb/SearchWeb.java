@@ -270,6 +270,7 @@ public class SearchWeb {
     }
 
     private List<Map.Entry<Double, Set<PeptideAccText>>> toAccession(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results) {
+        // TODO: use mapstruct
         List<Map.Entry<Double, Set<PeptideAccText>>> result = new ArrayList<>(results.size());
         for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> e : results) {
             Set<PeptideAccText> peptides = new HashSet<>();

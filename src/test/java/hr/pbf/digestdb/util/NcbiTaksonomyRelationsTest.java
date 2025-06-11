@@ -9,24 +9,24 @@ import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NcbiTaksonomyTest {
+class NcbiTaksonomyRelationsTest {
 
-    private static NcbiTaksonomy taxonomy;
+    private static NcbiTaksonomyRelations taxonomy;
     private static String pathToCsv;
 
     @BeforeAll
     public static void setUp() throws NcbiTaxonomyException {
-        ClassLoader classLoader = NcbiTaksonomyTest.class.getClassLoader();
+        ClassLoader classLoader = NcbiTaksonomyRelationsTest.class.getClassLoader();
         URL resource = classLoader.getResource("nodes_test.dmp");
         assertNotNull(resource, "Test file not found!");
         pathToCsv = new File(resource.getFile()).getAbsolutePath();
-        taxonomy =  NcbiTaksonomy.loadTaxonomy(pathToCsv);
+        taxonomy =  NcbiTaksonomyRelations.loadTaxonomyNodes(pathToCsv);
         assertNotNull(taxonomy.getChildParrents());
         assertFalse(taxonomy.getChildParrents().isEmpty(), "Taxonomy should not be empty");
     }
 
     @Test
-    public void testLoadTaxonomy() {
+    public void testLoadTaxonomyNodes() {
         assertNotNull(taxonomy, "Taxonomy should be initialized");
     }
 
