@@ -1,17 +1,13 @@
 package hr.pbf.digestdb.util;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +61,7 @@ class BinaryPeptideDbUtilTest {
 		log.debug("Bytes length: {}", bytes.length);
 		assertNotNull(bytes);
 		assertTrue(bytes.length > 0);
-		Set<BinaryPeptideDbUtil.PeptideAcc> result = BinaryPeptideDbUtil.readGroupedRow(bytes);
+		Set<BinaryPeptideDbUtil.PeptideAccids> result = BinaryPeptideDbUtil.readGroupedRow(bytes);
 		assertNotNull(result);
 		assertFalse(result.isEmpty());
 
@@ -99,17 +95,17 @@ class BinaryPeptideDbUtilTest {
 		log.debug("Bytes length: {}", bytes.length);
 		assertNotNull(bytes);
 		assertTrue(bytes.length > 0);
-		Set<BinaryPeptideDbUtil.PeptideAcc> result = BinaryPeptideDbUtil.readGroupedRow(bytes);
+		Set<BinaryPeptideDbUtil.PeptideAccids> result = BinaryPeptideDbUtil.readGroupedRow(bytes);
 		assertNotNull(result);
 		assertFalse(result.isEmpty());
 		assertEquals(3, result.size());
 		result.forEach(c -> {
 			switch(c.seq) {
-				case "SGAGAAA" -> assertEquals(15, c.acc[0]);
-				case "SAAGGAA" -> assertEquals(14, c.acc[0]);
+				case "SGAGAAA" -> assertEquals(15, c.accids[0]);
+				case "SAAGGAA" -> assertEquals(14, c.accids[0]);
 				case "TGAAAGG" -> {
-					assertEquals(16, c.acc[0]);
-					assertEquals(12345, c.acc[1]);
+					assertEquals(16, c.accids[0]);
+					assertEquals(12345, c.accids[1]);
 				}
 				default -> fail("Unexpected sequence: " + c.seq);
 			}

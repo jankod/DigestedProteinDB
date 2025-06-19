@@ -18,7 +18,7 @@ public class TaxonomySearchCalc {
         NcbiTaksonomyRelations taksonomy = NcbiTaksonomyRelations.loadTaxonomyNodes("/Users/tag/IdeaProjects/DigestedProteinDB/misc/ncbi_taxonomy/taxdump/nodes.dmp");
 
 
-        TaxonomySearch.TaxonomySearchResult taxonomyResults = TaxonomySearch.searchTaxonomy(mass1, mass2);
+        TaxonomySearch.TaxonomySearchResult taxonomyResults = TaxonomySearch.searchTaxonomyWeb(mass1, mass2);
 
         MassSpectrometryDatabase database = new MassSpectrometryDatabase();
 

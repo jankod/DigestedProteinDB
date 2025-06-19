@@ -5,6 +5,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resource" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resource" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/misc" />
+      <excludeFolder url="file://$MODULE_DIR$/python/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/python/.venv" />
     </content>
   </component>
 </module>

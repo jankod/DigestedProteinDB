@@ -64,70 +64,70 @@ class MassRocksDbTest {
             try (MassRocksDbReader reader = new MassRocksDbReader(dbDirPath)) {
 
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> emptyResult = reader.searchByMassPaginated(400, 503);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> emptyResult = reader.searchByMassPaginated(400, 503);
                     assertEquals(0, emptyResult.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultLeft8 = reader.searchByMassPaginated(503, 530);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> resultLeft8 = reader.searchByMassPaginated(503, 530);
                     assertEquals(8, resultLeft8.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result3 = reader.searchByMassPaginated(542, 544);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> result3 = reader.searchByMassPaginated(542, 544);
                     assertEquals(3, result3.size());
                     Double key542_2813 = result3.getFirst().getKey(); // 542.2813,AGGGGPK:29
-                    Set<BinaryPeptideDbUtil.PeptideAcc> valuePeptide = result3.getFirst().getValue();
+                    Set<BinaryPeptideDbUtil.PeptideAccids> valuePeptide = result3.getFirst().getValue();
                     assertEquals(1, valuePeptide.size());
                     assertEquals("AGGGGPK", valuePeptide.iterator().next().getSeq());
-                    assertArrayEquals(new int[]{29}, valuePeptide.iterator().next().getAcc());
+                    assertArrayEquals(new int[]{29}, valuePeptide.iterator().next().getAccids());
                     assertEquals(542.2813, key542_2813, 0.0001);
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> resultRight9 = reader.searchByMassPaginated(530, 544);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> resultRight9 = reader.searchByMassPaginated(530, 544);
                     assertEquals(9, resultRight9.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMassPaginated(544, 545);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> result2 = reader.searchByMassPaginated(544, 545);
                     assertEquals(2, result2.size());
                 }
                 {
-                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2 = reader.searchByMassPaginated(544, 545.2657);
+                    List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> result2 = reader.searchByMassPaginated(544, 545.2657);
                     assertEquals(2, result2.size());
 
 
                     // 544.2717,GAGAGGR:34-AAGGGGR:33-RAGGGAG:35
                     assertEquals(544.2717, result2.getFirst().getKey(), 0.0001);
-                    Set<BinaryPeptideDbUtil.PeptideAcc> pepAccFirstSet = result2.getFirst().getValue();
+                    Set<BinaryPeptideDbUtil.PeptideAccids> pepAccFirstSet = result2.getFirst().getValue();
                     assertEquals(3, pepAccFirstSet.size());
 
 
                     pepAccFirstSet.forEach(pepAcc -> {
                         ;
-                        log.debug("seq: " + pepAcc.getSeq() + " acc: " + Arrays.toString(pepAcc.getAcc()));
+                        log.debug("seq: " + pepAcc.getSeq() + " acc: " + Arrays.toString(pepAcc.getAccids()));
 
                         switch (pepAcc.getSeq()) {
-                            case "GAGAGGR" -> assertArrayEquals(new int[]{34}, pepAcc.getAcc());
-                            case "AAGGGGR" -> assertArrayEquals(new int[]{33}, pepAcc.getAcc());
-                            case "RAGGGAG" -> assertArrayEquals(new int[]{35}, pepAcc.getAcc());
+                            case "GAGAGGR" -> assertArrayEquals(new int[]{34}, pepAcc.getAccids());
+                            case "AAGGGGR" -> assertArrayEquals(new int[]{33}, pepAcc.getAccids());
+                            case "RAGGGAG" -> assertArrayEquals(new int[]{35}, pepAcc.getAccids());
                             default -> fail("Unexpected peptide sequence: " + pepAcc.getSeq());
                         }
                     });
 
-                    Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> pepAccSecondSet = result2.get(1);
+                    Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> pepAccSecondSet = result2.get(1);
                     // 544.2718,GGAGAGR:39;38;37;36-GGAGGAR:40-GGGGAAR:41
                     assertEquals(544.2718, pepAccSecondSet.getKey(), 0.0001);
                     assertEquals(3, pepAccSecondSet.getValue().size());
                     pepAccSecondSet.getValue().forEach(pepAcc -> {
 
                         switch (pepAcc.getSeq()) {
-                            case "GGAGAGR" -> assertArrayEquals(new int[]{39, 38, 37, 36}, pepAcc.getAcc());
-                            case "GGAGGAR" -> assertArrayEquals(new int[]{40}, pepAcc.getAcc());
-                            case "GGGGAAR" -> assertArrayEquals(new int[]{41}, pepAcc.getAcc());
+                            case "GGAGAGR" -> assertArrayEquals(new int[]{39, 38, 37, 36}, pepAcc.getAccids());
+                            case "GGAGGAR" -> assertArrayEquals(new int[]{40}, pepAcc.getAccids());
+                            case "GGGGAAR" -> assertArrayEquals(new int[]{41}, pepAcc.getAccids());
                             default -> fail("Unexpected peptide sequence: " + pepAcc.getSeq());
                         }
                     });
 
                     { // non existing rigth
-                        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> result2NonExisting = reader.searchByMassPaginated(544.3, 545);
+                        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> result2NonExisting = reader.searchByMassPaginated(544.3, 545);
                         assertEquals(0, result2NonExisting.size());
 
                     }

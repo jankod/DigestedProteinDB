@@ -32,7 +32,7 @@ public class MassRocksDbReader implements AutoCloseable {
 
     public MassPageResult searchByMassPaginated(double mass1, double mass2, int page, int pageSize) {
 
-        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results = new ArrayList<>();
+        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results = new ArrayList<>();
         int mass1Int = MyUtil.toInt(mass1); //(int) Math.round(mass1 * 10_000);
         int count = 0;
         int start = (page - 1) * pageSize;
@@ -53,7 +53,7 @@ public class MassRocksDbReader implements AutoCloseable {
                 totalCount++;
 
                 if (count >= start && count < end) {
-                    Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+                    Set<BinaryPeptideDbUtil.PeptideAccids> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
 
                     results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
                 }
@@ -65,8 +65,8 @@ public class MassRocksDbReader implements AutoCloseable {
         return new MassPageResult(totalCount, results);
     }
 
-    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> searchByMassPaginated(double mass1, double mass2) {
-        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results = new ArrayList<>();
+    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> searchByMassPaginated(double mass1, double mass2) {
+        List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results = new ArrayList<>();
         int mass1Int = (int) Math.round(mass1 * 10_000);
 
         RocksIterator it = db.newIterator();
@@ -80,7 +80,7 @@ public class MassRocksDbReader implements AutoCloseable {
                 break;
             }
 
-            Set<BinaryPeptideDbUtil.PeptideAcc> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
+            Set<BinaryPeptideDbUtil.PeptideAccids> peptideAccs = BinaryPeptideDbUtil.readGroupedRow(it.value());
             results.add(new AbstractMap.SimpleEntry<>(keyMass, peptideAccs));
             it.next();
         }
@@ -92,7 +92,7 @@ public class MassRocksDbReader implements AutoCloseable {
     @RequiredArgsConstructor
     public static class MassPageResult {
         private final int totalCount;
-        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results;
+        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results;
 
     }
 
@@ -100,7 +100,7 @@ public class MassRocksDbReader implements AutoCloseable {
     @RequiredArgsConstructor
     public static class MassPageResultTax {
         private final int totalCount;
-        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results;
+        private final List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results;
     }
 
 //    public static class PeptideAccTax {

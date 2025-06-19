@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.wildfly.common.annotation.NotNull;
 
 import java.io.*;
-import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.util.*;
 
@@ -90,15 +89,16 @@ public class BinaryPeptideDbUtil {
 		return result;
 	}
 
-	public Set<PeptideAcc> readGroupedRowNew(byte[] value) {
+	public Set<PeptideAccids> readGroupedRowNew(byte[] value) {
 		FastByteArrayInputStream bin = new FastByteArrayInputStream(new byte[(int) (value.length * 1.3)]);
 		DataInputStream in = new DataInputStream(bin);
 
-		Set<PeptideAcc> peptides = new HashSet<>();
+		Set<PeptideAccids> peptides = new HashSet<>();
 
 		// must got SGAGAAA:15-SAAGGAA:14-TGAAAGG:16;12345
 		try {
-			readVarInt(in);
+			int i = readVarInt(in);
+			// TODO: finish this
 
 		} catch(IOException e) {
 			log.error("Error reading varint", e);
@@ -109,9 +109,9 @@ public class BinaryPeptideDbUtil {
 
 	}
 
-	public Set<PeptideAcc> readGroupedRow(byte[] value) {
+	public Set<PeptideAccids> readGroupedRow(byte[] value) {
 		ByteBuffer buffer = ByteBuffer.wrap(value);
-		Set<PeptideAcc> peptides = new HashSet<>();
+		Set<PeptideAccids> peptides = new HashSet<>();
 
 		while(buffer.hasRemaining()) {
 			int seqLength = readVarInt(buffer);
@@ -121,12 +121,12 @@ public class BinaryPeptideDbUtil {
 
 			int accessionCount = readVarInt(buffer);
 
-			PeptideAcc acc = new PeptideAcc();
+			PeptideAccids acc = new PeptideAccids();
 			acc.seq = sequence;
-			acc.acc = new int[accessionCount];
+			acc.accids = new int[accessionCount];
 			for(int i = 0; i < accessionCount; i++) {
 				//acc.acc[i] = accessions.get(i);
-				acc.acc[i] = readVarInt(buffer);
+				acc.accids[i] = readVarInt(buffer);
 			}
 			peptides.add(acc);
 		}
@@ -210,12 +210,12 @@ public class BinaryPeptideDbUtil {
 	}
 
 	@Data
-	public static class PeptideAcc implements Comparable<PeptideAcc> {
+	public static class PeptideAccids implements Comparable<PeptideAccids> {
 		String seq;
-		int[] acc;
+		int[] accids;
 
 		@Override
-		public int compareTo(@NotNull PeptideAcc o) {
+		public int compareTo(@NotNull PeptideAccids o) {
 			if(seq.equals(o.seq)) {
 				return 0;
 			}
@@ -224,7 +224,7 @@ public class BinaryPeptideDbUtil {
 
 		@Override
 		public String toString() {
-			return seq + " " + Arrays.toString(acc);
+			return seq + " " + Arrays.toString(accids);
 		}
 	}
 

@@ -3,6 +3,7 @@ package hr.pbf.digestdb.experiments;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Slf4j
 @UtilityClass
 public class TaxonomySearch {
 
@@ -23,7 +25,7 @@ public class TaxonomySearch {
         double mass2 = 1600.1;
 
         try {
-            TaxonomySearchResult result = searchTaxonomy(mass1, mass2);
+            TaxonomySearchResult result = searchTaxonomyWeb(mass1, mass2);
             System.out.println("Total results: " + result.totalResult);
             System.out.println("Duration: " + result.duration);
             System.out.println("Memory: " + result.memory);
@@ -55,9 +57,7 @@ public class TaxonomySearch {
     }
 
 
-
-    public static TaxonomySearchResult searchTaxonomy(double mass1, double mass2)
-          throws IOException, InterruptedException {
+    public TaxonomySearchResult searchTaxonomyWeb(double mass1, double mass2) throws IOException, InterruptedException {
         String url = "http://digestedproteindb.pbf.hr:7071/search-taxonomy?mass1=" +
                      mass1 + "&mass2=" + mass2 + "&pageSize=1000";
 
@@ -79,7 +79,7 @@ public class TaxonomySearch {
 
 // Model classes for JSON deserialization
 
-    public static class TaxonomySearchResult {
+    public class TaxonomySearchResult {
         @JsonProperty("totalResult")
         public int totalResult;
 
@@ -99,7 +99,7 @@ public class TaxonomySearch {
         public List<Map<String, List<Peptide>>> result = new ArrayList<>();
     }
 
-    public static class Peptide {
+    public class Peptide {
         @JsonProperty("seq")
         public String seq;
 
@@ -107,7 +107,7 @@ public class TaxonomySearch {
         public List<AccessionTaxonomy> accsTax = new ArrayList<>();
     }
 
-    public static class AccessionTaxonomy {
+    public class AccessionTaxonomy {
         @JsonProperty("acc")
         public String acc;
 

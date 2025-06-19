@@ -44,8 +44,8 @@ public class SearchWeb {
         this.dbDirPath = dbDirPath;
         this.port = port;
         setDbDirPath(dbDirPath + "/" + CreateDatabase.DEFAULT_ROCKSDB_MASS_DB_FILE_NAME);
-        setAccDbPath(dbDirPath + "/" + CreateDatabase.DEFAULT_DB_FILE_NAME);
-        setDbAccTaxPath(dbDirPath + "/" + CreateDatabase.DEFAULT_DB_ACC_TAX);
+        setAccDbPath(dbDirPath + "/" + CreateDatabase.DEFAULT_ACCESSION_DB_FILE_NAME);
+        setDbAccTaxPath(dbDirPath + "/" + CreateDatabase.DEFAULT_ACC_TAX_DB_FILE_NAME);
     }
 
     public void start() throws RocksDBException, IOException {
@@ -269,17 +269,17 @@ public class SearchWeb {
         sendJsonResponse(exchange, StatusCodes.OK, jsonResult);
     }
 
-    private List<Map.Entry<Double, Set<PeptideAccText>>> toAccession(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>>> results) {
+    private List<Map.Entry<Double, Set<PeptideAccText>>> toAccession(List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results) {
         // TODO: use mapstruct
         List<Map.Entry<Double, Set<PeptideAccText>>> result = new ArrayList<>(results.size());
-        for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAcc>> e : results) {
+        for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> e : results) {
             Set<PeptideAccText> peptides = new HashSet<>();
-            for (BinaryPeptideDbUtil.PeptideAcc acc : e.getValue()) {
+            for (BinaryPeptideDbUtil.PeptideAccids acc : e.getValue()) {
                 PeptideAccText accText = new PeptideAccText();
                 accText.setSeq(acc.getSeq());
-                String[] accs = new String[acc.getAcc().length];
-                for (int i = 0; i < acc.getAcc().length; i++) {
-                    accs[i] = getAccDb().getAccession(acc.getAcc()[i]);
+                String[] accs = new String[acc.getAccids().length];
+                for (int i = 0; i < acc.getAccids().length; i++) {
+                    accs[i] = getAccDb().getAccession(acc.getAccids()[i]);
                 }
                 accText.setAcc(accs);
                 peptides.add(accText);
@@ -314,12 +314,12 @@ public class SearchWeb {
     }
 
     @Data
-    public static class PeptideAccText implements Comparable<BinaryPeptideDbUtil.PeptideAcc> {
+    public static class PeptideAccText implements Comparable<BinaryPeptideDbUtil.PeptideAccids> {
         private String seq;
         private String[] acc;
 
         @Override
-        public int compareTo(@NotNull BinaryPeptideDbUtil.PeptideAcc o) {
+        public int compareTo(@NotNull BinaryPeptideDbUtil.PeptideAccids o) {
             if (seq.equals(o.getSeq())) {
                 return 0;
             }

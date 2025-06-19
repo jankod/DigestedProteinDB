@@ -23,13 +23,14 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class CreateDatabase {
 
 	public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
-	public static final String DEFAULT_DB_FILE_NAME = "custom_accession.db";
-	public static final String DEFAULT_DB_ACC_TAX= "accession_tax.db";
+	public static final String DEFAULT_ACCESSION_DB_FILE_NAME = "custom_accession.db";
+	public static final String DEFAULT_ACC_TAX_DB_FILE_NAME = "accession_tax.db";
 
 	private final CreateDatabaseConfig config;
 
@@ -71,19 +72,23 @@ public class CreateDatabase {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
 
-		//steps = List.of(5, 6, 7);
-
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
 
-		final String PEPTIDE_MASS_CSV_PATH = DB_DIR_PATH + "/gen/peptide_mass.csv";
-		final String PEPTIDE_MASS_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/peptide_mass_sorted.csv";
-		final String GROUPED_WITH_IDS_CSV_PATH = DB_DIR_PATH + "/gen/grouped_with_ids.csv";
-		final String ACCESSION_MAP_CSV_PATH = DB_DIR_PATH + "/gen/accession_map.csv";
-		final String ACCESSION_MAP_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/accession_map.csv.sorted";
-		final String CUSTOM_ACCESSION_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_DB_FILE_NAME;
+		// ACC is a String accession number
+		// ACCID is an int accession id
+		// PEP is a String peptide sequence
+		// TAXID is an int taxonomy id from NCBI taxonomy
+
+
+		final String MASS_PEP_ACC_CSV_PATH = DB_DIR_PATH + "/gen/mass_pep_acc.csv";
+		final String MASS_PEP_ACC_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/mass_pep_acc_sorted.csv";
+		final String MASS_PEP_ACCID_GROUPED_CSV_PATH = DB_DIR_PATH + "/gen/mass_pep_accid_grouped.csv";
+		final String ACCID_ACC_CSV_PATH = DB_DIR_PATH + "/gen/accid_acc.csv";
+		final String ACCID_ACC_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/accid_acc_sorted.csv";
+		final String CUSTOM_ACCESSION_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_ACCESSION_DB_FILE_NAME;
 		final String ROCKDB_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_ROCKSDB_MASS_DB_FILE_NAME;
-		final String TAX_ACC_CSV_PATH = DB_DIR_PATH + "/gen/tax_acc.csv";
+		final String ACC_TAXIDS_CSV_PATH = DB_DIR_PATH + "/gen/acc_taxids.csv";
 		final String DB_INFO_PROPERTIES_PATH = DB_DIR_PATH + "/db_info.properties";
 
 		File genDir = new File(DB_DIR_PATH + "/gen");
@@ -113,8 +118,8 @@ public class CreateDatabase {
 			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
 
 			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
-			app1UniprotToCsv.setResultPeptideMassAccCsvPath(PEPTIDE_MASS_CSV_PATH);
-			app1UniprotToCsv.setResultTaxAccCsvPath(TAX_ACC_CSV_PATH);
+			app1UniprotToCsv.setResultPeptideMassAccCsvPath(MASS_PEP_ACC_CSV_PATH);
+			app1UniprotToCsv.setResultTaxAccCsvPath(ACC_TAXIDS_CSV_PATH);
 			app1UniprotToCsv.setNcbiTaxonomyPath(config.getNcbiTaxonomyPath());
 			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
 
@@ -147,8 +152,8 @@ public class CreateDatabase {
 
 			cmdString = new MyFormatter(cmdString)
 					.param("sort_temp_dir", sortTempDir)
-					.param("peptide_mass_csv_path", PEPTIDE_MASS_CSV_PATH)
-					.param("peptide_mass_sorted_console", PEPTIDE_MASS_CSV_SORTED_PATH)
+					.param("peptide_mass_csv_path", MASS_PEP_ACC_CSV_PATH)
+					.param("peptide_mass_sorted_console", MASS_PEP_ACC_CSV_SORTED_PATH)
 					.format();
 
 			log.debug("Execute command: {} in dir {}", cmdString, genDir);
@@ -162,12 +167,12 @@ public class CreateDatabase {
 
 		if(steps.contains(3)) { // 3.
 			JobCsvMassGrouperWithAccIds app3csvMassGroup = new JobCsvMassGrouperWithAccIds();
-			app3csvMassGroup.setInputCsvPeptideMassSorted(PEPTIDE_MASS_CSV_SORTED_PATH);
-			app3csvMassGroup.setOutputGroupedCsv(GROUPED_WITH_IDS_CSV_PATH);
-			app3csvMassGroup.setOutputAccessionMapCsv(ACCESSION_MAP_CSV_PATH);
+			app3csvMassGroup.setInputCsvPeptideMassSorted(MASS_PEP_ACC_CSV_SORTED_PATH);
+			app3csvMassGroup.setOutputGroupedCsv(MASS_PEP_ACCID_GROUPED_CSV_PATH);
+			app3csvMassGroup.setOutputAccessionMapCsv(ACCID_ACC_CSV_PATH);
 			app3csvMassGroup.setProteinCount(readXmlResult.getProteinCount());
 			Long2IntMap accCustomDb = app3csvMassGroup.start();
-			log.info("Grouped with ids: {}", GROUPED_WITH_IDS_CSV_PATH);
+			log.info("Grouped with ids: {}", MASS_PEP_ACCID_GROUPED_CSV_PATH);
 			log.info("Protein count: {}", readXmlResult.getProteinCount());
 		} else {
 			log.info("Skip step 3");
@@ -189,22 +194,22 @@ public class CreateDatabase {
 			cmdSortAccession += " sort -t',' -k1n ${accession_map.csv}  -o ${accession_map.csv.sorted} ";
 			cmdSortAccession = new MyFormatter(cmdSortAccession)
 					.param("sort_temp_dir", sortTempDir)
-					.param("accession_map.csv", ACCESSION_MAP_CSV_PATH)
-					.param("accession_map.csv.sorted", ACCESSION_MAP_CSV_SORTED_PATH)
+					.param("accession_map.csv", ACCID_ACC_CSV_PATH)
+					.param("accession_map.csv.sorted", ACCID_ACC_CSV_SORTED_PATH)
 					.format();
 
 			log.debug("Execute command: {} in dir {}", cmdSortAccession, genDir);
 			cmd.setCmd(cmdSortAccession);
 			cmd.setDir(genDir);
 			cmd.start();
-			log.info("Accession map sorted: {}", ACCESSION_MAP_CSV_SORTED_PATH);
+			log.info("Accession map sorted: {}", ACCID_ACC_CSV_SORTED_PATH);
 		} else {
 			log.info("Skip step 4");
 		}
 
 		if(steps.contains(5)) { // 5. Create rocksdb mass
 			//  MassRocksDb app4createMassRocksDb = new MassRocksDb();
-			MassRocksDbCreator massDb = new MassRocksDbCreator(GROUPED_WITH_IDS_CSV_PATH, ROCKDB_DB_DIR_PATH);
+			MassRocksDbCreator massDb = new MassRocksDbCreator(MASS_PEP_ACCID_GROUPED_CSV_PATH, ROCKDB_DB_DIR_PATH);
 
 			massDb.startCreate();
 			log.info("RockDB db is created: {}", ROCKDB_DB_DIR_PATH);
@@ -213,7 +218,7 @@ public class CreateDatabase {
 		}
 
 		if(steps.contains(6)) { // 6. Create custom accession db
-			AccessionDbCreator accDb = new AccessionDbCreator(ACCESSION_MAP_CSV_SORTED_PATH, CUSTOM_ACCESSION_DB_DIR_PATH);
+			AccessionDbCreator accDb = new AccessionDbCreator(ACCID_ACC_CSV_SORTED_PATH, CUSTOM_ACCESSION_DB_DIR_PATH);
 			accDb.startCreate();
 			log.info("Custom accession db is created: {}. File: size: {}", CUSTOM_ACCESSION_DB_DIR_PATH, MyUtil.getFileSize(CUSTOM_ACCESSION_DB_DIR_PATH));
 		} else {
@@ -226,7 +231,7 @@ public class CreateDatabase {
 			log.info("Skip step 7");
 		}
 
-		log.info("Finished time: {}", DurationFormatUtils.formatDurationHMS(watch.getTime()));
+		log.info("Finished time: {}", DurationFormatUtils.formatDurationHMS(watch.getTime(TimeUnit.NANOSECONDS)));
 	}
 
 	private void saveDbInfoToProperties(long proteinCount, String dbInfoPropertiesPath, long peptideCount) {
