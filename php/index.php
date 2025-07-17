@@ -7,6 +7,7 @@ include_once 'lib.php';
 <html lang="en">
 <head>
     <?php include_once "inc/html_head.php"; ?>
+
 </head>
 <body>
 <!--<h1 class="text-center display-5 fw-bold text-primary shadow p-3 mb-5 bg-body rounded">-->
@@ -486,5 +487,7 @@ include_once 'lib.php';
 <script src="bootstrap.bundle.min.js"></script>
 <script src="bio-lib.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
+
+<?php include_once "inc/google_analytics_body.php"; ?>
 </body>
 </html>

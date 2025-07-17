@@ -4,3 +4,5 @@
 <link href="bootstrap-sandstone.min.css" rel="stylesheet">
 <link href="all.css" rel="stylesheet">
 <!--<link rel="stylesheet" href="bootstrap-icons.min.css">-->
+
+<?php include_once "inc/google_analytics_head.php"; ?>
