@@ -195,9 +195,7 @@ public class UniprotXMLParser {
     public class ProteinInfo {
         String accession;
         String proteinName;
-        //  int taxonomyId;
         List<Integer> taxonomyIds = new ArrayList<>(6);
-     //   String taxonomyName;
         int divisionId = -1;
 
         @ToString.Exclude

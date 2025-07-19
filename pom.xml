@@ -15,6 +15,7 @@
         <maven.compiler.target>24</maven.compiler.target>
         <lombok.version>1.18.38</lombok.version>
         <main.class>hr.pbf.digestdb.DigestedApp</main.class>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -136,8 +137,6 @@
         </resources>
 
         <plugins>
-
-
 
 
             <plugin>

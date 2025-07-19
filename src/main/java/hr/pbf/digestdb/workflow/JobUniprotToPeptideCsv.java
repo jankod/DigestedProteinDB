@@ -58,7 +58,7 @@ public class JobUniprotToPeptideCsv {
         }
         if (minPeptideLength < 1 || minPeptideLength > maxPeptideLength) {
             throw new ValidationException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
-                    + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
+                                          + minPeptideLength + " maxPeptideLength: " + maxPeptideLength);
         }
         NcbiTaksonomyRelations ncbiTaksonomyRelations = null;
         if (ncbiTaxonomyPath != null) {
@@ -98,9 +98,8 @@ public class JobUniprotToPeptideCsv {
                             return;
                         }
                     }
-//                    if("Q9UKP3".equals(p.getAccession())) {
-//                        System.out.println("Q9UKP3");
-//                    }
+
+
                     if (finalNcbiTaksonomyRelations != null) {
                         boolean hasParent = false;
 
@@ -124,12 +123,6 @@ public class JobUniprotToPeptideCsv {
 
                     List<String> peptides;
                     peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
-
-//					if(enzyme == CreateDatabase.CreateDatabaseConfig.Enzyme.Trypsin) {
-//						peptides = BioUtil.tripsyn1mc(p.getSequence(), minPeptideLength, maxPeptideLength);
-//					} else {
-//						peptides = BioUtil.chymotrypsin1(p.getSequence(), minPeptideLength, maxPeptideLength);
-//					}
 
                     peptides.forEach(peptide -> {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
