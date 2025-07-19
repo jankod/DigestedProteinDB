@@ -26,6 +26,14 @@ class NcbiTaksonomyRelationsTest {
     }
 
     @Test
+    void testSheep () {
+        // sheep 9940
+        // virus 11588
+        boolean ancestor = taxonomy.isAncestor(9940, 11588);
+        assertFalse(ancestor, "9940 should not be ancestor of 11588");
+    }
+
+    @Test
     public void testLoadTaxonomyNodes() {
         assertNotNull(taxonomy, "Taxonomy should be initialized");
     }

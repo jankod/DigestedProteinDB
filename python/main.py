@@ -2,6 +2,8 @@
 
 from ete3 import NCBITaxa
 ncbi = NCBITaxa()
+ncbi.update_taxonomy_database()
+
 
 # npr. želimo info za taxid 9606 (human)
 print(ncbi.get_taxid_translator([9606]))

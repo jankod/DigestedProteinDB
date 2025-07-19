@@ -101,7 +101,6 @@ class MassRocksDbTest {
 
 
                     pepAccFirstSet.forEach(pepAcc -> {
-                        ;
                         log.debug("seq: " + pepAcc.getSeq() + " acc: " + Arrays.toString(pepAcc.getAccids()));
 
                         switch (pepAcc.getSeq()) {

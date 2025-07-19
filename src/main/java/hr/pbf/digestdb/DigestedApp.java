@@ -52,7 +52,7 @@ public class DigestedApp {
 																   "for sorting on linux sort command (if needed) on diferent disk")
 		String sortTempDir;
 
-		@Option(names = { "-ncbi", "--ncbi-taxonomy-path" }, description = "Path to the NCBI taxonomy file (nodes.dmp)")
+		@Option(names = { "-ncbi-nodes", "--ncbi-nodes-taxonomy-path" }, description = "Path to the NCBI taxonomy file (nodes.dmp)")
 		String ncbiTaxonomyPath = null;
 
 		@Option(names = { "-p", "--taxonomy-parents" }, description = "Taxonomy parents (ancestors) ids, default all. Use -p taxID1, taxID2 ... for filtering by taxonomy.", split = ",")

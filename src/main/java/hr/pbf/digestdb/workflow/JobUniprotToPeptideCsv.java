@@ -65,6 +65,7 @@ public class JobUniprotToPeptideCsv {
             ValidatateUtil.fileMustExist(ncbiTaxonomyPath);
             try {
                 ncbiTaksonomyRelations = NcbiTaksonomyRelations.loadTaxonomyNodes(ncbiTaxonomyPath);
+
             } catch (NcbiTaxonomyException e) {
                 throw new RuntimeException(e);
             }
@@ -88,6 +89,9 @@ public class JobUniprotToPeptideCsv {
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
+                    if (stopped) {
+                        return;
+                    }
                     if (counter > maxProteinCount) {
                         stopped = true;
                         log.info("Finish read proteins, max protein count reached: {}", maxProteinCount);
@@ -107,6 +111,8 @@ public class JobUniprotToPeptideCsv {
                             for (Integer taxonomyId : p.getTaxonomyIds()) {
                                 if (finalNcbiTaksonomyRelations.isAncestor(taxonomyId, parentsId)) {
                                     hasParent = true;
+                                    if (taxonomyId != parentsId)
+                                        log.debug("{} is ancestor of {}", taxonomyId, parentsId);
                                     break;
                                 }
                             }
@@ -117,7 +123,7 @@ public class JobUniprotToPeptideCsv {
                         }
                     }
 
-
+          //          log.debug("Processing protein: {}", p.getAccession());
                     proteinCount.increment();
                     saveTaxonomy(p.getAccession(), p.getTaxonomyIds(), outTaxonomy);
 

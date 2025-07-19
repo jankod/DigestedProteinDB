@@ -76,19 +76,16 @@ public class NcbiTaksonomyRelations {
             if (currentId == taxIdAncestor) {
                 return true;
             }
-            currentId = childParrents.get(currentId);
+            currentId = childParrents.get(currentId.intValue());
             depth++;
             if (maxDepth != null && depth > maxDepth) {
                 return false;
             }
-            if (currentId != null && currentId.equals(taxIdDescendant)) {
+            if (currentId.equals(taxIdDescendant)) {
                 return false; // Detection that we didn't move
             }
-            if (currentId != null && currentId == 1 && taxIdAncestor != 1) {
+            if (currentId == 1 && taxIdAncestor != 1) {
                 return false; // If we reach the root and the search is not for root
-            }
-            if (currentId == null) {
-                return false; // If there's no parent
             }
         }
         return currentId.equals(taxIdAncestor);

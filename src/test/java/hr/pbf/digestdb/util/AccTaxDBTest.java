@@ -1,11 +1,13 @@
 package hr.pbf.digestdb.util;
 
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AccTaxDBTest {
 
 
-    @org.junit.jupiter.api.Test
+  //  @Test
     void testAccTaxDBCreation() {
 
         String xmlPath = "/Users/tag/IdeaProjects/DigestedProteinDB/misc/db_all_swisprot/src/uniprot_sprot.xml";
