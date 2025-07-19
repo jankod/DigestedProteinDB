@@ -84,6 +84,10 @@ public class DigestedApp {
 			config.setTaxonomyParentsIds(taxonomyParentsIds);
 			config.setNcbiTaxonomyPath(ncbiTaxonomyPath);
 
+			if (taxonomyParentsIds != null && taxonomyParentsIds.length > 0 && ncbiTaxonomyPath == null) {
+				throw new IllegalArgumentException("If -p option is set, -ncbi option must be set too.");
+			}
+
 			CreateDatabase createDatabase = new CreateDatabase(config);
 			createDatabase.start();
 

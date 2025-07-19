@@ -20,7 +20,7 @@ public class MassRocksDbReader implements AutoCloseable {
         open();
     }
 
-    private void open() throws RocksDBException {
+    public void open() throws RocksDBException {
         this.db = MyUtil.openReadDB(dbPath);
     }
 
