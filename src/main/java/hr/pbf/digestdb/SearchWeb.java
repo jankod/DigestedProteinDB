@@ -140,7 +140,7 @@ public class SearchWeb {
     private PageResultTax toTaxonomy(PageResult pageResult) {
         if (accTaxDb == null) {
             accTaxDb = new AccTaxDB();
-            accTaxDb.readFromDisk(dbAccTaxPath);
+            accTaxDb.readFromDiskByte(dbAccTaxPath);
             log.debug("Taxonomy read from disk: {}", accTaxDb);
         }
 

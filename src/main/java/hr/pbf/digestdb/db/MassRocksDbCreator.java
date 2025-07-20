@@ -5,11 +5,13 @@ import hr.pbf.digestdb.util.MyUtil;
 import hr.pbf.digestdb.util.ValidatateUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,6 +90,8 @@ public class MassRocksDbCreator {
         log.debug("RocksDB created successfully with {} masses.", countMasses);
 
         try {
+            long sizeOfDirectory = FileUtils.sizeOfDirectory(new File(toDbPath));
+            log.debug("RocksDB directory size: {} bytes", FileUtils.byteCountToDisplaySize(sizeOfDirectory));
             log.debug("RocksDB file size: {} bytes", Files.size(Path.of(toDbPath)));
         } catch (IOException ignore) {
         }

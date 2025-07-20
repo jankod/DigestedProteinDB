@@ -2,10 +2,11 @@ package hr.pbf.digestdb.util;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.xml.stream.XMLStreamException;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,22 +40,27 @@ public class AccTaxDB {
     }
 
 
-    public void createDb(String xmlPath) {
+    public void createDb(String xmlPath) throws XMLStreamException, IOException {
         Long2ObjectMap<byte[]> accessionTaxMap = new Long2ObjectOpenHashMap<>();
         UniprotXMLParser parser = new UniprotXMLParser();
         parser.parseProteinsFromXMLstream(xmlPath, new UniprotXMLParser.ProteinHandler() {
             @Override
             public void gotProtein(UniprotXMLParser.ProteinInfo p) throws IOException {
-                long acc = MyUtil.toAccessionLong36(p.getAccession());
-                List<Integer> taxonomyIds = p.getTaxonomyIds();
-                byte[] taxonomyIdsBytes = IntegerListConverter.toByteArray(taxonomyIds);
-                if (accessionTaxMap.containsKey(acc)) {
-                    throw new IllegalStateException("Duplicate accession: " + p.getAccession());
+                try {
+                    long acc = MyUtil.toAccessionLong36(p.getAccession());
+                    List<Integer> taxonomyIds = p.getTaxonomyIds();
+                    byte[] taxonomyIdsBytes = IntegerListConverter.toByteArray(taxonomyIds);
+                    if (accessionTaxMap.containsKey(acc)) {
+                        throw new IllegalStateException("Duplicate accession: " + p.getAccession());
+                    }
+                    accessionTaxMap.put(acc, taxonomyIdsBytes);
+                } catch (Exception e) { // Hvatanje općenite iznimke za svaki slučaj
+                    throw new RuntimeException("Error processing protein: " + p.getAccession(), e);
                 }
-                accessionTaxMap.put(acc, taxonomyIdsBytes);
             }
         });
         this.db = accessionTaxMap;
+
     }
 
     public void writeToDisk(String path) {
@@ -78,7 +84,58 @@ public class AccTaxDB {
 
     }
 
-    public synchronized void readFromDisk(String path) {
+    public synchronized void readFromDiskCsv(String path) {
+        // CSV Q6TW45,[10258, 9925, 9606, 9940]
+        //A9Z0R2,[10258, 9925, 9606, 9940]
+        //A0A0F6N206,[10258, 9925, 9606, 9940]
+        //A0A0Y0RJ21,[10258, 9925, 9606, 9940]
+        //A0A2S1CI81,[10258, 9925, 9606, 9940]
+        Long2ObjectMap<byte[]> accessionTaxMap = new Long2ObjectOpenHashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length < 2) {
+                    log.warn("Skipping invalid line: {}", line);
+                    continue; // Skip invalid lines
+                }
+                String accession = parts[0].trim();
+
+                long acc = MyUtil.toAccessionLong36(accession);
+
+                String taxonomyIdsStr = parts[1].trim();
+                taxonomyIdsStr = taxonomyIdsStr.replaceAll("\\[", "");
+                taxonomyIdsStr = taxonomyIdsStr.replaceAll("\\]", "");
+                String[] taxonomyIdsArray = taxonomyIdsStr.split(",");
+                List<Integer> taxonomyIds = new ArrayList<>(taxonomyIdsArray.length);
+                for (String taxIdStr : taxonomyIdsArray) {
+                    try {
+                        int taxId = Integer.parseInt(taxIdStr.trim());
+                        taxonomyIds.add(taxId);
+                    } catch (NumberFormatException e) {
+                        log.warn("Invalid taxonomy ID: {}", taxIdStr, e);
+                    }
+                }
+                if (taxonomyIds.isEmpty()) {
+                    log.warn("No valid taxonomy IDs found for accession: {}", accession);
+                    continue; // Skip if no valid taxonomy IDs
+                }
+                byte[] taxonomyIdsBytes = IntegerListConverter.toByteArray(taxonomyIds);
+                if (accessionTaxMap.containsKey(acc)) {
+                    log.warn("Duplicate accession found: {}", accession);
+                    continue; // Skip duplicate accessions
+                }
+                accessionTaxMap.put(acc, taxonomyIdsBytes);
+
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read from disk: " + path, e);
+        }
+        this.db = accessionTaxMap;
+
+    }
+
+    public synchronized void readFromDiskByte(String path) {
         Long2ObjectMap<byte[]> accessionTaxMap;
         try (DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(path), 8 * 1024 * 16))) {
             accessionTaxMap = new Long2ObjectOpenHashMap<>(dis.readInt()); // Read the size of the map first

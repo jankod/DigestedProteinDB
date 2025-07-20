@@ -32,18 +32,7 @@ public class UniprotXMLParser {
 
     @Getter
     public enum Division {
-        BACTERIA(0, "Bacteria"),
-        INVERTEBRATES(1, "Invertebrates"),
-        MAMMALS(2, "Mammals"),
-        PHAGES(3, "Phages"),
-        PLANTS_AND_FUNGI(4, "Plants and Fungi"),
-        PRIMATES(5, "Primates"),
-        RODENTS(6, "Rodents"),
-        SYNTHETIC_AND_CHIMERIC(7, "Synthetic and Chimeric"),
-        UNASSIGNED(8, "Unassigned"),
-        VIRUSES(9, "Viruses"),
-        VERTEBRATES(10, "Vertebrates"),
-        ENVIRONMENTAL_SAMPLES(11, "Environmental samples");
+        BACTERIA(0, "Bacteria"), INVERTEBRATES(1, "Invertebrates"), MAMMALS(2, "Mammals"), PHAGES(3, "Phages"), PLANTS_AND_FUNGI(4, "Plants and Fungi"), PRIMATES(5, "Primates"), RODENTS(6, "Rodents"), SYNTHETIC_AND_CHIMERIC(7, "Synthetic and Chimeric"), UNASSIGNED(8, "Unassigned"), VIRUSES(9, "Viruses"), VERTEBRATES(10, "Vertebrates"), ENVIRONMENTAL_SAMPLES(11, "Environmental samples");
 
         private final int id;
         private final String name;
@@ -54,8 +43,7 @@ public class UniprotXMLParser {
         }
 
         public static Division fromTaxon(String taxon) {
-            if (taxon == null)
-                return UNASSIGNED;
+            if (taxon == null) return UNASSIGNED;
 
             return switch (taxon.trim().toLowerCase()) {
                 case "bacteria" -> BACTERIA;
@@ -86,7 +74,7 @@ public class UniprotXMLParser {
 
     private long totalCount = 0;
 
-    public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) {
+    public void parseProteinsFromXMLstream(String filePath, ProteinHandler proteinHandler) throws IOException, XMLStreamException {
         String limit = String.valueOf(Integer.MAX_VALUE);
         System.setProperty("jdk.xml.maxGeneralEntitySizeLimit", limit);
         System.setProperty("jdk.xml.totalEntitySizeLimit", limit);
@@ -94,20 +82,19 @@ public class UniprotXMLParser {
 
         ProteinInfo proteinInfo = null;
         boolean inLineage = false;
+        boolean isOrganism = false;
 
-        try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            XMLStreamReader reader;
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+        XMLStreamReader reader;
 
-            if (filePath.endsWith(".gz")) {
-                GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(filePath), 65536 * 2);
-                reader = factory.createXMLStreamReader(gzipInputStream);
-            } else {
-                reader = factory.createXMLStreamReader(new FileInputStream(filePath));
-            }
+        try (InputStream inputStream = filePath.endsWith(".gz") ? new GZIPInputStream(new FileInputStream(filePath), 65536 * 2) : new FileInputStream(filePath)) {
+            reader = factory.createXMLStreamReader(inputStream);
+
+
             while (reader.hasNext()) {
                 int event = reader.next();
+
 
                 switch (event) {
                     case XMLStreamConstants.START_ELEMENT:
@@ -132,8 +119,11 @@ public class UniprotXMLParser {
 //                                    System.out.println("fullName " + fullName);
                                     proteinInfo.setProteinName(fullName);
                                     break;
+                                case "organism":
+                                    isOrganism = true;
+                                    break;
                                 case "dbReference":
-                                    if ("NCBI Taxonomy".equals(reader.getAttributeValue(null, "type"))) {
+                                    if (isOrganism && "NCBI Taxonomy".equals(reader.getAttributeValue(null, "type"))) {
                                         try {
                                             String taxId = reader.getAttributeValue(null, "id");
 //                                            System.out.println("taxonomyId " + taxId);
@@ -145,6 +135,7 @@ public class UniprotXMLParser {
                                         }
                                     }
                                     break;
+
                               /*  case "name":
                                     if ("scientific".equals(reader.getAttributeValue(null, "type"))) {
                                         String elementText = reader.getElementText();
@@ -172,21 +163,28 @@ public class UniprotXMLParser {
                         }
                         break;
 
+
                     case XMLStreamConstants.END_ELEMENT:
-                        if ("entry".equals(reader.getLocalName()) && proteinInfo != null) {
-//                            System.out.println("entry end");
-                            proteinHandler.counter++;
-                            totalCount++;
-                            proteinHandler.gotProtein(proteinInfo);
+
+                        switch (reader.getLocalName()) {
+                            case "entry":
+                                if (proteinInfo != null) {
+                                    proteinHandler.counter++;
+                                    totalCount++;
+                                    proteinHandler.gotProtein(proteinInfo);
+                                }
+                                break;
+                            case "organism":
+                                isOrganism = false; // Ispravno resetiranje
+                                break;
+                            case "lineage":
+                                inLineage = false; // Ispravno resetiranje
+                                break;
                         }
                         break;
                 }
             }
 
-            reader.close();
-
-        } catch (XMLStreamException | IOException e) {
-            throw new RuntimeException(e);
         }
 
     }
@@ -207,4 +205,9 @@ public class UniprotXMLParser {
     }
 
 }
+
+
+
+
+
 

@@ -2,7 +2,12 @@ package hr.pbf.digestdb.experiments;
 
 import hr.pbf.digestdb.db.AccessionDbReader;
 import hr.pbf.digestdb.db.MassRocksDbReader;
+import hr.pbf.digestdb.exception.NcbiTaxonomyException;
+import hr.pbf.digestdb.util.AccTaxDB;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
+import hr.pbf.digestdb.util.NcbiTaksonomyRelations;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 
@@ -12,11 +17,12 @@ import java.util.*;
 @Slf4j
 public class SearchSheep {
 
-    public static void main(String[] args) throws RocksDBException {
-        MassRocksDbReader db = new MassRocksDbReader("/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep/rocksdb_mass.db");
+    public static void main(String[] args) throws RocksDBException, NcbiTaxonomyException {
+        String dbDir = "/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep2/";
+        MassRocksDbReader db = new MassRocksDbReader(dbDir + "rocksdb_mass.db");
         db.open();
 
-        AccessionDbReader accessionDbReader = new AccessionDbReader("/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep/custom_accession.db");
+        AccessionDbReader accessionDbReader = new AccessionDbReader(dbDir + "custom_accession.db");
 
 
         List<Double> sheepMasses = getMassesSheep("/media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt");
@@ -55,8 +61,54 @@ public class SearchSheep {
         // Get ranked proteins
         List<Map.Entry<String, Integer>> ranked = scorer.getRankedProteins();
         for (Map.Entry<String, Integer> entry : ranked) {
-            System.out.println(entry.getKey() + ", unique peptides: " + entry.getValue());
+            //  System.out.println(entry.getKey() + ", unique peptides: " + entry.getValue());
         }
+
+        NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes("/home/tag/IdeaProjects/DigestedProteinDB/misc/ncbi/taxdump/nodes.dmp");
+
+        AccTaxDB accessionTaxDb = new AccTaxDB();
+        accessionTaxDb.readFromDiskCsv(dbDir + "gen/acc_taxids.csv");
+
+        Map<Integer, List<ProteinResult>> taxIdToProteins = new HashMap<>();
+
+
+        // 3. Grupirajte proteine po TaxID-u
+        for (Map.Entry<String, Integer> entry : ranked) {
+            String accession = entry.getKey();
+            int peptideCount = entry.getValue();
+            List<Integer> taxonomyIds = accessionTaxDb.getTaxonomyIds(accession);
+            for (Integer taxonomyId : taxonomyIds) {
+                taxIdToProteins.computeIfAbsent(taxonomyId, k -> new ArrayList<>())
+                      .add(new ProteinResult(accession, peptideCount, taxonomyId));
+            }
+        }
+
+
+        // 4. Ispišite rezultate
+        // sortiraj po navecem broju peptida
+
+
+        for (Map.Entry<Integer, List<ProteinResult>> entry : taxIdToProteins.entrySet()) {
+            Integer taxId = entry.getKey();
+            List<ProteinResult> proteins = entry.getValue();
+            //  log.info("TaxID: " + taxId + ", Proteins: " + proteins.size());
+            proteins.sort(Comparator.naturalOrder()); // Sort by peptide count descending
+            int c = 1;
+//            if (taxId == 9940) {
+            System.out.println("TaxID: " + taxId + ", Proteins: " + proteins.size());
+            System.out.println("#, Accession, Peptide Count");
+//            }
+            for (ProteinResult protein : proteins) {
+                //  if (taxId == 9940) {
+                //log.info("  Accession: " + protein.getAccession() + ", Peptide Count: " + protein.getPeptideCount());
+                System.out.println(c++ + "  " + protein.getAccession() + ", " + protein.getPeptideCount());
+                // }
+//                if (c++ > 10) {
+//                    break; // Limit to top 10 proteins per taxId
+//                }
+            }
+        }
+
 
     }
 
@@ -70,7 +122,22 @@ public class SearchSheep {
             throw new RuntimeException("Error reading masses from file: " + path, e);
         }
     }
+
+    @Getter
+    @AllArgsConstructor
+
+    static class ProteinResult implements Comparable<ProteinResult> {
+        private String accession;
+        private int peptideCount;
+        private Integer taxId;
+
+        @Override
+        public int compareTo(ProteinResult o) {
+            return Integer.compare(o.peptideCount, this.peptideCount); // Sort by peptide count descending
+        }
+    }
 }
+
 
 class ProteinScorer {
 

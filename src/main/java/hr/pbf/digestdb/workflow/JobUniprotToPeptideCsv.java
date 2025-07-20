@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -49,7 +50,7 @@ public class JobUniprotToPeptideCsv {
 
     }
 
-    public Result start() throws IOException {
+    public Result start() throws Exception {
         ValidatateUtil.fileMustExist(fromSwisprotPath);
         ValidatateUtil.fileMustNotExist(resultPeptideMassAccCsvPath);
 
@@ -111,8 +112,8 @@ public class JobUniprotToPeptideCsv {
                             for (Integer taxonomyId : p.getTaxonomyIds()) {
                                 if (finalNcbiTaksonomyRelations.isAncestor(taxonomyId, parentsId)) {
                                     hasParent = true;
-                                    if (taxonomyId != parentsId)
-                                        log.debug("{} is ancestor of {}", taxonomyId, parentsId);
+//                                    if (taxonomyId != parentsId)
+//                                        log.debug("{} is ancestor of {}", taxonomyId, parentsId);
                                     break;
                                 }
                             }
@@ -122,8 +123,9 @@ public class JobUniprotToPeptideCsv {
                             return;
                         }
                     }
+//                    writeToDebug(p);
 
-          //          log.debug("Processing protein: {}", p.getAccession());
+                    //          log.debug("Processing protein: {}", p.getAccession());
                     proteinCount.increment();
                     saveTaxonomy(p.getAccession(), p.getTaxonomyIds(), outTaxonomy);
 
@@ -160,6 +162,14 @@ public class JobUniprotToPeptideCsv {
         result.setProteinCount(proteinCount.get());
 
         return result;
+    }
+
+    private void writeToDebug(UniprotXMLParser.ProteinInfo p) {
+        List<Integer> taxonomyIds = p.getTaxonomyIds();
+        if (taxonomyIds.size() == 1 && taxonomyIds.contains(9940)) {
+            return;
+        }
+        System.out.println(taxonomyIds + " " + p.getAccession() + " " + p.getDivisionId());
     }
 
     @SneakyThrows
