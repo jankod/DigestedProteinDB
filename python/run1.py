@@ -72,12 +72,12 @@ def analyze_ms_data(file, top_n=10):
         print(f"Obrada pika {i+1}/{top_n}: m/z = {mass:.4f}, intenzitet = {intensity:.2e}")
 
         # REST API upit
-        results = query_peptide_by_mass(mass)
-        if results:
+        ptmSearchResults = query_peptide_by_mass(mass)
+        if ptmSearchResults:
             all_results.append({
                 'mass': mass,
                 'intensity': intensity,
-                'peptides': results
+                'peptides': ptmSearchResults
             })
 
     # Analiza rezultata

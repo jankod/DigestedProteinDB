@@ -1,0 +1,31 @@
+For each observed_mono_mass in spectrum:
+    For each peptide in peptide_database:
+        For each PTM_combination in allowed_PTMs:
+            theoretical_mass = peptide.mass + PTM_combination.mass_delta
+
+            If abs(observed_mono_mass - theoretical_mass) <= tolerance:
+                Report match:
+                    - peptide sequence
+                    - PTM(s) applied
+                    - delta_mass
+
+
+	•	Maksimalno 1 PTM po peptidu (za početnu implementaciju).
+
+
+	•	Opcionalno: Omogućiti korisniku da izabere broj dozvoljenih PTM-ova (n = 1..2).
+
++---------------------+-------------+----------------------+-------------+------------------------------+
+| PTM naziv           | Δ Masa (Da) | Target AK            | Tip         | Učestalost                  |
++---------------------+-------------+----------------------+-------------+------------------------------+
+| Carbamidomethyl     | +57.0215    | C                    | Fiksni      | Vrlo često (alkilacija)     |
+| Oxidation           | +15.9949    | M, H, W              | Varijabilni | Vrlo često (biološki/artf.) |
+| Deamidation         | +0.9840     | N, Q                 | Varijabilni | Često                       |
+| Phosphorylation     | +79.9663    | S, T, Y              | Varijabilni | Srednje                     |
+| Acetylation         | +42.0106    | K, N-term            | Varijabilni | Srednje                     |
+| Formylation         | +27.9949    | K, N-term            | Varijabilni | Rjeđe                       |
+| Methylation         | +14.0157    | K, R                 | Varijabilni | Umjereno                    |
+| Dimethylation       | +28.0313    | K, R                 | Varijabilni | Umjereno                    |
+| Trimethylation      | +42.0469    | K, R                 | Varijabilni | Rjeđe                       |
+| Sulfation           | +79.9568    | Y                    | Varijabilni | Rijetko                     |
++---------------------+-------------+----------------------+-------------+------------------------------+

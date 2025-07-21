@@ -19,7 +19,7 @@ This compact database layout enables fast peptide mass queries with minimal reso
 TrEMBL bacteria dataset (7 to 30 amino acids, 1 missed cleavage) occupies about 50 GB on disk and supports quick lookups
 by mass range on standard hardware.
 
-For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON results like:
+For example, searching for masses from: `1500.6` Da to `1500.8` Da gives JSON ptmSearchResults like:
 
 **acc** — Uniprot accession number
 **seq** - peptide sequence,

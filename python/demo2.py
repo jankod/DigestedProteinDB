@@ -13,11 +13,11 @@ url = f"http://localhost:7071/search-taxonomy?mass1={mass1}&mass2={mass2}&pageSi
 response = requests.get(url)
 if response.status_code == 200:
     data = response.json()
-    # Parse the results
-    results = data.get('result', [])
-    pprint(results)
+    # Parse the ptmSearchResults
+    ptmSearchResults = data.get('result', [])
+    pprint(ptmSearchResults)
     parsed_results = []
-    for item in results:
+    for item in ptmSearchResults:
         for mass, sequences in item.items():
             for seq_info in sequences:
                 parsed_results.append({
@@ -25,7 +25,7 @@ if response.status_code == 200:
                     'seq': seq_info['seq'],
                     'accsTax': seq_info['accsTax']
                 })
-    # Print parsed results
+    # Print parsed ptmSearchResults
     for result in parsed_results:
        #print(f"Mass: {result['mass']}, Seq: {result['seq']}, AccsTax: {result['accsTax']}")
        print("")

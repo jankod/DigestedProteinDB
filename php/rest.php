@@ -18,8 +18,8 @@ include_once 'lib.php';
         <div class="card-body">
             <code>GET https://digestedproteindb.pbf.hr/search.php</code>
             <p class="mt-3">
-                Retrieves peptide/protein results filtered by a specific mass range or peptide query.<br>
-                Returns results in JSON format.
+                Retrieves peptide/protein ptmSearchResults filtered by a specific mass range or peptide query.<br>
+                Returns ptmSearchResults in JSON format.
             </p>
         </div>
     </div>
@@ -69,7 +69,7 @@ include_once 'lib.php';
                     <td><code>pageSize</code></td>
                     <td>integer</td>
                     <td>No</td>
-                    <td>Number of results per page. Default is <code>10</code>. Maximum allowed is <code>1000</code>.
+                    <td>Number of ptmSearchResults per page. Default is <code>10</code>. Maximum allowed is <code>1000</code>.
                     </td>
                 </tr>
                 </tbody>
@@ -126,7 +126,7 @@ include_once 'lib.php';
                 <li><code>memory</code> – Memory usage for the request.</li>
                 <li><code>duration</code> – Query execution time.</li>
                 <li><code>page</code> – Current page number.</li>
-                <li><code>pageSize</code> – Number of results per page.</li>
+                <li><code>pageSize</code> – Number of ptmSearchResults per page.</li>
                 <li>
                     <code>result</code> – Array of objects, each key is the peptide mass (as a string/number), value is
                     an array of peptide objects:

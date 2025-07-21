@@ -19,13 +19,16 @@ public class SearchSheep {
 
     public static void main(String[] args) throws RocksDBException, NcbiTaxonomyException {
         String dbDir = "/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep2/";
+        dbDir = "/Users/tag/PBF radovi/digestedproteindb/sheep/rocksdb_mass.db"; // For testing on local machine
         MassRocksDbReader db = new MassRocksDbReader(dbDir + "rocksdb_mass.db");
         db.open();
 
         AccessionDbReader accessionDbReader = new AccessionDbReader(dbDir + "custom_accession.db");
 
 
-        List<Double> sheepMasses = getMassesSheep("/media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt");
+        String pathSheep = "/media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt";
+        pathSheep = "'/Users/tag/PBF radovi/digestedproteindb'/Trypsin_HTXdigest_sheep_butorka.txt";
+        List<Double> sheepMasses = getMassesSheep(pathSheep);
         log.debug("Sheep masses: " + sheepMasses.size());
         ProteinScorer scorer = new ProteinScorer();
 
@@ -33,7 +36,17 @@ public class SearchSheep {
         for (Double mass : sheepMasses) {
             double mass1 = mass - 0.02;
             double mass2 = mass + 0.02;
+
+            PeptideMS1Search peptideMS1Search = new PeptideMS1Search(db, accessionDbReader, mass1, mass2, PTM.CARBAMIDOMETHYL, PTM.OXIDATION, PTM.DEAMIDATION, PTM.PHOSPHORYLATION);
+            List<PeptideMS1Search.PtmSearchResult> res = peptideMS1Search.search();
+            String filePath = "/Users/tag/peptides_sheep.csv";
+            peptideMS1Search.saveToFile(filePath, res);
+            System.out.println("Save to file: " + filePath);
+            if(true) return; // For testing, remove this line to process all masses
+
+
             List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMassPaginated(mass1, mass2);
+
             //log.debug("Mass: " + mass + " found peptides: " + peptides.size());
             //  System.out.println("Mass: " + mass + " found peptides: " + peptides.size());
 

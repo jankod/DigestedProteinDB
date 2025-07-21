@@ -116,7 +116,7 @@ include_once 'lib.php';
     </div>
 </div>
 
-<div class="row mt-4 mb-4" x-show="results && totalPages > 0">
+<div class="row mt-4 mb-4" x-show="ptmSearchResults && totalPages > 0">
     <div class="col">
         <div class="card shadow-sm">
             <div class="card-body">
@@ -164,7 +164,7 @@ include_once 'lib.php';
     <div class="row">
         <div class="col">
             <div class="badge bg-success text-white">
-                <span>Total: <span x-text="totalItems"></span> results</span>
+                <span>Total: <span x-text="totalItems"></span> ptmSearchResults</span>
             </div>
             <div class="badge bg-success text-white">
                 <div>Response JSON Size: <span x-text="responseSize"></span></div>
@@ -177,11 +177,11 @@ include_once 'lib.php';
     <div class="col">
         <h2>Results</h2>
         <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
-        <!--            <pre x-text="results"></pre>-->
+        <!--            <pre x-text="ptmSearchResults"></pre>-->
 
 
-        <!-- Table for displaying results instead of raw JSON -->
-        <div x-show="results && parsedResults.length > 0" class="table-responsive">
+        <!-- Table for displaying ptmSearchResults instead of raw JSON -->
+        <div x-show="ptmSearchResults && parsedResults.length > 0" class="table-responsive">
             <table class="table  table-hover">
                 <thead>
                 <tr>
@@ -233,7 +233,7 @@ include_once 'lib.php';
         </div>
 
         <div class="alert alert-info" x-show="parsedResults && parsedResults.length === 0">
-            No results found for the search criteria.
+            No ptmSearchResults found for the search criteria.
         </div>
 
 
@@ -287,7 +287,7 @@ include_once 'lib.php';
 
             mass1: 1500.6,
             mass2: 1500.8,
-            results: null,
+            ptmSearchResults: null,
             error: "",
             loading: false,
             dbInfo: {},
@@ -473,7 +473,7 @@ include_once 'lib.php';
                     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
 
                     if (typeof data === 'string') {
-                        this.results = data;
+                        this.ptmSearchResults = data;
                         this.loading = false;
                         this.error = data;
                         return;
@@ -484,14 +484,14 @@ include_once 'lib.php';
 //                    const memoryUsage = data.memory;
 //                    const duration = data.duration;
 
-                    this.results = JSON.stringify(data, null, 2);
+                    this.ptmSearchResults = JSON.stringify(data, null, 2);
                 } catch (error) {
                     console.error('Error:', error);
-                    this.results = `Error: ${error.message}`;
+                    this.ptmSearchResults = `Error: ${error.message}`;
                     this.error = error.message;
 
                     this.totalPages = 0;
-                    this.results = [];
+                    this.ptmSearchResults = [];
                 } finally {
                     this.loading = false;
                 }

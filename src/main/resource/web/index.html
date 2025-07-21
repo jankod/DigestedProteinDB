@@ -57,7 +57,7 @@
             <h2>Results</h2>
             <div class="alert alert-danger" role="alert" x-text="error" x-show="error" style="display: none;"></div>
 
-            <pre x-text="results"></pre>
+            <pre x-text="ptmSearchResults"></pre>
 
         </div>
     </div>
@@ -70,7 +70,7 @@
         return {
             mass1: "1500.6",
             mass2: "1500.8",
-            results: "",
+            ptmSearchResults: "",
             error: "",
             loading: false,
             dbInfo: {},
@@ -96,15 +96,15 @@
                         const errorMessage = await response.text(); // Read error from response
                         throw new Error(`Server error: ${errorMessage}`);
                     }
-                    this.results = await response.json();
-                    this.results = JSON.stringify(this.results, null, 2);
+                    this.ptmSearchResults = await response.json();
+                    this.ptmSearchResults = JSON.stringify(this.ptmSearchResults, null, 2);
                 } catch (error) {
                     console.error('Error:', error);
-                    this.results = `Error: ${error.message}`;
+                    this.ptmSearchResults = `Error: ${error.message}`;
                     this.error = error.message;
 
 
-                    this.results = [];
+                    this.ptmSearchResults = [];
                 } finally {
                     this.loading = false;
                 }

@@ -12,10 +12,10 @@ response = requests.get(url)
 if response.status_code == 200:
     data = response.json()
     pprint(data)
-    # Parse the results
-    results = data.get('result', [])
+    # Parse the ptmSearchResults
+    ptmSearchResults = data.get('result', [])
     parsed_results = []
-    for item in results:
+    for item in ptmSearchResults:
         for mass, sequences in item.items():
             for seq_info in sequences:
                 parsed_results.append({
@@ -23,7 +23,7 @@ if response.status_code == 200:
                     'seq': seq_info['seq'],
                     'accsTax': seq_info['accsTax']
                 })
-    # Print parsed results
+    # Print parsed ptmSearchResults
     for result in parsed_results:
         print(f"Mass: {result['mass']}, Seq: {result['seq']}, AccsTax: {result['accsTax']}")
 else:
