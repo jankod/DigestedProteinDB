@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 
 
@@ -47,7 +46,7 @@ public class PeptideMS1Search {
             double deltaMass = ptm.getDeltaMass();
             double adjustedMass1 = mass1 - deltaMass;
             double adjustedMass2 = mass2 - deltaMass;
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMassPaginated(adjustedMass1, adjustedMass2);
+            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMass(adjustedMass1, adjustedMass2);
 
             for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> entry : peptides) {
 

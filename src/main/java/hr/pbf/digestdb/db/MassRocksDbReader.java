@@ -30,7 +30,7 @@ public class MassRocksDbReader implements AutoCloseable {
         }
     }
 
-    public MassPageResult searchByMassPaginated(double mass1, double mass2, int page, int pageSize) {
+    public MassPageResult searchByMass(double mass1, double mass2, int page, int pageSize) {
 
         List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results = new ArrayList<>();
         int mass1Int = MyUtil.toInt(mass1); //(int) Math.round(mass1 * 10_000);
@@ -65,7 +65,7 @@ public class MassRocksDbReader implements AutoCloseable {
         return new MassPageResult(totalCount, results);
     }
 
-    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> searchByMassPaginated(double mass1, double mass2) {
+    public List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> searchByMass(double mass1, double mass2) {
         List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> results = new ArrayList<>();
         int mass1Int = (int) Math.round(mass1 * 10_000);
 

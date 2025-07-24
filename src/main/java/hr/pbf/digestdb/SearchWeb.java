@@ -118,7 +118,7 @@ public class SearchWeb {
 
 
             MyStopWatch watch = new MyStopWatch();
-            MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
+            MassRocksDbReader.MassPageResult result = massDb.searchByMass(mass1, mass2, page, pageSize);
             long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
             String memory = l / 1024 / 1024 + " MB";
             PageResult pageResult = new PageResult(result.getTotalCount(), toAccession(result.getResults()), memory, watch.getCurrentDuration(), page, pageSize);
@@ -261,7 +261,7 @@ public class SearchWeb {
 
     synchronized private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
         MyStopWatch watch = new MyStopWatch();
-        MassRocksDbReader.MassPageResult result = massDb.searchByMassPaginated(mass1, mass2, page, pageSize);
+        MassRocksDbReader.MassPageResult result = massDb.searchByMass(mass1, mass2, page, pageSize);
         long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
         String memory = l / 1024 / 1024 + " MB";
         PageResult pageResult = new PageResult(result.getTotalCount(), toAccession(result.getResults()), memory, watch.getCurrentDuration(), page, pageSize);

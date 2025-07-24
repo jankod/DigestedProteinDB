@@ -45,21 +45,21 @@ public class BioUtil {
     public static final double H2O = 18.0105646D;
 
     public BufferedReader newFileReader(String path, String charset, int bufSize)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
         if (charset == null) {
             charset = "ASCII";
         }
         return new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset),
-                bufSize);
+              bufSize);
     }
 
     public BufferedReader newFileReader(String path, String charset)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
         return newFileReader(path, charset, 8192);
     }
 
     public BufferedWriter newFileWiter(String path, String charset)
-            throws UnsupportedEncodingException, FileNotFoundException {
+          throws UnsupportedEncodingException, FileNotFoundException {
 
         if (charset == null) {
             charset = "ASCII";
@@ -68,13 +68,13 @@ public class BioUtil {
 
 
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
-                BUFFER);
+              BUFFER);
     }
 
     public DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
         return new DataOutputStream(
-                new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
+              new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
     }
 
     public DataInputStream newDataInputStreamCompressed(String path) throws IOException {
@@ -218,7 +218,7 @@ public class BioUtil {
         List<String> peptides = new ArrayList<>();
         int n = prot.length();
 
-        List<Integer> extendedSites = new ArrayList<>(sites.size()+2);
+        List<Integer> extendedSites = new ArrayList<>(sites.size() + 2);
         extendedSites.add(0);
         extendedSites.addAll(sites);
         extendedSites.add(n);
@@ -244,9 +244,65 @@ public class BioUtil {
 
     }
 
+    /**
+     * Fast method for trypsin cleaving with 2 miss cleavage. Cleaves after R or K if next is not P. All chars must be upper case!
+     *
+     * @param prot protein sequence
+     * @param min  minimal length of peptide
+     * @param max  maximal length of peptide
+     * @return list of peptides
+     */
+    public List<String> tripsyn2mc(String prot, int min, int max) {
+        if (prot.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        final int numberOfRandK = StringUtils.countMatches(prot, "R") + StringUtils.countMatches(prot, "K");
+        if (numberOfRandK == 0) {
+            List<String> result = new ArrayList<>(1);
+            if (prot.length() >= min && prot.length() <= max)
+                result.add(prot);
+            return result;
+        }
+
+        // Pre-calculate cleavage sites
+        List<Integer> sites = new ArrayList<>(numberOfRandK + 2);
+        sites.add(0); // Start position
+
+        for (int i = 0; i < prot.length(); i++) {
+            final char charAt = prot.charAt(i);
+            if (charAt == 'R' || charAt == 'K') {
+                if (i + 1 < prot.length() && prot.charAt(i + 1) == 'P') {
+                    continue; // Skip if next amino acid is P
+                }
+                sites.add(i + 1); // Position after cleavage site
+            }
+        }
+
+        // Only add end position if it's different from the last cleavage site
+        if (sites.get(sites.size() - 1) != prot.length()) {
+            sites.add(prot.length()); // End position
+        }
+
+        List<String> result = new ArrayList<>(numberOfRandK * 6); // Estimate capacity
+
+        // Generate peptides with 0, 1, and 2 missed cleavages
+        for (int mc = 0; mc <= 2; mc++) {
+            for (int i = 0; i < sites.size() - 1 - mc; i++) {
+                int start = sites.get(i);
+                int end = sites.get(i + 1 + mc);
+
+                if (end > start && end - start >= min && end - start <= max) {
+                    result.add(prot.substring(start, end));
+                }
+            }
+        }
+
+        return result;
+    }
 
     /**
-     * Fast method for trypsin cleaving with 1 miss clevage. Cleaves after R or K if next. All chars must be upper case!
+     * Fast method for trypsin cleaving with 1 miss cleavage. Cleaves after R or K if next is not P. All chars must be upper case!
      *
      * @param prot protein sequence
      * @param min  minimal length of peptide
@@ -254,67 +310,51 @@ public class BioUtil {
      * @return list of peptides
      */
     public List<String> tripsyn1mc(String prot, int min, int max) {
+        if (prot.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         final int numberOfRandK = StringUtils.countMatches(prot, "R") + StringUtils.countMatches(prot, "K");
         if (numberOfRandK == 0) {
-            List<String> result = new ArrayList<String>(1);
+            List<String> result = new ArrayList<>(1);
             if (prot.length() >= min && prot.length() <= max)
                 result.add(prot);
             return result;
         }
-        List<String> result = new ArrayList<String>(numberOfRandK * 3 + 2);
 
-        if (prot.length() < min) {
-            return result;
-        }
-
-        String lastChunk = null;
-        int lastPos = 0;
+        // Pre-calculate cleavage sites
+        List<Integer> sites = new ArrayList<>(numberOfRandK + 2);
+        sites.add(0); // Start position
 
         for (int i = 0; i < prot.length(); i++) {
             final char charAt = prot.charAt(i);
-
             if (charAt == 'R' || charAt == 'K') {
-                if (prot.length() > i + 1) {
-                    final char nextChar = prot.charAt(i + 1);
-                    if (nextChar == 'P') {
-                        continue;
-                    }
+                if (i + 1 < prot.length() && prot.charAt(i + 1) == 'P') {
+                    continue; // Skip if next amino acid is P
                 }
-
-                final String chunk = prot.substring(lastPos, i + 1);
-                if (chunk.length() >= min && chunk.length() <= max) {
-                    result.add(chunk);
-                }
-                lastPos = i + 1;
-                if (lastChunk != null) {
-                    int size = lastChunk.length() + chunk.length();
-                    if (size >= min && size <= max)
-                        result.add(lastChunk + chunk);
-                }
-
-                lastChunk = chunk;
+                sites.add(i + 1); // Position after cleavage site
             }
-
         }
 
-        // add last chunk
-        if (lastPos < prot.length()) {
-            final String residue = prot.substring(lastPos);
-            if (lastChunk != null) {
-                String n = lastChunk + residue;
-                if (n.length() >= min && n.length() <= max) {
-                    result.add(n);
-                }
-                if (residue.length() >= min && residue.length() <= max) {
-                    result.add(residue);
-                }
+        // Only add end position if it's different from the last cleavage site
+        if (sites.get(sites.size() - 1) != prot.length()) {
+            sites.add(prot.length()); // End position
+        }
 
-            } else {
-                if (residue.length() <= max) {
-                    result.add(residue);
+        List<String> result = new ArrayList<>(numberOfRandK * 4); // Estimate capacity
+
+        // Generate peptides with 0 and 1 missed cleavages
+        for (int mc = 0; mc <= 1; mc++) {
+            for (int i = 0; i < sites.size() - 1 - mc; i++) {
+                int start = sites.get(i);
+                int end = sites.get(i + 1 + mc);
+
+                if (end > start && end - start >= min && end - start <= max) {
+                    result.add(prot.substring(start, end));
                 }
             }
         }
+
         return result;
     }
 

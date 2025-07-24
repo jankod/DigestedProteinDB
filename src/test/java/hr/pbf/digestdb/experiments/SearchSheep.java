@@ -24,7 +24,6 @@ public class SearchSheep {
         String pathSheep = "/media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt";
         pathSheep = "'/Users/tag/PBF radovi/digestedproteindb'/Trypsin_HTXdigest_sheep_butorka.txt";
 
-
         String pathToNodesDmp = "/home/tag/IdeaProjects/DigestedProteinDB/misc/ncbi/taxdump/nodes.dmp";
 
         MassRocksDbReader db = new MassRocksDbReader(dbDir + "rocksdb_mass.db");
@@ -52,7 +51,7 @@ public class SearchSheep {
                 if (true) return; // For testing, remove this line to process all masses
             }
 
-            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMassPaginated(mass1, mass2);
+            List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMass(mass1, mass2);
 
             //log.debug("Mass: " + mass + " found peptides: " + peptides.size());
             //  System.out.println("Mass: " + mass + " found peptides: " + peptides.size());
