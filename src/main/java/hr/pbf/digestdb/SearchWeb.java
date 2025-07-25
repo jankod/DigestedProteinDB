@@ -137,10 +137,10 @@ public class SearchWeb {
         }
     }
 
-    private PageResultTax toTaxonomy(PageResult pageResult) {
+    private PageResultTax toTaxonomy(PageResult pageResult) throws IOException {
         if (accTaxDb == null) {
             accTaxDb = new AccTaxDB();
-            accTaxDb.readFromDiskByte(dbAccTaxPath);
+            accTaxDb.loadFromDisk(dbAccTaxPath);
             log.debug("Taxonomy read from disk: {}", accTaxDb);
         }
 
@@ -160,7 +160,8 @@ public class SearchWeb {
                 for (String accText : acc.getAcc()) {
                     AccTaxs accTaxs = new AccTaxs();
                     accTaxs.setAcc(accText);
-                    accTaxs.setTaxIds(accTaxDb.getTaxonomyIds(accText));
+                    //accTaxs.setTaxIds(accTaxDb.getTaxonomyIds(accText));
+                    accTaxs.setTaxId(accTaxDb.getTaxonomyId(accText));
                     accsTaxs.add(accTaxs);
                 }
                 accTax.setAccsTax(accsTaxs);
@@ -310,7 +311,7 @@ public class SearchWeb {
     @Data
     static class AccTaxs {
         String acc;
-        List<Integer> taxIds = new ArrayList<>();
+        int taxId;
     }
 
     @Data

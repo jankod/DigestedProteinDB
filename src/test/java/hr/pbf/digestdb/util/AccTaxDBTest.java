@@ -17,7 +17,7 @@ class AccTaxDBTest {
 
         accTaxDB.writeToDisk(dbPath);
 
-        accTaxDB.readFromDiskByte(dbPath);
+        accTaxDB.loadFromDisk(dbPath);
 
         System.out.println("Read accession to taxonomy ID map from disk with size: " + accTaxDB.size());
 

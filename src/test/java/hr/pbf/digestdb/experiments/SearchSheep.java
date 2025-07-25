@@ -12,12 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
 public class SearchSheep {
 
-    public static void main(String[] args) throws RocksDBException, NcbiTaxonomyException {
+    public static void main(String[] args) throws RocksDBException, NcbiTaxonomyException, IOException {
         String dbDir = "/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep2/";
         dbDir = "/Users/tag/PBF radovi/digestedproteindb/sheep/rocksdb_mass.db"; // For testing on local machine
 
@@ -30,7 +31,6 @@ public class SearchSheep {
         db.open();
 
         AccessionDbReader accessionDbReader = new AccessionDbReader(dbDir + "custom_accession.db");
-
 
 
         List<Double> sheepMasses = getMassesSheep(pathSheep);
@@ -87,7 +87,7 @@ public class SearchSheep {
         NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
 
         AccTaxDB accessionTaxDb = new AccTaxDB();
-        accessionTaxDb.readFromDiskCsv(dbDir + "gen/acc_taxids.csv");
+        accessionTaxDb.loadFromDisk(dbDir + "gen/acc_taxids.csv");
 
         Map<Integer, List<ProteinResult>> taxIdToProteins = new HashMap<>();
 
@@ -96,11 +96,9 @@ public class SearchSheep {
         for (Map.Entry<String, Integer> entry : ranked) {
             String accession = entry.getKey();
             int peptideCount = entry.getValue();
-            List<Integer> taxonomyIds = accessionTaxDb.getTaxonomyIds(accession);
-            for (Integer taxonomyId : taxonomyIds) {
-                taxIdToProteins.computeIfAbsent(taxonomyId, k -> new ArrayList<>())
-                      .add(new ProteinResult(accession, peptideCount, taxonomyId));
-            }
+            int taxonomyId = accessionTaxDb.getTaxonomyId(accession);
+            taxIdToProteins.computeIfAbsent(taxonomyId, k -> new ArrayList<>())
+                  .add(new ProteinResult(accession, peptideCount, taxonomyId));
         }
 
 

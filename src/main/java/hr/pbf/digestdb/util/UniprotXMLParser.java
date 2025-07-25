@@ -126,9 +126,8 @@ public class UniprotXMLParser {
                                     if (isOrganism && "NCBI Taxonomy".equals(reader.getAttributeValue(null, "type"))) {
                                         try {
                                             String taxId = reader.getAttributeValue(null, "id");
-//                                            System.out.println("taxonomyId " + taxId);
-                                            // proteinInfo.setTaxonomyId(Integer.parseInt(reader.getAttributeValue(null, "id")));
-                                            proteinInfo.addTaxonomyId(Integer.parseInt(taxId));
+                                             proteinInfo.setTaxonomyId(Integer.parseInt(taxId));
+                                            //proteinInfo.addTaxonomyId(Integer.parseInt(taxId));
                                         } catch (NumberFormatException e) {
                                             //proteinInfo.setTaxonomyId(-1);
                                             log.error("Error parsing taxonomyId", e);
@@ -193,15 +192,16 @@ public class UniprotXMLParser {
     public class ProteinInfo {
         String accession;
         String proteinName;
-        List<Integer> taxonomyIds = new ArrayList<>(6);
+       // List<Integer> taxonomyIds = new ArrayList<>(6);
+        int taxonomyId = -1;
         int divisionId = -1;
 
         @ToString.Exclude
         String sequence;
 
-        public void addTaxonomyId(int taxId) {
-            taxonomyIds.add(taxId);
-        }
+        //public void addTaxonomyId(int taxId) {
+         //   taxonomyIds.add(taxId);
+       // }
     }
 
 }

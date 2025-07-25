@@ -37,13 +37,9 @@ public class TaxPeptideCalculator {
                   List<String> peptides = BioUtil.tripsyn2mc(p.getSequence(), 6, 50);
                   for (String peptide : peptides) {
 
-                        for (int taxId : p.getTaxonomyIds()) {
-                            if (taxIdPeptideCount.containsKey(taxId)) {
-                                taxIdPeptideCount.put(taxId, taxIdPeptideCount.get(taxId) + 1);
-                            } else {
-                                taxIdPeptideCount.put(taxId, 1);
-                            }
-                        }
+
+
+
                   }
 
               }
