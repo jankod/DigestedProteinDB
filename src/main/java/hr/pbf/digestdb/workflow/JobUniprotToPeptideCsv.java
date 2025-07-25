@@ -6,13 +6,15 @@ import hr.pbf.digestdb.model.Enzyme;
 import hr.pbf.digestdb.model.TaxonomyDivision;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,6 +32,8 @@ public class JobUniprotToPeptideCsv {
     public String resultAccTaxCsvPath = "";
 
     public String fromSwisprotPath = "";
+    public String ncbiTaxonomyPath = null;
+
 
     public long maxProteinCount = Long.MAX_VALUE - 1;
     public int minPeptideLength = 0;
@@ -38,7 +42,6 @@ public class JobUniprotToPeptideCsv {
     private Enzyme enzyme;
 
     public int[] taxonomyParentsIds;
-    public String ncbiTaxonomyPath = null;
 
     private TaxonomyDivision taxonomyDivision = TaxonomyDivision.ALL;
 
@@ -79,6 +82,8 @@ public class JobUniprotToPeptideCsv {
         LongCounter proteinCount = new LongCounter();
         LongCounter peptideCount = new LongCounter();
 
+        Int2IntOpenHashMap taxIdPeptideCount = new Int2IntOpenHashMap();
+
         Charset standardCharset = StandardCharsets.UTF_8;
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16);
              BufferedOutputStream outTaxonomy = new BufferedOutputStream(new FileOutputStream(resultAccTaxCsvPath), 4 * 1024 * 16)) {
@@ -87,6 +92,11 @@ public class JobUniprotToPeptideCsv {
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
+
+                    int taxonomyId = p.getTaxonomyId();
+
+                    taxIdPeptideCount.addTo(taxonomyId, 1);
+
                     if (stopped) {
                         return;
                     }
@@ -146,11 +156,40 @@ public class JobUniprotToPeptideCsv {
             });
         }
 
+        saveTaxIdPeptideCount(taxIdPeptideCount);
+
         Result result = new Result();
         result.setPeptideCount(peptideCount.get());
         result.setProteinCount(proteinCount.get());
 
         return result;
+    }
+
+    private void saveTaxIdPeptideCount(Int2IntOpenHashMap taxIdPeptideCount) throws IOException {
+        // replace path resultAccTaxCsvPath only last file name with "taxId_peptide_count.csv" with FileUtils class
+        String taxIdPeptideCountPath = FileUtils.getFile(resultAccTaxCsvPath).
+                                             getParentFile().getAbsolutePath() + "/taxId_peptide_count.csv";
+
+        boolean fistLine = true;
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(taxIdPeptideCountPath), StandardCharsets.UTF_8))) {
+            for (Int2IntMap.Entry entry : taxIdPeptideCount.int2IntEntrySet()) {
+                if (fistLine) {
+                    writer.write("Taxonomy ID,Peptide Count\n");
+                    fistLine = false;
+                } else {
+                    writer.write('\n');
+                }
+
+                writer.write(String.valueOf(entry.getIntKey()));
+                writer.write(',');
+                writer.write(String.valueOf(entry.getIntValue()));
+
+            }
+            log.info("Taxonomy ID => peptide count saved to: {}", taxIdPeptideCountPath);
+        } catch (IOException e) {
+            log.error("Error saving taxonomy ID peptide count to file: {}", taxIdPeptideCountPath, e);
+            throw e;
+        }
     }
 
     private void writeToDebug(UniprotXMLParser.ProteinInfo p) {
