@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -80,6 +81,10 @@ public class JobUniprotToPeptideCsv {
         UniprotXMLParser parser = new UniprotXMLParser();
 
         LongCounter proteinCount = new LongCounter();
+
+        /*
+         * Non-unique peptide count, so it can be more than protein count.
+         */
         LongCounter peptideCount = new LongCounter();
 
         Int2IntOpenHashMap taxIdPeptideCount = new Int2IntOpenHashMap();
@@ -93,9 +98,9 @@ public class JobUniprotToPeptideCsv {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
 
-                    int taxonomyId = p.getTaxonomyId();
 
-                    taxIdPeptideCount.addTo(taxonomyId, 1);
+
+
 
                     if (stopped) {
                         return;
@@ -128,7 +133,7 @@ public class JobUniprotToPeptideCsv {
 //                    writeToDebug(p);
 
                     proteinCount.increment();
-                    saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
+                   // saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
                     List<String> peptides;
                     peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
@@ -137,6 +142,10 @@ public class JobUniprotToPeptideCsv {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
                             return;
                         }
+                        taxIdPeptideCount.addTo(p.getTaxonomyId(), 1);
+                        if(true)
+                            return;
+
                         peptideCount.increment();
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
                         double mass4 = MyUtil.roundTo4(mass);
@@ -145,8 +154,8 @@ public class JobUniprotToPeptideCsv {
                             out.write(row.getBytes(standardCharset));
                             counter++;
 
-                            if (counter % 5_000_000 == 0) {
-                                log.debug("Current protein count: {}", counter);
+                            if (counter % 100_000_000 == 0) {
+                                log.debug("Current protein count: {}", NumberFormat.getInstance().format(counter));
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -162,7 +171,9 @@ public class JobUniprotToPeptideCsv {
         result.setPeptideCount(peptideCount.get());
         result.setProteinCount(proteinCount.get());
 
-        return result;
+        System.exit(1);
+        throw new RuntimeException("JobUniprotToPeptideCsv is not finished yet, please implement it.");
+       // return result;
     }
 
     private void saveTaxIdPeptideCount(Int2IntOpenHashMap taxIdPeptideCount) throws IOException {
