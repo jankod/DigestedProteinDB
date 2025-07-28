@@ -21,8 +21,8 @@ class NcbiTaksonomyRelationsTereticalTest {
         assertNotNull(resource, "Test file not found!");
         pathToCsv = new File(resource.getFile()).getAbsolutePath();
         taxonomy =  NcbiTaksonomyRelations.loadTaxonomyNodes(pathToCsv);
-        assertNotNull(taxonomy.getChildParrents());
-        assertFalse(taxonomy.getChildParrents().isEmpty(), "Taxonomy should not be empty");
+        assertNotNull(taxonomy.getChildParrentsMap());
+        assertFalse(taxonomy.getChildParrentsMap().isEmpty(), "Taxonomy should not be empty");
     }
 
     @Test
