@@ -1,19 +1,15 @@
 package hr.pbf.digestdb.util;
 
-import com.fasterxml.jackson.core.Base64Variant;
 import lombok.Data;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 @Slf4j
@@ -27,7 +23,7 @@ public class UniprotXMLParser {
 
         public boolean stopped = false;
 
-        public long counter = 0;
+        public long proteinCounter = 0;
 
         public abstract void gotProtein(ProteinInfo p) throws IOException;
     }
@@ -169,7 +165,7 @@ public class UniprotXMLParser {
                         switch (reader.getLocalName()) {
                             case "entry":
                                 if (proteinInfo != null) {
-                                    proteinHandler.counter++;
+                                    proteinHandler.proteinCounter++;
                                     totalCount++;
                                     proteinHandler.gotProtein(proteinInfo);
                                 }

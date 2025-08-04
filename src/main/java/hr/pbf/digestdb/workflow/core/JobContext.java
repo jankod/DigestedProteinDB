@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
-public class JobWorkflowContext {
+public class JobContext {
 
-	public JobWorkflowContext() {
+	public JobContext() {
 
 	}
 

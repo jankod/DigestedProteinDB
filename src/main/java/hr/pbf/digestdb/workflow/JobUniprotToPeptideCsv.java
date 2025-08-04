@@ -6,7 +6,6 @@ import hr.pbf.digestdb.model.Enzyme;
 import hr.pbf.digestdb.model.TaxonomyDivision;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
-import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Data;
@@ -81,7 +80,7 @@ public class JobUniprotToPeptideCsv {
         UniprotXMLParser parser = new UniprotXMLParser();
 
 
-        LongCounter proteinCount = new LongCounter();
+        LongCounter proteinCounterParent = new LongCounter();
 
         /*
          * Non-unique peptide count, so it can be more than protein count.
@@ -102,7 +101,7 @@ public class JobUniprotToPeptideCsv {
                     if (super.stopped) {
                         return;
                     }
-                    if (super.counter > maxProteinCount) {
+                    if (super.proteinCounter > maxProteinCount) {
                         stopped = true;
                         log.info("Finish read proteins, max protein count reached: {}", maxProteinCount);
                         return;
@@ -129,11 +128,16 @@ public class JobUniprotToPeptideCsv {
                     }
 //                    writeToDebug(p);
 
-                    proteinCount.increment();
+                    //proteinCount.increment();
                     saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
                     List<String> peptides;
                     peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
+
+                    if (proteinCounter % 100_000_000 == 0) {
+                        log.debug("Current protein count: {}", NumberFormat.getInstance().format(proteinCounter));
+                    }
+                    proteinCounterParent.increment();
 
                     peptides.forEach(peptide -> {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
@@ -148,9 +152,7 @@ public class JobUniprotToPeptideCsv {
                         try {
                             out.write(row.getBytes(standardCharset));
 
-                            if (counter % 100_000_000 == 0) {
-                                log.debug("Current protein count: {}", NumberFormat.getInstance().format(counter));
-                            }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -163,7 +165,7 @@ public class JobUniprotToPeptideCsv {
 
         Result result = new Result();
         result.setPeptideCount(peptideCount.get());
-        result.setProteinCount(proteinCount.get());
+        result.setProteinCount(proteinCounterParent.get());
 
         return result;
     }
@@ -171,6 +173,7 @@ public class JobUniprotToPeptideCsv {
 
     /**
      * Statistics: save taxonomy ID and peptide count to CSV file.
+     *
      * @param taxIdPeptideCount
      * @throws IOException
      */

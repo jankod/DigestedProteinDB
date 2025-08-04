@@ -3,10 +3,11 @@ package hr.pbf.digestdb.workflow.core;
 /**
  * Job interface.
  *
- * @param <R> result type
  */
-public interface Job<R> {
+public interface Job {
 
-    R start(JobWorkflowContext context) throws Exception;
+    void run(JobContext context) throws Exception;
+
+
 
 }
