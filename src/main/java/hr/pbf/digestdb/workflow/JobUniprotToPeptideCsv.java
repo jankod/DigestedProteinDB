@@ -98,10 +98,6 @@ public class JobUniprotToPeptideCsv {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
 
-
-
-
-
                     if (stopped) {
                         return;
                     }

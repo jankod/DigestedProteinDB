@@ -86,8 +86,7 @@ public class SearchSheep {
 
         NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
 
-        AccTaxDB accessionTaxDb = new AccTaxDB();
-        accessionTaxDb.loadFromDisk(dbDir + "gen/acc_taxids.csv");
+        AccTaxDB accessionTaxDb = AccTaxDB.loadFromDisk(dbDir + "gen/acc_taxids.csv");
 
         Map<Integer, List<ProteinResult>> taxIdToProteins = new HashMap<>();
 

@@ -20,6 +20,8 @@ import java.util.zip.GZIPInputStream;
 @Getter
 public class UniprotXMLParser {
 
+    private static final int BUFFER_SIZE = 1024 * 1024 * 8; // 8 MB
+
     @Data
     public abstract static class ProteinHandler {
 
@@ -88,9 +90,8 @@ public class UniprotXMLParser {
         factory.setProperty(XMLInputFactory.IS_COALESCING, true);
         XMLStreamReader reader;
 
-        try (InputStream inputStream = filePath.endsWith(".gz") ? new GZIPInputStream(new FileInputStream(filePath), 65536 * 2) : new FileInputStream(filePath)) {
+        try (InputStream inputStream = filePath.endsWith(".gz") ? new GZIPInputStream(new FileInputStream(filePath), BUFFER_SIZE) : new FileInputStream(filePath)) {
             reader = factory.createXMLStreamReader(inputStream);
-
 
             while (reader.hasNext()) {
                 int event = reader.next();

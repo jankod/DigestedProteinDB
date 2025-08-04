@@ -2,15 +2,10 @@ package hr.pbf.digestdb.util;
 
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 
 /**
@@ -23,9 +18,14 @@ public class AccTaxDB {
     // Acc => TaxId
     private Long2IntMap db;
 
-    public void createEmptyDb() {
-        this.db = new Long2IntOpenHashMap();
-        this.db.defaultReturnValue(-1); // Default value for non-existing keys
+    private AccTaxDB() {
+    }
+
+    public static AccTaxDB createEmptyDb() {
+        AccTaxDB accTaxDB = new AccTaxDB();
+        accTaxDB.db = new Long2IntOpenHashMap();
+        accTaxDB.db.defaultReturnValue(-1); // Default value for non-existing keys
+        return accTaxDB;
     }
 
     public void addAccessionTaxId(long accession, int taxId) {
@@ -74,12 +74,12 @@ public class AccTaxDB {
 
     }
 
-    public void writeToDisk(String path) {
+    public void writeToDisk(String pathCsv) {
         if (db == null) {
             throw new IllegalStateException("Database is not initialized. Call createDb() first.");
         }
         // write to CSV
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathCsv))) {
             db.forEach((keyAcc, valueTaxId) -> {
                 try {
                     writer.write(keyAcc + "," + valueTaxId);
@@ -89,14 +89,15 @@ public class AccTaxDB {
                 }
             });
         } catch (IOException e) {
-            throw new RuntimeException("Failed to write to disk: " + path, e);
+            throw new RuntimeException("Failed to write to disk: " + pathCsv, e);
         }
 
     }
 
-    public void loadFromDisk(String path) throws IOException {
-        db = new Long2IntOpenHashMap();
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+    public static AccTaxDB loadFromDisk(String pathCsv) throws IOException {
+        AccTaxDB accTaxDB = new AccTaxDB();
+        accTaxDB.db = new Long2IntOpenHashMap();
+        try (BufferedReader reader = new BufferedReader(new FileReader(pathCsv))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -107,13 +108,14 @@ public class AccTaxDB {
                 try {
                     long acc = Long.parseLong(parts[0]);
                     int taxId = Integer.parseInt(parts[1]);
-                    db.put(acc, taxId);
+                    accTaxDB.db.put(acc, taxId);
                 } catch (NumberFormatException e) {
                     log.warn("Error parsing line: {}", line, e);
                 }
             }
         }
-        log.info("Loaded {} entries from {}", db.size(), path);
+        log.info("Loaded {} entries from {}", accTaxDB.db.size(), pathCsv);
+        return accTaxDB;
     }
 
 

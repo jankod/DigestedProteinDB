@@ -71,6 +71,7 @@ public class CreateDatabase {
 	public void start() throws Exception {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
+	//	steps = List.of(3, 4, 5, 6, 7); // for biopro
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
