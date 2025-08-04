@@ -6,16 +6,18 @@ import hr.pbf.digestdb.model.Enzyme;
 import hr.pbf.digestdb.model.TaxonomyDivision;
 import hr.pbf.digestdb.util.*;
 import hr.pbf.digestdb.util.UniprotXMLParser.ProteinHandler;
+import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -28,9 +30,11 @@ public class JobUniprotToPeptideCsv {
 
     public String resultPeptideMassAccCsvPath = "";
 
-    public String resultTaxAccCsvPath = "";
+    public String resultAccTaxCsvPath = "";
 
     public String fromSwisprotPath = "";
+    public String ncbiTaxonomyPath = null;
+
 
     public long maxProteinCount = Long.MAX_VALUE - 1;
     public int minPeptideLength = 0;
@@ -39,7 +43,6 @@ public class JobUniprotToPeptideCsv {
     private Enzyme enzyme;
 
     public int[] taxonomyParentsIds;
-    public String ncbiTaxonomyPath = null;
 
     private TaxonomyDivision taxonomyDivision = TaxonomyDivision.ALL;
 
@@ -47,15 +50,14 @@ public class JobUniprotToPeptideCsv {
     public static class Result {
         long proteinCount;
         long peptideCount;
-
     }
 
     public Result start() throws Exception {
         ValidatateUtil.fileMustExist(fromSwisprotPath);
         ValidatateUtil.fileMustNotExist(resultPeptideMassAccCsvPath);
 
-        if (missedClevage != 1) {
-            throw new ValidationException("Miss clevage must be 1 curently.");
+        if (missedClevage != 1 && missedClevage != 2) {
+            throw new ValidationException("Miss clevage must be 1 or 2 curently.");
         }
         if (minPeptideLength < 1 || minPeptideLength > maxPeptideLength) {
             throw new ValidationException("minPeptideLength must be > 0 and minPeptideLength < maxPeptideLength. minPeptideLength: "
@@ -76,20 +78,26 @@ public class JobUniprotToPeptideCsv {
             }
         }
 
-
         UniprotXMLParser parser = new UniprotXMLParser();
 
         LongCounter proteinCount = new LongCounter();
+
+        /*
+         * Non-unique peptide count, so it can be more than protein count.
+         */
         LongCounter peptideCount = new LongCounter();
+
+        Int2IntOpenHashMap taxIdPeptideCount = new Int2IntOpenHashMap();
 
         Charset standardCharset = StandardCharsets.UTF_8;
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(resultPeptideMassAccCsvPath), 8 * 1024 * 16);
-             BufferedOutputStream outTaxonomy = new BufferedOutputStream(new FileOutputStream(resultTaxAccCsvPath), 4 * 1024 * 16)) {
+             BufferedOutputStream outTaxonomy = new BufferedOutputStream(new FileOutputStream(resultAccTaxCsvPath), 4 * 1024 * 16)) {
 
             NcbiTaksonomyRelations finalNcbiTaksonomyRelations = ncbiTaksonomyRelations;
             parser.parseProteinsFromXMLstream(fromSwisprotPath, new ProteinHandler() {
                 @Override
                 public void gotProtein(UniprotXMLParser.ProteinInfo p) {
+
                     if (stopped) {
                         return;
                     }
@@ -104,20 +112,15 @@ public class JobUniprotToPeptideCsv {
                         }
                     }
 
-
                     if (finalNcbiTaksonomyRelations != null) {
                         boolean hasParent = false;
 
                         for (int parentsId : taxonomyParentsIds) {
-                            for (Integer taxonomyId : p.getTaxonomyIds()) {
-                                if (finalNcbiTaksonomyRelations.isAncestor(taxonomyId, parentsId)) {
-                                    hasParent = true;
-//                                    if (taxonomyId != parentsId)
-//                                        log.debug("{} is ancestor of {}", taxonomyId, parentsId);
-                                    break;
-                                }
+                            int taxId = p.getTaxonomyId();
+                            if (finalNcbiTaksonomyRelations.isAncestor(taxId, parentsId)) {
+                                hasParent = true;
+                                break;
                             }
-
                         }
                         if (!hasParent) {
                             return;
@@ -125,9 +128,8 @@ public class JobUniprotToPeptideCsv {
                     }
 //                    writeToDebug(p);
 
-                    //          log.debug("Processing protein: {}", p.getAccession());
                     proteinCount.increment();
-                    saveTaxonomy(p.getAccession(), p.getTaxonomyIds(), outTaxonomy);
+                   // saveTaxonomy(p.getAccession(), p.getTaxonomyId(), outTaxonomy);
 
                     List<String> peptides;
                     peptides = enzyme.cleavage(p.getSequence(), missedClevage, minPeptideLength, maxPeptideLength);
@@ -136,6 +138,10 @@ public class JobUniprotToPeptideCsv {
                         if (peptide.contains("X") || peptide.contains("Z") || peptide.contains("B")) {
                             return;
                         }
+                        taxIdPeptideCount.addTo(p.getTaxonomyId(), 1);
+                        if(true)
+                            return;
+
                         peptideCount.increment();
                         double mass = BioUtil.calculateMassWidthH2O(peptide);
                         double mass4 = MyUtil.roundTo4(mass);
@@ -144,37 +150,62 @@ public class JobUniprotToPeptideCsv {
                             out.write(row.getBytes(standardCharset));
                             counter++;
 
-                            if (counter % 5_000_000 == 0) {
-                                log.debug("Current protein count: {}", counter);
+                            if (counter % 100_000_000 == 0) {
+                                log.debug("Current protein count: {}", NumberFormat.getInstance().format(counter));
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
-
                     });
                 }
             });
-
         }
+
+        saveTaxIdPeptideCount(taxIdPeptideCount);
 
         Result result = new Result();
         result.setPeptideCount(peptideCount.get());
         result.setProteinCount(proteinCount.get());
 
-        return result;
+        System.exit(1);
+        throw new RuntimeException("JobUniprotToPeptideCsv is not finished yet, please implement it.");
+       // return result;
+    }
+
+    private void saveTaxIdPeptideCount(Int2IntOpenHashMap taxIdPeptideCount) throws IOException {
+        // replace path resultAccTaxCsvPath only last file name with "taxId_peptide_count.csv" with FileUtils class
+        String taxIdPeptideCountPath = FileUtils.getFile(resultAccTaxCsvPath).
+                                             getParentFile().getAbsolutePath() + "/taxId_peptide_count.csv";
+
+        boolean fistLine = true;
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(taxIdPeptideCountPath), StandardCharsets.UTF_8))) {
+            for (Int2IntMap.Entry entry : taxIdPeptideCount.int2IntEntrySet()) {
+                if (fistLine) {
+                    writer.write("Taxonomy ID,Peptide Count\n");
+                    fistLine = false;
+                } else {
+                    writer.write('\n');
+                }
+
+                writer.write(String.valueOf(entry.getIntKey()));
+                writer.write(',');
+                writer.write(String.valueOf(entry.getIntValue()));
+
+            }
+            log.info("Taxonomy ID => peptide count saved to: {}", taxIdPeptideCountPath);
+        } catch (IOException e) {
+            log.error("Error saving taxonomy ID peptide count to file: {}", taxIdPeptideCountPath, e);
+            throw e;
+        }
     }
 
     private void writeToDebug(UniprotXMLParser.ProteinInfo p) {
-        List<Integer> taxonomyIds = p.getTaxonomyIds();
-        if (taxonomyIds.size() == 1 && taxonomyIds.contains(9940)) {
-            return;
-        }
-        System.out.println(taxonomyIds + " " + p.getAccession() + " " + p.getDivisionId());
+        int taxonomyId = p.getTaxonomyId();
+        System.out.println(taxonomyId + " " + p.getAccession() + " " + p.getDivisionId());
     }
 
     @SneakyThrows
-    private void saveTaxonomy(String accession, List<Integer> taxonomyIds, BufferedOutputStream outTaxonomy) {
-        outTaxonomy.write((accession + "," + taxonomyIds + "\n").getBytes(StandardCharsets.UTF_8));
+    private void saveTaxonomy(String accession, int taxonomyId, BufferedOutputStream outTaxonomy) {
+        outTaxonomy.write((accession + "," + taxonomyId + "\n").getBytes(StandardCharsets.UTF_8));
     }
-
 }

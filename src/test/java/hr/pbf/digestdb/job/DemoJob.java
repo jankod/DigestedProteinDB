@@ -1,5 +1,7 @@
-package hr.pbf.digestdb.workflow.core;
+package hr.pbf.digestdb.job;
 
+import hr.pbf.digestdb.workflow.core.Job;
+import hr.pbf.digestdb.workflow.core.JobWorkflowContext;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,12 +34,10 @@ public class DemoJob {
             log.info("Starting job SimpleJob1");
             context.setParam(PARAM3, param1);
 
-
             for (int i = 0; i < 10; i++) {
                 Thread.sleep(2000);
                 log.debug("Job SimpleJob1, iteration: {}", i);
             }
-
             return null;
         }
     }

@@ -49,9 +49,8 @@ public class JobCsvMassGrouperWithAccIds {
 	 * @return
 	 */
 	private Long2IntMap buildAccessionMap(String inputCsvPath, String outputGroupedCsvPath, int bufferSize) {
-		// Java heap space for TrEMLB od 32GB RAM
-		// accession => accessionNum
-		//Object2IntMap<String> accessionToIdMap = new Object2IntOpenHashMap<>();
+
+
 		Long2IntMap accessionLongToIntMap = new Long2IntOpenHashMap(Math.toIntExact(proteinCount));
 		int nextAccNumId = 0;
 		// Trembl ha 10_252_140_061 lines

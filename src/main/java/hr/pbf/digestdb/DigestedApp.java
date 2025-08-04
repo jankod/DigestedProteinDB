@@ -38,14 +38,14 @@ public class DigestedApp {
 		@Option(names = { "-c", "--clean" }, description = "Clean all files in database directory before creating")
 		boolean cleanDb = false;
 
-		@Option(names = { "-m", "--min-length" }, description = "Min peptide length, default 7", defaultValue = "7")
-		int minPeptideLength = 7;
+		@Option(names = { "-m", "--min-length" }, description = "Min peptide length, default 6", defaultValue = "6")
+		int minPeptideLength = 6;
 
-		@Option(names = { "-M", "--max-length" }, description = "Max peptide length, default 30", defaultValue = "30")
-		int maxPeptideLength = 30;
+		@Option(names = { "-M", "--max-length" }, description = "Max peptide length, default 50", defaultValue = "50")
+		int maxPeptideLength = 50;
 
-		@Option(names = { "-mc", "--missed-cleavage" }, description = "Missed cleavage, default 1 (currently only option)", defaultValue = "1")
-		int missedCleavage = 1;
+		@Option(names = { "-mc", "--missed-cleavage" }, description = "Missed cleavage, default 2", defaultValue = "2")
+		int missedCleavage = 2;
 
 		@Option(
 				names = { "-s", "--sort-temp-dir" }, description = "Path to the temporary directory, used " +

@@ -71,6 +71,7 @@ public class CreateDatabase {
 	public void start() throws Exception {
 
 		List<Integer> steps = List.of(1, 2, 3, 4, 5, 6, 7);
+	//	steps = List.of(3, 4, 5, 6, 7); // for biopro
 
 		StopWatch watch = StopWatch.createStarted();
 		final String DB_DIR_PATH = config.dbDir;
@@ -88,7 +89,7 @@ public class CreateDatabase {
 		final String ACCID_ACC_CSV_SORTED_PATH = DB_DIR_PATH + "/gen/accid_acc_sorted.csv";
 		final String CUSTOM_ACCESSION_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_ACCESSION_DB_FILE_NAME;
 		final String ROCKDB_DB_DIR_PATH = DB_DIR_PATH + "/" + DEFAULT_ROCKSDB_MASS_DB_FILE_NAME;
-		final String ACC_TAXIDS_CSV_PATH = DB_DIR_PATH + "/gen/acc_taxids.csv";
+		final String ACC_TAXID_CSV_PATH = DB_DIR_PATH + "/acc_taxid.csv";
 		final String DB_INFO_PROPERTIES_PATH = DB_DIR_PATH + "/db_info.properties";
 
 		File genDir = new File(DB_DIR_PATH + "/gen");
@@ -119,7 +120,7 @@ public class CreateDatabase {
 
 			app1UniprotToCsv.setEnzyme(config.enzymeType.getEnzyme());
 			app1UniprotToCsv.setResultPeptideMassAccCsvPath(MASS_PEP_ACC_CSV_PATH);
-			app1UniprotToCsv.setResultTaxAccCsvPath(ACC_TAXIDS_CSV_PATH);
+			app1UniprotToCsv.setResultAccTaxCsvPath(ACC_TAXID_CSV_PATH);
 			app1UniprotToCsv.setNcbiTaxonomyPath(config.getNcbiTaxonomyPath());
 			app1UniprotToCsv.setTaxonomyParentsIds(config.getTaxonomyParentsIds());
 

@@ -17,16 +17,41 @@ class NcbiTaksonomyRelationsTest {
     @BeforeAll
     public static void setUp() throws NcbiTaxonomyException {
         ClassLoader classLoader = NcbiTaksonomyRelationsTest.class.getClassLoader();
-        URL resource = classLoader.getResource("nodes_test.dmp");
+        URL resource = classLoader.getResource("nodes_test.dmp.csv");
         assertNotNull(resource, "Test file not found!");
         pathToCsv = new File(resource.getFile()).getAbsolutePath();
-        taxonomy =  NcbiTaksonomyRelations.loadTaxonomyNodes(pathToCsv);
-        assertNotNull(taxonomy.getChildParrents());
-        assertFalse(taxonomy.getChildParrents().isEmpty(), "Taxonomy should not be empty");
+        taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToCsv);
+        assertNotNull(taxonomy.getChildParrentsMap());
+        assertFalse(taxonomy.getChildParrentsMap().isEmpty(), "Taxonomy should not be empty");
+    }
+
+
+    @Test
+    void testGetDivisionForTaxId() {
+        System.out.println(taxonomy.getTaxIdToDivisionIdMap());
+        assertEquals(0, taxonomy.getDivisionForTaxId(2));
+
+        assertEquals(0, taxonomy.getDivisionForTaxId(7));
+
+        assertEquals(-1, taxonomy.getDivisionForTaxId(999999));
     }
 
     @Test
-    void testSheep () {
+    void testIsTaxIdInDivision() {
+        // Provjera točne pripadnosti
+        assertTrue(taxonomy.isTaxIdInDivision(7, 0));
+
+        // Provjera netočne pripadnosti
+        assertFalse(taxonomy.isTaxIdInDivision(1, 0));
+        assertFalse(taxonomy.isTaxIdInDivision(7, 1));
+
+        // Provjera za nepostojeći tax_id
+        assertFalse(taxonomy.isTaxIdInDivision(999999, 0));
+    }
+
+
+    @Test
+    void testSheep() {
         // sheep 9940
         // virus 11588
         boolean ancestor = taxonomy.isAncestor(9940, 11588);
@@ -87,8 +112,6 @@ class NcbiTaksonomyRelationsTest {
         assertFalse(taxonomy.isAncestor(24, 25), "24 should not be ancestor of 25 (siblings)");
         assertFalse(taxonomy.isAncestor(25, 23), "25 should not be ancestor of 23 (siblings)");
     }
-
-
 
 
     @Test

@@ -89,12 +89,8 @@ public class MassRocksDbCreator {
         dbInfo.countMasses = countMasses;
         log.debug("RocksDB created successfully with {} masses.", countMasses);
 
-        try {
-            long sizeOfDirectory = FileUtils.sizeOfDirectory(new File(toDbPath));
-            log.debug("RocksDB directory size: {} bytes", FileUtils.byteCountToDisplaySize(sizeOfDirectory));
-            log.debug("RocksDB file size: {} bytes", Files.size(Path.of(toDbPath)));
-        } catch (IOException ignore) {
-        }
+        long sizeOfDirectory = FileUtils.sizeOfDirectory(new File(toDbPath));
+        log.debug("RocksDB directory size: {} bytes", FileUtils.byteCountToDisplaySize(sizeOfDirectory));
         return dbInfo;
     }
 

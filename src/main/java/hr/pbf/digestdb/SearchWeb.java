@@ -63,22 +63,22 @@ public class SearchWeb {
 
             // Resource handler for static files
             ResourceHandler homeHtmlPageHandler = new ResourceHandler(
-                    new ClassPathResourceManager(getClass().getClassLoader(), "web"))
-                    .setWelcomeFiles("index.html");
+                  new ClassPathResourceManager(getClass().getClassLoader(), "web"))
+                  .setWelcomeFiles("index.html");
 
             // Create paths
             PathHandler pathHandler = new PathHandler()
-                    .addPrefixPath("/", homeHtmlPageHandler)
-                    .addExactPath("/db-info", this::handleDbInfo)
-                    .addExactPath("/search", this::handleSearch)
-                    .addExactPath("/search-peptide", this::handleSearchByPeptide)
-                    .addExactPath("/search-taxonomy", this::handleSearchTaxonomy);
+                  .addPrefixPath("/", homeHtmlPageHandler)
+                  .addExactPath("/db-info", this::handleDbInfo)
+                  .addExactPath("/search", this::handleSearch)
+                  .addExactPath("/search-peptide", this::handleSearchByPeptide)
+                  .addExactPath("/search-taxonomy", this::handleSearchTaxonomy);
 
 
             server = Undertow.builder()
-                    .addHttpListener(port, "0.0.0.0")
-                    .setHandler(pathHandler)
-                    .build();
+                  .addHttpListener(port, "0.0.0.0")
+                  .setHandler(pathHandler)
+                  .build();
 
             server.start();
             log.info("Web started on {}", "http://localhost:" + port);
@@ -112,7 +112,7 @@ public class SearchWeb {
 
             if (mass1 == 0 || mass2 == 0) {
                 sendJsonResponse(http, StatusCodes.BAD_REQUEST,
-                        "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
+                      "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
                 return;
             }
 
@@ -133,14 +133,13 @@ public class SearchWeb {
         } catch (Exception e) {
             log.error("Error searching taxonomy", e);
             sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
-                    "{\"error\": \"" + e.getMessage() + "\"}");
+                  "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
-    private PageResultTax toTaxonomy(PageResult pageResult) {
+    private PageResultTax toTaxonomy(PageResult pageResult) throws IOException {
         if (accTaxDb == null) {
-            accTaxDb = new AccTaxDB();
-            accTaxDb.readFromDiskByte(dbAccTaxPath);
+            accTaxDb = AccTaxDB.loadFromDisk(dbAccTaxPath);
             log.debug("Taxonomy read from disk: {}", accTaxDb);
         }
 
@@ -160,7 +159,8 @@ public class SearchWeb {
                 for (String accText : acc.getAcc()) {
                     AccTaxs accTaxs = new AccTaxs();
                     accTaxs.setAcc(accText);
-                    accTaxs.setTaxIds(accTaxDb.getTaxonomyIds(accText));
+                    //accTaxs.setTaxIds(accTaxDb.getTaxonomyIds(accText));
+                    accTaxs.setTaxId(accTaxDb.getTaxonomyId(accText));
                     accsTaxs.add(accTaxs);
                 }
                 accTax.setAccsTax(accsTaxs);
@@ -187,7 +187,7 @@ public class SearchWeb {
             String peptide = params.getOrDefault("peptide", "");
             if (peptide.isEmpty()) {
                 sendJsonResponse(http, StatusCodes.BAD_REQUEST,
-                        "{\"error\": \"Peptide is required\"}");
+                      "{\"error\": \"Peptide is required\"}");
                 return;
             }
             double mass1 = BioUtil.calculateMassWidthH2O(peptide);
@@ -198,7 +198,7 @@ public class SearchWeb {
             searchByMass(http, mass1, mass2, page, pageSize);
         } catch (Exception e) {
             sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
-                    "{\"error\": \"" + e.getMessage() + "\"}");
+                  "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -222,7 +222,7 @@ public class SearchWeb {
             sendJsonResponse(exchange, StatusCodes.OK, toJson(getDbInfo()));
         } catch (Exception e) {
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
-                    "{\"error\": \"" + e.getMessage() + "\"}");
+                  "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -243,7 +243,7 @@ public class SearchWeb {
 
             if (mass1 == 0 || mass2 == 0) {
                 sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-                        "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
+                      "{\"error\": \"Mass1 and Mass2 are required as doubles.\"}");
                 return;
             }
 
@@ -251,11 +251,11 @@ public class SearchWeb {
 
         } catch (NumberFormatException e) {
             sendJsonResponse(exchange, StatusCodes.BAD_REQUEST,
-                    "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
+                  "{\"error\": \"Mass1 and Mass2 must be numbers.\"}");
         } catch (Exception e) {
             log.error("Error on search", e);
             sendJsonResponse(exchange, StatusCodes.INTERNAL_SERVER_ERROR,
-                    "{\"error\": \"" + e.getMessage() + "\"}");
+                  "{\"error\": \"" + e.getMessage() + "\"}");
         }
     }
 
@@ -310,7 +310,7 @@ public class SearchWeb {
     @Data
     static class AccTaxs {
         String acc;
-        List<Integer> taxIds = new ArrayList<>();
+        int taxId;
     }
 
     @Data
