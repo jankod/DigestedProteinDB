@@ -1,0 +1,130 @@
+07:05:31.952 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=false, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:05:31.965 INFO  hr.pbf.digestdb.DigestedApp:124 - Fininsh, exiting with code 1
+07:05:31.966 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:05:41.093 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=false, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:05:41.121 INFO  h.p.d.w.JobUniprotToPeptideCsv:106 - Finish read proteins, max protein count reached: 5
+07:05:41.123 INFO  h.p.d.w.JobUniprotToPeptideCsv:193 - Taxonomy ID => peptide count saved to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/taxId_peptide_count.csv
+07:05:41.124 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:07:34.989 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=false, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:07:35.021 INFO  h.p.d.w.JobUniprotToPeptideCsv:107 - Finish read proteins, max protein count reached: 500
+07:07:35.025 INFO  h.p.d.w.JobUniprotToPeptideCsv:192 - Taxonomy ID => peptide count saved to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/taxId_peptide_count.csv
+07:07:35.026 INFO  hr.pbf.digestdb.CreateDatabase:132 - Uniprot extracted. Protein count: 12, Peptide count: 488
+07:07:35.033 DEBUG hr.pbf.digestdb.CreateDatabase:162 - Execute command: sort  -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:07:35.042 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:59 - Start creating accession map from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv
+07:07:35.085 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:78 - Processed 1 accession numbers. Time: 00:00:00.041
+07:07:35.087 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:86 - Finished creating accession map. Size: 12. Time: 00:00:00.044
+07:07:35.087 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:88 - Start writing accession map to CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:07:35.131 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:38 - Accession map is builded. Size: 12
+07:07:35.131 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:110 - Reading input CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv and write CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:07:35.204 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:164 - Finished writing grouped CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:07:35.204 INFO  hr.pbf.digestdb.CreateDatabase:178 - Grouped with ids: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:07:35.204 INFO  hr.pbf.digestdb.CreateDatabase:179 - Protein count: 12
+07:07:35.204 DEBUG hr.pbf.digestdb.CreateDatabase:204 - Execute command:  sort -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv  -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv  in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:07:35.207 INFO  hr.pbf.digestdb.CreateDatabase:208 - Accession map sorted: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv
+07:07:35.208 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:55 - Start creating RocksDB from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:07:35.299 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:90 - RocksDB created successfully with 340 masses.
+07:07:35.303 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:93 - RocksDB directory size: 46 KB bytes
+07:07:35.303 INFO  hr.pbf.digestdb.CreateDatabase:218 - RockDB db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:07:35.304 DEBUG h.pbf.digestdb.db.AccessionDbCreator:32 - Start creating accession DB from: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db
+07:07:35.311 INFO  hr.pbf.digestdb.CreateDatabase:226 - Custom accession db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db. File: size: 100 bytes
+07:07:35.311 INFO  hr.pbf.digestdb.CreateDatabase:237 - Finished time: 89:49:19.141
+07:07:35.312 INFO  hr.pbf.digestdb.DigestedApp:124 - Fininsh, exiting with code 0
+07:07:35.312 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:11:36.686 INFO  hr.pbf.digestdb.CreateDatabase:99 - Clean all files in dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot
+07:11:36.696 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=true, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:11:36.893 INFO  h.p.d.w.JobUniprotToPeptideCsv:107 - Finish read proteins, max protein count reached: 500
+07:11:36.896 INFO  h.p.d.w.JobUniprotToPeptideCsv:191 - Taxonomy ID => peptide count saved to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/taxId_peptide_count.csv
+07:11:36.896 INFO  hr.pbf.digestdb.CreateDatabase:132 - Uniprot extracted. Protein count: 500, Peptide count: 42052
+07:11:36.904 DEBUG hr.pbf.digestdb.CreateDatabase:162 - Execute command: sort  -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:11:36.935 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:59 - Start creating accession map from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv
+07:11:36.980 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:78 - Processed 1 accession numbers. Time: 00:00:00.043
+07:11:36.999 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:86 - Finished creating accession map. Size: 500. Time: 00:00:00.063
+07:11:36.999 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:88 - Start writing accession map to CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:11:37.040 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:38 - Accession map is builded. Size: 500
+07:11:37.040 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:110 - Reading input CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv and write CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:11:37.182 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:164 - Finished writing grouped CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:11:37.182 INFO  hr.pbf.digestdb.CreateDatabase:178 - Grouped with ids: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:11:37.182 INFO  hr.pbf.digestdb.CreateDatabase:179 - Protein count: 500
+07:11:37.183 DEBUG hr.pbf.digestdb.CreateDatabase:204 - Execute command:  sort -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv  -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv  in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:11:37.185 INFO  hr.pbf.digestdb.CreateDatabase:208 - Accession map sorted: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv
+07:11:37.185 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:55 - Start creating RocksDB from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:11:37.435 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:90 - RocksDB created successfully with 27471 masses.
+07:11:37.439 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:93 - RocksDB directory size: 1 MB bytes
+07:11:37.440 INFO  hr.pbf.digestdb.CreateDatabase:218 - RockDB db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:11:37.440 DEBUG h.pbf.digestdb.db.AccessionDbCreator:32 - Start creating accession DB from: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db
+07:11:37.449 INFO  hr.pbf.digestdb.CreateDatabase:226 - Custom accession db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db. File: size: 3 KB
+07:11:37.450 INFO  hr.pbf.digestdb.CreateDatabase:237 - Finished time: 212:22:47.472
+07:11:37.451 INFO  hr.pbf.digestdb.DigestedApp:124 - Fininsh, exiting with code 0
+07:11:37.451 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:15:46.768 INFO  hr.pbf.digestdb.CreateDatabase:99 - Clean all files in dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot
+07:15:46.778 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=true, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:15:46.971 INFO  h.p.d.w.JobUniprotToPeptideCsv:107 - Finish read proteins, max protein count reached: 500
+07:15:46.974 INFO  h.p.d.w.JobUniprotToPeptideCsv:191 - Taxonomy ID => peptide count saved to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/taxId_peptide_count.csv
+07:15:46.975 INFO  hr.pbf.digestdb.CreateDatabase:132 - Uniprot extracted. Protein count: 500, Peptide count: 42052
+07:15:46.981 DEBUG hr.pbf.digestdb.CreateDatabase:162 - Execute command: sort  -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:15:47.009 INFO  hr.pbf.digestdb.CreateDatabase:172 - Deleted old mass csv file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv
+07:15:47.011 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:59 - Start creating accession map from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv
+07:15:47.054 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:78 - Processed 1 accession numbers. Time: 00:00:00.041
+07:15:47.074 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:86 - Finished creating accession map. Size: 500. Time: 00:00:00.062
+07:15:47.074 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:88 - Start writing accession map to CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:15:47.114 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:38 - Accession map is builded. Size: 500
+07:15:47.114 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:110 - Reading input CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv and write CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:15:47.256 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:164 - Finished writing grouped CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:15:47.257 INFO  hr.pbf.digestdb.CreateDatabase:191 - Grouped with ids: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:15:47.257 INFO  hr.pbf.digestdb.CreateDatabase:192 - Protein count: 500
+07:15:47.257 DEBUG hr.pbf.digestdb.CreateDatabase:217 - Execute command:  sort -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv  -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv  in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:15:47.259 INFO  hr.pbf.digestdb.CreateDatabase:221 - Accession map sorted: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv
+07:15:47.259 INFO  hr.pbf.digestdb.CreateDatabase:228 - Deleted old accession csv file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:15:47.260 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:55 - Start creating RocksDB from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:15:47.481 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:90 - RocksDB created successfully with 27471 masses.
+07:15:47.486 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:93 - RocksDB directory size: 1 MB bytes
+07:15:47.486 INFO  hr.pbf.digestdb.CreateDatabase:242 - RockDB db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:15:47.487 DEBUG h.pbf.digestdb.db.AccessionDbCreator:32 - Start creating accession DB from: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db
+07:15:47.495 INFO  hr.pbf.digestdb.CreateDatabase:250 - Custom accession db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db. File: size: 3 KB
+07:15:47.496 INFO  hr.pbf.digestdb.CreateDatabase:261 - Finished time: 202:14:45.475
+07:15:47.496 INFO  hr.pbf.digestdb.DigestedApp:124 - Fininsh, exiting with code 0
+07:15:47.496 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:17:00.411 DEBUG hr.pbf.digestdb.SearchWeb:53 - Start web on port: 7071 db dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:17:00.413 INFO  hr.pbf.digestdb.SearchWeb:57 - Initializing database...
+07:17:00.499 INFO  hr.pbf.digestdb.SearchWeb:61 - Database initialized in 86 ms
+07:17:00.581 INFO  hr.pbf.digestdb.SearchWeb:84 - Web started on http://localhost:7071
+07:19:08.363 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:19:08.364 INFO  hr.pbf.digestdb.SearchWeb:415 - Server stopped and resources released
+07:19:29.106 INFO  hr.pbf.digestdb.CreateDatabase:99 - Clean all files in dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot
+07:19:29.116 INFO  hr.pbf.digestdb.CreateDatabase:106 - Start create DB, params  CreateDatabase.CreateDatabaseConfig(minPeptideLength=6, maxPeptideLength=50, missedCleavage=2, cleanBefore=true, dbDir=/home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot, uniprotXmlPath=/media/tag/D/digested-db/uniprot_sprot.xml.gz, sortTempDir=null, dbName=Swisprot trypsin, enzymeType=Trypsin, taxonomyDivision=ALL, taxonomyParentsIds=null, ncbiTaxonomyPath=null)!
+07:20:31.632 INFO  hr.pbf.digestdb.CreateDatabase:130 - Uniprot extracted. Protein count: 572970, Peptide count: 49918563
+07:20:31.639 DEBUG hr.pbf.digestdb.CreateDatabase:160 - Execute command: sort  -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:21:04.614 INFO  hr.pbf.digestdb.CreateDatabase:170 - Deleted old mass csv file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc.csv
+07:21:04.620 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:59 - Start creating accession map from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv
+07:21:04.704 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:78 - Processed 1 accession numbers. Time: 00:00:00.082
+07:21:12.902 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:86 - Finished creating accession map. Size: 572348. Time: 00:00:08.281
+07:21:12.902 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:88 - Start writing accession map to CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:21:13.026 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:38 - Accession map is builded. Size: 572348
+07:21:13.026 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:110 - Reading input CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_acc_sorted.csv and write CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:21:53.321 DEBUG h.p.d.w.JobCsvMassGrouperWithAccIds:164 - Finished writing grouped CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:21:53.321 INFO  hr.pbf.digestdb.CreateDatabase:189 - Grouped with ids: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv
+07:21:53.321 INFO  hr.pbf.digestdb.CreateDatabase:190 - Protein count: 572970
+07:21:53.321 DEBUG hr.pbf.digestdb.CreateDatabase:215 - Execute command:  sort -t',' -k1n /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv  -o /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv  in dir /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen
+07:21:53.401 INFO  hr.pbf.digestdb.CreateDatabase:219 - Accession map sorted: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv
+07:21:53.402 INFO  hr.pbf.digestdb.CreateDatabase:226 - Deleted old accession csv file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc.csv
+07:21:53.402 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:55 - Start creating RocksDB from CSV file: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/mass_pep_accid_grouped.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:22:20.139 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:90 - RocksDB created successfully with 5734171 masses.
+07:22:20.143 DEBUG h.pbf.digestdb.db.MassRocksDbCreator:93 - RocksDB directory size: 710 MB bytes
+07:22:20.143 INFO  hr.pbf.digestdb.CreateDatabase:240 - RockDB db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:22:20.144 DEBUG h.pbf.digestdb.db.AccessionDbCreator:32 - Start creating accession DB from: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/gen/accid_acc_sorted.csv and write DB to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db
+07:22:20.234 INFO  hr.pbf.digestdb.CreateDatabase:248 - Custom accession db is created: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/custom_accession.db. File: size: 4 MB
+07:22:20.234 INFO  hr.pbf.digestdb.CreateDatabase:259 - Finished time: 47535:40:32.657
+07:22:20.234 INFO  hr.pbf.digestdb.DigestedApp:124 - Fininsh, exiting with code 0
+07:22:20.235 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:23:08.151 DEBUG hr.pbf.digestdb.SearchWeb:53 - Start web on port: 7071 db dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/swisprot/rocksdb_mass.db
+07:23:08.153 INFO  hr.pbf.digestdb.SearchWeb:57 - Initializing database...
+07:23:08.477 INFO  hr.pbf.digestdb.SearchWeb:61 - Database initialized in 324 ms
+07:23:08.538 INFO  hr.pbf.digestdb.SearchWeb:84 - Web started on http://localhost:7071
+07:25:04.879 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:25:04.881 INFO  hr.pbf.digestdb.SearchWeb:415 - Server stopped and resources released
+07:25:12.820 DEBUG hr.pbf.digestdb.SearchWeb:53 - Start web on port: 7071 db dir: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl/rocksdb_mass.db
+07:25:12.822 INFO  hr.pbf.digestdb.SearchWeb:57 - Initializing database...
+07:25:19.382 INFO  hr.pbf.digestdb.SearchWeb:61 - Database initialized in 6560 ms
+07:25:19.444 INFO  hr.pbf.digestdb.SearchWeb:84 - Web started on http://localhost:7071
+07:27:08.273 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+07:27:08.275 INFO  hr.pbf.digestdb.SearchWeb:415 - Server stopped and resources released

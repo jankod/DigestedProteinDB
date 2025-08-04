@@ -197,5 +197,6 @@ Many optimizations are used to speed up the process, including:
 - Develop native version for Windows, MacOS, and Linux without Java and RockDB dependencies
 
 This project uses **JProfiler**, a powerful profiling tool, for performance analysis and optimization. We thank ej-technologies GmbH for providing an open-source license.
+
 [![JProfiler](https://www.ej-technologies.com/images/product_banners/jprofiler_large.png)](https://www.ej-technologies.com/jprofiler)
 
