@@ -12,7 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @Slf4j
@@ -20,10 +23,11 @@ public class SearchSheep {
 
     public static void main(String[] args) throws RocksDBException, NcbiTaxonomyException, IOException {
         String dbDir = "/home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep2/";
-        dbDir = "/Users/tag/PBF radovi/digestedproteindb/sheep/rocksdb_mass.db"; // For testing on local machine
+        //dbDir = "/Users/tag/PBF radovi/digestedproteindb/sheep/rocksdb_mass.db"; // For testing on local machine
+        dbDir = "/home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl/";
 
         String pathSheep = "/media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt";
-        pathSheep = "'/Users/tag/PBF radovi/digestedproteindb'/Trypsin_HTXdigest_sheep_butorka.txt";
+        //pathSheep = "'/Users/tag/PBF radovi/digestedproteindb'/Trypsin_HTXdigest_sheep_butorka.txt";
 
         String pathToNodesDmp = "/home/tag/IdeaProjects/DigestedProteinDB/misc/ncbi/taxdump/nodes.dmp";
 
@@ -32,20 +36,24 @@ public class SearchSheep {
 
         AccessionDbReader accessionDbReader = new AccessionDbReader(dbDir + "custom_accession.db");
 
+        String resultPath = "/home/tag/peptides_sheep.txt";
 
         List<Double> sheepMasses = getMassesSheep(pathSheep);
         log.debug("Sheep masses: " + sheepMasses.size());
         ProteinScorer scorer = new ProteinScorer();
 
 
+        AccTaxDB accessionTaxDb = AccTaxDB.loadFromDiskString(dbDir + "/acc_taxid.csv");
+
         for (Double mass : sheepMasses) {
             double mass1 = mass - 0.02;
             double mass2 = mass + 0.02;
 
-            {
+            if (false) {
                 PeptideMS1Search peptideMS1Search = new PeptideMS1Search(db, accessionDbReader, mass1, mass2, PTM.CARBAMIDOMETHYL, PTM.OXIDATION, PTM.DEAMIDATION, PTM.PHOSPHORYLATION);
                 List<PeptideMS1Search.PtmSearchResult> res = peptideMS1Search.search();
                 String filePath = "/Users/tag/peptides_sheep.csv";
+                filePath = "/home/tag/peptides_sheep.csv";
                 peptideMS1Search.saveToFile(filePath, res);
                 System.out.println("Save to file: " + filePath);
                 if (true) return; // For testing, remove this line to process all masses
@@ -53,29 +61,50 @@ public class SearchSheep {
 
             List<Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>>> peptides = db.searchByMass(mass1, mass2);
 
+
             //log.debug("Mass: " + mass + " found peptides: " + peptides.size());
             //  System.out.println("Mass: " + mass + " found peptides: " + peptides.size());
-
-
-            for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> entry : peptides) {
-                for (BinaryPeptideDbUtil.PeptideAccids peptideAccids : entry.getValue()) {
-                    String peptide = peptideAccids.getSeq();
-                    int[] proteins = peptideAccids.getAccids();
-                    Set<String> accessions = new HashSet<>(proteins.length);
-                    for (int protIdInt : proteins) {
-                        String acc = accessionDbReader.getAccession(protIdInt);
-                        if (acc == null || acc.isEmpty()) {
-                            log.warn("Protein accession is null or empty for ID: " + protIdInt);
-                            continue;
+            try (BufferedWriter result = Files.newBufferedWriter(Path.of(resultPath))) {
+                result.write("Peptide, Accessions, TaxID\n");
+                for (Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> entry : peptides) {
+                    for (BinaryPeptideDbUtil.PeptideAccids peptideAccids : entry.getValue()) {
+                        String peptide = peptideAccids.getSeq();
+                        int[] proteins = peptideAccids.getAccids();
+                        Set<String> accessions = new HashSet<>(proteins.length);
+                        for (int protIdInt : proteins) {
+                            String acc = accessionDbReader.getAccession(protIdInt);
+                            if (acc == null || acc.isEmpty()) {
+                                log.warn("Protein accession is null or empty for ID: " + protIdInt);
+                                continue;
+                            }
+                            accessions.add(acc);
+                            // System.out.println("Protein: " + acc + ", Peptide: " + peptide);
                         }
-                        accessions.add(acc);
-                        // System.out.println("Protein: " + acc + ", Peptide: " + peptide);
-                    }
-                    scorer.addPeptide(peptide, accessions);
-                }
-            }
 
+                        Set<String> taxIds = new HashSet<>();
+                        for (String accession : accessions) {
+                            int taxId = accessionTaxDb.getTaxonomyId(accession);
+                            if (taxId == 0) {
+                                log.warn("Taxonomy ID is 0 for accession: " + accession);
+                            } else {
+                                taxIds.add(taxId + "");
+                            }
+                        }
+
+
+                        result.write(peptide);
+                        result.write(", " + String.join(";", accessions));
+                        result.write("," + String.join(";", taxIds));
+                        result.write("\n");
+
+
+                        //scorer.addPeptide(peptide, accessions);
+                    }
+                }
+
+            }
         }
+        if (true) return;
 
         // Get ranked proteins
         List<Map.Entry<String, Integer>> ranked = scorer.getRankedProteins();
@@ -84,9 +113,8 @@ public class SearchSheep {
         }
 
 
-        NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
+        //     NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
 
-        AccTaxDB accessionTaxDb = AccTaxDB.loadFromDisk(dbDir + "gen/acc_taxids.csv");
 
         Map<Integer, List<ProteinResult>> taxIdToProteins = new HashMap<>();
 
@@ -103,26 +131,21 @@ public class SearchSheep {
 
         // 4. Ispišite rezultate
         // sortiraj po navecem broju peptida
+        try (BufferedWriter result = Files.newBufferedWriter(Path.of(resultPath))) {
 
-
-        for (Map.Entry<Integer, List<ProteinResult>> entry : taxIdToProteins.entrySet()) {
-            Integer taxId = entry.getKey();
-            List<ProteinResult> proteins = entry.getValue();
-            //  log.info("TaxID: " + taxId + ", Proteins: " + proteins.size());
-            proteins.sort(Comparator.naturalOrder()); // Sort by peptide count descending
-            int c = 1;
-//            if (taxId == 9940) {
-            System.out.println("TaxID: " + taxId + ", Proteins: " + proteins.size());
-            System.out.println("#, Accession, Peptide Count");
-//            }
-            for (ProteinResult protein : proteins) {
-                //  if (taxId == 9940) {
-                //log.info("  Accession: " + protein.getAccession() + ", Peptide Count: " + protein.getPeptideCount());
-                System.out.println(c++ + "  " + protein.getAccession() + ", " + protein.getPeptideCount());
-                // }
-//                if (c++ > 10) {
-//                    break; // Limit to top 10 proteins per taxId
-//                }
+            for (Map.Entry<Integer, List<ProteinResult>> entry : taxIdToProteins.entrySet()) {
+                Integer taxId = entry.getKey();
+                List<ProteinResult> proteins = entry.getValue();
+                //  log.info("TaxID: " + taxId + ", Proteins: " + proteins.size());
+                proteins.sort(Comparator.naturalOrder()); // Sort by peptide count descending
+                int c = 1;
+                result.write("TaxID: " + taxId + ", Proteins: " + proteins.size() + "\n");
+                //System.out.println("TaxID: " + taxId + ", Proteins: " + proteins.size());
+                //System.out.println("#, Accession, Peptide Count");
+                result.write("#, Accession, Peptide Count\n");
+                for (ProteinResult protein : proteins) {
+                    result.write(c++ + ", " + protein.getAccession() + ", " + protein.getPeptideCount() + "\n");
+                }
             }
         }
 

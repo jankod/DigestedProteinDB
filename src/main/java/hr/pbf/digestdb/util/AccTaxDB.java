@@ -94,6 +94,44 @@ public class AccTaxDB {
 
     }
 
+    /**
+     * Read CSV file with accession (string) numbers and taxonomy ID (int) .
+     * @param pathCsv
+     * @return
+     * @throws IOException
+     */
+    public static AccTaxDB loadFromDiskString(String pathCsv) throws IOException {
+        AccTaxDB accTaxDB = new AccTaxDB();
+        accTaxDB.db = new Long2IntOpenHashMap();
+        try (BufferedReader reader = new BufferedReader(new FileReader(pathCsv))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length != 2) {
+                    log.warn("Invalid line format: {}", line);
+                    continue; // Skip invalid lines
+                }
+                try {
+                    String accStr = parts[0];
+                    long acc = MyUtil.toAccessionLong36(accStr);
+                    int taxId = Integer.parseInt(parts[1]);
+                    accTaxDB.db.put(acc, taxId);
+                } catch (NumberFormatException e) {
+                    log.warn("Error parsing line: {}", line, e);
+                }
+            }
+        }
+        log.info("Loaded {} entries from {}", accTaxDB.db.size(), pathCsv);
+        return accTaxDB;
+    }
+
+
+    /**
+     * Read CSV file with accession (long) numbers and taxonomy ID (int) .
+     * @param pathCsv
+     * @return
+     * @throws IOException
+     */
     public static AccTaxDB loadFromDisk(String pathCsv) throws IOException {
         AccTaxDB accTaxDB = new AccTaxDB();
         accTaxDB.db = new Long2IntOpenHashMap();
