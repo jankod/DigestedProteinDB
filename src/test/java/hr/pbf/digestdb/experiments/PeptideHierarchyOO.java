@@ -21,7 +21,7 @@ public class PeptideHierarchyOO {
         String outputPath = "/home/tag/peptides_sheep_sorted.txt";
 
         String pathToNodesDmp = "/home/tag/IdeaProjects/DigestedProteinDB/misc/ncbi/taxdump/nodes.dmp";
-       // NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
+        // NcbiTaksonomyRelations taxonomy = NcbiTaksonomyRelations.loadTaxonomyNodes(pathToNodesDmp);
 
 
         List<PeptideRecord> records = Files.lines(Paths.get(inputPath))
@@ -40,7 +40,7 @@ public class PeptideHierarchyOO {
         try (PrintWriter out = new PrintWriter(outputPath); NCBITaxaEte ncbi = new NCBITaxaEte()) {
 
             // Print first just the summary of taxa
-            out.println("TaxId\tName\tProteins\tPeptides");
+            out.println("Taxonomy\tProteins\tPeptides\tUnique Peptides");
             taxa.values().stream()
                   .sorted(
                         Comparator.<Taxon>comparingInt(Taxon::getPeptideCount)
@@ -48,11 +48,19 @@ public class PeptideHierarchyOO {
                               .thenComparing(Taxon::getTaxId)
                   )
                   .forEach(taxon -> {
-                      out.printf("%d\t%s\t%d\t%d\n",
-                            taxon.getTaxId(),
+                      // Pravi izračun jedinstvenih peptida za takson
+                      long uniquePeptideCount = taxon.getProteinsSorted().stream()
+                            .flatMap(protein -> protein.getPeptides().stream())
+                            .distinct()
+                            .count();
+
+
+                      out.printf("%s\t%d\t%s\t%s\n",
+                            //taxon.getTaxId(),
                             ncbi.getTaxidTranslator(Set.of(taxon.getTaxId()), true),
                             taxon.getProteinCount(),
-                            taxon.getPeptideCount());
+                            taxon.getPeptideCount() ,
+                            uniquePeptideCount);
 
                   });
 
@@ -66,14 +74,20 @@ public class PeptideHierarchyOO {
                               .thenComparing(Taxon::getTaxId)
                   )
                   .forEach(taxon -> {
-                      // ispis...
+                      // Pravi izračun jedinstvenih peptida za takson
+                      long uniquePeptideCount = taxon.getProteinsSorted().stream()
+                            .flatMap(protein -> protein.getPeptides().stream())
+                            .distinct()
+                            .count();
                       out.printf("TaxId: %d\tProteins: %d\tPeptides: %d%n",
                             taxon.getTaxId(),
                             taxon.getProteinCount(),
                             taxon.getPeptideCount());
+
                       for (Protein prot : taxon.getProteinsSorted()) {
-                          out.printf("  Accession: %s %n",
-                                prot.getAccession()
+                          out.printf("  Accession: %s (%d peptides) %n",
+                                prot.getAccession(),
+                                prot.getPeptides().size()
                           );
                           for (String pep : prot.getPeptidesSorted()) {
                               double mass = BioUtil.calculateMassWidthH2O(pep);
@@ -147,9 +161,10 @@ public class PeptideHierarchyOO {
 
     }
 
+    @Getter
     static class Protein {
         private final String accession;
-        private final Set<String> peptides = new TreeSet<>();
+        private final List<String> peptides = new ArrayList<>();
 
         public Protein(String accession) {
             this.accession = accession;
@@ -157,14 +172,6 @@ public class PeptideHierarchyOO {
 
         public void addPeptide(String peptide) {
             peptides.add(peptide);
-        }
-
-        public String getAccession() {
-            return accession;
-        }
-
-        public Set<String> getPeptides() {
-            return peptides;
         }
 
         public List<String> getPeptidesSorted() {
