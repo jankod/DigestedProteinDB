@@ -5,19 +5,16 @@ import org.apache.commons.lang3.time.StopWatch;
 
 public class MyStopWatch {
 
-    StopWatch stopWatch;
+    private long lastTime;
 
     public MyStopWatch() {
-        stopWatch = new StopWatch();
-        stopWatch.start();
+        lastTime = System.currentTimeMillis();
     }
 
     public String getCurrentDuration() {
-        stopWatch.split();
-        return DurationFormatUtils.formatDurationHMS(stopWatch.getSplitTime());
-    }
-
-    public StopWatch getStopWatch() {
-        return stopWatch;
+        long currentTime = System.currentTimeMillis();
+        long duration = currentTime - lastTime;
+        lastTime = currentTime; // Ažuriraj za sljedeći poziv
+        return DurationFormatUtils.formatDurationHMS(duration);
     }
 }

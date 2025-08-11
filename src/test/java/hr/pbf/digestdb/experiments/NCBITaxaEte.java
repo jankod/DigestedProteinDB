@@ -103,6 +103,10 @@ public class NCBITaxaEte implements AutoCloseable {
         }
     }
 
+    public String getBestName(int taxid) {
+        return getTaxidTranslator(Set.of(taxid), true).get(taxid);
+    }
+
     /**
      * taxid -> scientific name (pokušava i preko merged mape, vraća stare ključeve)
      */

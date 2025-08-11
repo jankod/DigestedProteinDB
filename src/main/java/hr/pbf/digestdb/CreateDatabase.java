@@ -30,7 +30,7 @@ public class CreateDatabase {
 
     public static final String DEFAULT_ROCKSDB_MASS_DB_FILE_NAME = "rocksdb_mass.db";
     public static final String DEFAULT_ACCESSION_DB_FILE_NAME = "custom_accession.db";
-    public static final String DEFAULT_ACC_TAX_DB_FILE_NAME = "accession_tax.db";
+    public static final String DEFAULT_ACC_TAX_DB_FILE_NAME = "acc_taxid.csv";
 
     private final CreateDatabaseConfig config;
 

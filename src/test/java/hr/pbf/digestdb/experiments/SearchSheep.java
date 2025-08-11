@@ -5,10 +5,10 @@ import hr.pbf.digestdb.db.MassRocksDbReader;
 import hr.pbf.digestdb.exception.NcbiTaxonomyException;
 import hr.pbf.digestdb.util.AccTaxDB;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
-import hr.pbf.digestdb.util.NcbiTaksonomyRelations;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.rocksdb.RocksDBException;
 
 import java.io.BufferedReader;
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class SearchSheep {
@@ -43,7 +44,7 @@ public class SearchSheep {
         ProteinScorer scorer = new ProteinScorer();
 
 
-        AccTaxDB accessionTaxDb = AccTaxDB.loadFromDiskString(dbDir + "/acc_taxid.csv");
+        AccTaxDB accessionTaxDb = AccTaxDB.loadFromDiskCsv(dbDir + "/acc_taxid.csv");
 
         for (Double mass : sheepMasses) {
             double mass1 = mass - 0.02;
@@ -152,12 +153,16 @@ public class SearchSheep {
 
     }
 
-    private static List<Double> getMassesSheep(String path) {
+    public static List<Double> getMassesSheep(String path) {
         try (BufferedReader reader = java.nio.file.Files.newBufferedReader(java.nio.file.Paths.get(path))) {
+            List<Double> masses = new ArrayList<>(5172);
             return reader.lines()
-                  .map(line -> line.split("\t")[0])
-                  .map(Double::parseDouble)
-                  .toList();
+                  .map(line -> {
+                      int tabIndex = line.indexOf('\t');
+                      String massStr = tabIndex >= 0 ? line.substring(0, tabIndex) : line;
+                      return Double.parseDouble(massStr);
+                  })
+                  .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Error reading masses from file: " + path, e);
         }

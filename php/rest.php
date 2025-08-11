@@ -170,7 +170,7 @@ include_once 'lib.php';
                 </li>
                 <li>
                     Each entry in <code>result</code> is an object with the mass as the key, mapping to an array of
-                    peptide/protein hits.
+                    peptide/protein hitPeptides.
                 </li>
                 <li>
                     The endpoint is optimized for read-only, high-performance querying.

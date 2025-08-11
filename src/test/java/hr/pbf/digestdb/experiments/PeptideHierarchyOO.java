@@ -59,7 +59,7 @@ public class PeptideHierarchyOO {
                             //taxon.getTaxId(),
                             ncbi.getTaxidTranslator(Set.of(taxon.getTaxId()), true),
                             taxon.getProteinCount(),
-                            taxon.getPeptideCount() ,
+                            taxon.getPeptideCount(),
                             uniquePeptideCount);
 
                   });
@@ -110,6 +110,9 @@ public class PeptideHierarchyOO {
         List<PeptideRecord> list = new ArrayList<>();
         for (String acc : accs) {
             for (String tax : taxIds) {
+                if ("61622".equals(tax)) {
+                    System.err.println("Skipping peptide with tax ID 61622: " + peptide + " " + acc);
+                }
                 try {
                     list.add(new PeptideRecord(peptide, acc.trim(), Integer.parseInt(tax.trim())));
                 } catch (NumberFormatException e) {
@@ -147,6 +150,13 @@ public class PeptideHierarchyOO {
         public int getPeptideCount() {
             return proteins.values().stream()
                   .mapToInt(p -> p.getPeptides().size()).sum();
+        }
+
+        // Nova metoda za jedinstvene peptide
+        public Set<String> getUniquePeptides() {
+            return new HashSet<>(proteins.values().stream().
+                  flatMap(protein -> protein.getPeptides().stream())
+                  .toList());
         }
 
         public List<Protein> getProteinsSorted() {

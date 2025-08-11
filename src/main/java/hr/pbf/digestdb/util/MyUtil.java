@@ -1,5 +1,6 @@
 package hr.pbf.digestdb.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public class MyUtil {
     private static final DecimalFormat df4 = new DecimalFormat("#.####", DecimalFormatSymbols.getInstance(Locale.US));
@@ -171,4 +173,19 @@ public class MyUtil {
         }
         return ByteBuffer.wrap(buffer).getLong();
     }
+
+
+    public static <T> T stopWatch(String operationName, Supplier<T> operation) {
+        // TODO: fix logging
+        StopWatch stopWatch = StopWatch.createStarted();
+        try {
+            T result = operation.get();
+            //        log.debug("{} completed in: {}", operationName, stopWatch.formatTime());
+            return result;
+        } finally {
+            stopWatch.stop();
+        }
+    }
+
+
 }

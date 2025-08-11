@@ -15,7 +15,7 @@ class AccTaxDBTest {
         accTaxDB.createDb(xmlPath);
         System.out.println("Created accession to taxonomy ID map with size: " + accTaxDB.size());
 
-        accTaxDB.writeToDisk(dbPath);
+        accTaxDB.writeToDiskCsv(dbPath);
 
         accTaxDB = AccTaxDB.loadFromDisk(dbPath);
 

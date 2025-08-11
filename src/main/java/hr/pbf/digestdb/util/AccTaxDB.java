@@ -74,7 +74,7 @@ public class AccTaxDB {
 
     }
 
-    public void writeToDisk(String pathCsv) {
+    public void writeToDiskCsv(String pathCsv) {
         if (db == null) {
             throw new IllegalStateException("Database is not initialized. Call createDb() first.");
         }
@@ -100,7 +100,7 @@ public class AccTaxDB {
      * @return
      * @throws IOException
      */
-    public static AccTaxDB loadFromDiskString(String pathCsv) throws IOException {
+    public static AccTaxDB loadFromDiskCsv(String pathCsv) throws IOException {
         AccTaxDB accTaxDB = new AccTaxDB();
         accTaxDB.db = new Long2IntOpenHashMap();
         try (BufferedReader reader = new BufferedReader(new FileReader(pathCsv))) {

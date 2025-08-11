@@ -16,6 +16,9 @@ import java.nio.file.Path;
 
 public class UseOnlyBacteria {
 
+    public static void main(String[] args) throws IOException {
+          AccTaxDB accTaxDB = AccTaxDB.loadFromDiskCsv("/home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl/acc_taxid.csv");
+    }
 
     public static void main2(String[] args) throws NcbiTaxonomyException, XMLStreamException, IOException {
 
@@ -83,6 +86,6 @@ public class UseOnlyBacteria {
                 accTaxDB.addAccessionTaxId(accLong36, p.getTaxonomyId());
             }
         });
-        accTaxDB.writeToDisk("/home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl/gen/acc_taxid.csv");
+        accTaxDB.writeToDiskCsv("/home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl/gen/acc_taxid.csv");
     }
 }
