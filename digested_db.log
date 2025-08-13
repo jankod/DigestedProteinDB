@@ -1,23 +1,24 @@
-10:21:04.350 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
-10:21:04.372 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - Sheep masses: 5172
-10:30:37.428 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
-10:30:37.511 INFO  h.p.digestdb.experiments.SearchSheep:173 - Loaded masses in 00:00:00.008 from: /media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt
-10:39:42.184 DEBUG h.p.d.e.SearchSheepToDuckDb:51 - RocksDB opened in: 00:00:01.171
-10:39:47.328 DEBUG h.p.d.e.SearchSheepToDuckDb:55 - Accession DB opened in: 00:00:00.000
-10:39:47.411 DEBUG h.p.d.e.SearchSheepToDuckDb:59 - NCBITaxaEte opened in: 00:00:00.000
-10:40:56.382 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
-10:40:56.383 DEBUG h.p.d.e.SearchSheepToDuckDb:64 - AccTaxDB loaded in: 00:00:00.000
-10:40:56.388 DEBUG h.p.d.e.SearchSheepToDuckDb:69 - Sheep masses loaded in: 00:00:00.000
-10:40:56.389 DEBUG h.p.d.e.SearchSheepToDuckDb:72 - Sheep masses: 5172
-11:06:45.781 DEBUG h.p.d.e.SearchSheepToDuckDb:54 - RocksDB opened in: 00:00:01.247
-11:06:50.985 DEBUG h.p.d.e.SearchSheepToDuckDb:57 - Accession DB opened in: 00:00:06.456
-11:06:51.070 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - NCBITaxaEte opened in: 00:00:06.542
-11:07:19.225 DEBUG h.p.d.e.SearchSheepToDuckDb:54 - RocksDB opened in: 00:00:01.194
-11:07:24.405 DEBUG h.p.d.e.SearchSheepToDuckDb:57 - Accession DB opened in: 00:00:06.380
-11:07:24.489 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - NCBITaxaEte opened in: 00:00:06.465
-11:08:38.337 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
-11:08:38.339 DEBUG h.p.d.e.SearchSheepToDuckDb:64 - AccTaxDB loaded in: 00:01:20.314
-11:08:38.344 DEBUG h.p.d.e.SearchSheepToDuckDb:68 - Sheep masses loaded in: 00:01:20.320
-11:08:38.344 DEBUG h.p.d.e.SearchSheepToDuckDb:69 - Sheep masses: 5172
-15:54:03.216 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
-16:03:34.478 INFO  h.p.d.e.SearchSheepToDuckDb:76 - Results exported to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep_hits.duckdb_result.csv
+16:07:29.510 DEBUG h.p.d.job.InMemoryJobTrackingService:20 - Saved job execution: 4626823200136710938
+16:07:29.513 INFO  hr.pbf.digestdb.job.JobExecutor:40 - Starting job execution for class: SimpleJob1 with ID: 4626823200136710938
+16:07:29.513 DEBUG h.p.d.job.InMemoryJobTrackingService:26 - Updated job execution: 4626823200136710938
+16:07:29.517 INFO  hr.pbf.digestdb.job.JobExecutor:168 - Found 3 tasks in job class SimpleJob1
+16:07:29.518 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
+16:07:29.518 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task1 (order: 1, ID: 1022830939937394141)
+16:07:29.518 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
+16:07:29.518 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:80 - Executing task1 with parameters: SimpleJobParam[param1=value1, param2=value2]
+16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
+16:07:30.526 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task1 completed successfully in 1008 ms
+16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
+16:07:30.526 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task2 (order: 2, ID: 2635022807747544746)
+16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
+16:07:30.527 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:91 - Executing task2 with result from task1: TaskResult1[result=Result from task1]
+16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
+16:07:31.028 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task2 completed successfully in 501 ms
+16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
+16:07:31.028 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task3 (order: 3, ID: 255831772810267209)
+16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
+16:07:31.030 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:102 - Executing task3 with results: TaskResult1[result=Result from task1] and TaskResult2[result=Result from task2 based on Result from task1]
+16:07:31.330 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
+16:07:31.331 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task3 completed successfully in 302 ms
+16:07:31.331 DEBUG h.p.d.job.InMemoryJobTrackingService:26 - Updated job execution: 4626823200136710938
+16:07:31.331 INFO  hr.pbf.digestdb.job.JobExecutor:72 - Job execution completed successfully! Job ID: 4626823200136710938, Duration: 1822 ms

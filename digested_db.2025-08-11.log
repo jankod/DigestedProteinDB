@@ -1,0 +1,23 @@
+10:21:04.350 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+10:21:04.372 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - Sheep masses: 5172
+10:30:37.428 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+10:30:37.511 INFO  h.p.digestdb.experiments.SearchSheep:173 - Loaded masses in 00:00:00.008 from: /media/tag/D/digested-db/Trypsin_HTXdigest-ovca.txt
+10:39:42.184 DEBUG h.p.d.e.SearchSheepToDuckDb:51 - RocksDB opened in: 00:00:01.171
+10:39:47.328 DEBUG h.p.d.e.SearchSheepToDuckDb:55 - Accession DB opened in: 00:00:00.000
+10:39:47.411 DEBUG h.p.d.e.SearchSheepToDuckDb:59 - NCBITaxaEte opened in: 00:00:00.000
+10:40:56.382 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+10:40:56.383 DEBUG h.p.d.e.SearchSheepToDuckDb:64 - AccTaxDB loaded in: 00:00:00.000
+10:40:56.388 DEBUG h.p.d.e.SearchSheepToDuckDb:69 - Sheep masses loaded in: 00:00:00.000
+10:40:56.389 DEBUG h.p.d.e.SearchSheepToDuckDb:72 - Sheep masses: 5172
+11:06:45.781 DEBUG h.p.d.e.SearchSheepToDuckDb:54 - RocksDB opened in: 00:00:01.247
+11:06:50.985 DEBUG h.p.d.e.SearchSheepToDuckDb:57 - Accession DB opened in: 00:00:06.456
+11:06:51.070 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - NCBITaxaEte opened in: 00:00:06.542
+11:07:19.225 DEBUG h.p.d.e.SearchSheepToDuckDb:54 - RocksDB opened in: 00:00:01.194
+11:07:24.405 DEBUG h.p.d.e.SearchSheepToDuckDb:57 - Accession DB opened in: 00:00:06.380
+11:07:24.489 DEBUG h.p.d.e.SearchSheepToDuckDb:60 - NCBITaxaEte opened in: 00:00:06.465
+11:08:38.337 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+11:08:38.339 DEBUG h.p.d.e.SearchSheepToDuckDb:64 - AccTaxDB loaded in: 00:01:20.314
+11:08:38.344 DEBUG h.p.d.e.SearchSheepToDuckDb:68 - Sheep masses loaded in: 00:01:20.320
+11:08:38.344 DEBUG h.p.d.e.SearchSheepToDuckDb:69 - Sheep masses: 5172
+15:54:03.216 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+16:03:34.478 INFO  h.p.d.e.SearchSheepToDuckDb:76 - Results exported to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep_hits.duckdb_result.csv

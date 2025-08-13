@@ -1,0 +1,10 @@
+07:30:04.579 INFO  h.p.d.e.SearchSheepToDuckDb:109 - Sheep protein-peptide count exported to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep_hits.duckdb_sheep_protein_peptide_count.csv
+11:38:48.964 INFO  h.p.d.e.SearchSheepToDuckDb:111 - Sheep protein-peptide count exported to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep_hits.duckdb_sheep_protein_peptide_count.csv
+15:53:27.725 DEBUG h.p.d.e.SearchSheepToDuckDb:137 - RocksDB opened in: 00:00:01.321
+15:53:35.532 DEBUG h.p.d.e.SearchSheepToDuckDb:140 - Accession DB opened in: 00:00:07.817
+15:53:35.624 DEBUG h.p.d.e.SearchSheepToDuckDb:143 - NCBITaxaEte opened in: 00:00:00.091
+15:54:49.523 INFO  hr.pbf.digestdb.util.AccTaxDB:124 - Loaded 252633201 entries from /home/tag/IdeaProjects/DigestedProteinDB/misc/db/trembl//acc_taxid.csv
+15:54:49.524 DEBUG h.p.d.e.SearchSheepToDuckDb:147 - AccTaxDB loaded in: 00:01:13.901
+15:54:49.528 DEBUG h.p.d.e.SearchSheepToDuckDb:151 - Sheep masses loaded in: 00:00:00.004
+15:54:49.529 DEBUG h.p.d.e.SearchSheepToDuckDb:152 - Sheep masses: 2403
+18:57:41.694 INFO  h.p.d.e.SearchSheepToDuckDb:143 - Sheep protein-peptide count exported to: /home/tag/IdeaProjects/DigestedProteinDB/misc/db/sheep_only_hits_v2.duckdb_sheep_only_v2_protein_peptide_count.csv
