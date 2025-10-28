@@ -6,16 +6,29 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <?php
+            // detect if we are running on localhost / loopback
+            $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+            $remote = $_SERVER['REMOTE_ADDR'] ?? '';
+            $isLocal = false;
+            // HTTP_HOST can include port (e.g. localhost:8080), so use stripos for localhost
+            if (stripos($host, 'localhost') !== false || strpos($host, '127.') === 0 || $remote === '127.0.0.1' || $remote === '::1') {
+                $isLocal = true;
+            }
+            ?>
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('index.php') ?>" href="index.php"
                        aria-current="page">Search</a>
                 </li>
+
+                <?php if ($isLocal): ?>
                 <li class="nav-item">
                     <a class="nav-link <?php echo isActive('analyze_ms1.php') ?>" href="analyze_ms1.php"
                        aria-current="page">Analyze</a>
                 </li>
+                <?php endif; ?>
 
 
 

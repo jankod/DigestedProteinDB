@@ -54,7 +54,7 @@ include_once 'lib.php';
                             <label for="mass2" class="form-label">Mass to (Da)</label>
                             <input x-model="mass2" type="text" class="form-control w-50" id="mass2" name="mass2"
                                    required
-                                   value="1500.8">
+                                   value="1500.62">
                         </div>
                         <button type="submit" class="btn btn-primary" :disabled="loading">
                             <span x-show="!loading">Search</span>
@@ -64,10 +64,7 @@ include_once 'lib.php';
                 </div>
 
                 <div class="col mt-2">
-
-
                     <h4>Calculate by m/z</h4>
-
                     <form @submit.prevent="addByMZ">
 
                         <div class="mb-3">
