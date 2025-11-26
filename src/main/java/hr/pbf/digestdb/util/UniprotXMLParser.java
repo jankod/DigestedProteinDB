@@ -196,6 +196,7 @@ public class UniprotXMLParser {
         @ToString.Exclude
         String sequence;
 
+
         //public void addTaxonomyId(int taxId) {
          //   taxonomyIds.add(taxId);
        // }

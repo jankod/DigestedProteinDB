@@ -1,24 +1,6 @@
-16:07:29.510 DEBUG h.p.d.job.InMemoryJobTrackingService:20 - Saved job execution: 4626823200136710938
-16:07:29.513 INFO  hr.pbf.digestdb.job.JobExecutor:40 - Starting job execution for class: SimpleJob1 with ID: 4626823200136710938
-16:07:29.513 DEBUG h.p.d.job.InMemoryJobTrackingService:26 - Updated job execution: 4626823200136710938
-16:07:29.517 INFO  hr.pbf.digestdb.job.JobExecutor:168 - Found 3 tasks in job class SimpleJob1
-16:07:29.518 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
-16:07:29.518 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task1 (order: 1, ID: 1022830939937394141)
-16:07:29.518 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
-16:07:29.518 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:80 - Executing task1 with parameters: SimpleJobParam[param1=value1, param2=value2]
-16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 1022830939937394141 for job: 4626823200136710938
-16:07:30.526 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task1 completed successfully in 1008 ms
-16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
-16:07:30.526 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task2 (order: 2, ID: 2635022807747544746)
-16:07:30.526 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
-16:07:30.527 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:91 - Executing task2 with result from task1: TaskResult1[result=Result from task1]
-16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 2635022807747544746 for job: 4626823200136710938
-16:07:31.028 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task2 completed successfully in 501 ms
-16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
-16:07:31.028 INFO  hr.pbf.digestdb.job.JobExecutor:102 - Executing task: task3 (order: 3, ID: 255831772810267209)
-16:07:31.028 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
-16:07:31.030 INFO  h.p.digestdb.job.DemoJob$SimpleJob1:102 - Executing task3 with results: TaskResult1[result=Result from task1] and TaskResult2[result=Result from task2 based on Result from task1]
-16:07:31.330 DEBUG h.p.d.job.InMemoryJobTrackingService:34 - Saved task execution: 255831772810267209 for job: 4626823200136710938
-16:07:31.331 INFO  hr.pbf.digestdb.job.JobExecutor:123 - Task task3 completed successfully in 302 ms
-16:07:31.331 DEBUG h.p.d.job.InMemoryJobTrackingService:26 - Updated job execution: 4626823200136710938
-16:07:31.331 INFO  hr.pbf.digestdb.job.JobExecutor:72 - Job execution completed successfully! Job ID: 4626823200136710938, Duration: 1822 ms
+10:18:38.023 DEBUG hr.pbf.digestdb.SearchWeb:55 - Start web on port: 7071 db dir: /Users/tag/IdeaProjects/DigestedProteinDB/misc/db_all_swisprot/rocksdb_mass.db
+10:18:38.027 INFO  hr.pbf.digestdb.SearchWeb:59 - Initializing database...
+10:18:39.185 INFO  hr.pbf.digestdb.SearchWeb:63 - Database initialized in 1158 ms
+10:18:39.368 INFO  hr.pbf.digestdb.SearchWeb:86 - Web started on http://localhost:7071
+11:42:02.299 INFO  hr.pbf.digestdb.DigestedApp:120 - Application is shutting down, possibly due to SIGINT
+11:42:02.300 INFO  hr.pbf.digestdb.SearchWeb:419 - Server stopped and resources released

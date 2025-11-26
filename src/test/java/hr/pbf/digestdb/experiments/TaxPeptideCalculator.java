@@ -19,31 +19,33 @@ public class TaxPeptideCalculator {
 
     public static void main(String[] args) throws NcbiTaxonomyException, XMLStreamException, IOException {
 
+
+        System.out.println("TaxPeptideCalculator");
+        if (args.length != 2) {
+            System.out.println("Usage: <ncbiTaxonomyPath> <uniprotXmlPath>");
+            System.exit(1);
+        }
         String ncbiTaxonomyPath = "";
         String uniprotXmlPath = "";
 
         NcbiTaksonomyRelations ncbiTaksonomyRelations = NcbiTaksonomyRelations.loadTaxonomyNodes(ncbiTaxonomyPath);
 
-         UniprotXMLParser parser = new UniprotXMLParser();
+        UniprotXMLParser parser = new UniprotXMLParser();
 
-
-         // taxId -> peptide count
+        // taxId -> peptide count
         Int2IntArrayMap taxIdPeptideCount = new Int2IntArrayMap();
 
         parser.parseProteinsFromXMLstream(uniprotXmlPath, new UniprotXMLParser.ProteinHandler() {
-              @Override
-              public void gotProtein(UniprotXMLParser.ProteinInfo p) {
-
-                  List<String> peptides = BioUtil.tripsyn2mc(p.getSequence(), 6, 50);
-                  for (String peptide : peptides) {
-
+            @Override
+            public void gotProtein(UniprotXMLParser.ProteinInfo p) {
+                List<String> peptides = BioUtil.tripsyn2mc(p.getSequence(), 6, 50);
+                for (String peptide : peptides) {
 
 
+                }
 
-                  }
-
-              }
-          });
+            }
+        });
 
     }
 }

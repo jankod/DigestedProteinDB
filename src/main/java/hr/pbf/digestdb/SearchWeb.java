@@ -16,7 +16,9 @@ import io.undertow.server.handlers.resource.ClassPathResourceManager;
 import io.undertow.server.handlers.resource.ResourceHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.StatusCodes;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksDBException;
@@ -308,9 +310,11 @@ public class SearchWeb {
     }
 
     @Data
-    static class AccTaxs {
-        String acc;
-        int taxId;
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AccTaxs {
+        private String acc;
+        private int taxId;
     }
 
     @Data
