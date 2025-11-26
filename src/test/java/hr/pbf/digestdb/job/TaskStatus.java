@@ -3,7 +3,7 @@ package hr.pbf.digestdb.job;
 public enum TaskStatus {
     PENDING,
     RUNNING,
-    COMPLETED,
+    COMPLETED, 
     FAILED,
     SKIPPED
 }

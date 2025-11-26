@@ -12,7 +12,7 @@ public class JobExecution {
     private LocalDateTime endTime;
     private JobStatus status;
     private String errorMessage;
-
+    
     public JobExecution(long jobId, String jobName, Object jobParams) {
         this.jobId = jobId;
         this.jobName = jobName;
@@ -20,12 +20,11 @@ public class JobExecution {
         this.startTime = LocalDateTime.now();
         this.status = JobStatus.PENDING;
     }
-
+    
     public long getDurationMs() {
         if (endTime != null) {
             return java.time.Duration.between(startTime, endTime).toMillis();
         }
         return java.time.Duration.between(startTime, LocalDateTime.now()).toMillis();
     }
-
 }
