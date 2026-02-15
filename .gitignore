@@ -12,3 +12,4 @@ war/node_modules
 /src/main/java/hr/pbf/digestdb/App.java
 /DigestedProteinDB.iml
 /python/misc/
+/src/test/java/hr/pbf/digestdb/experiments/
