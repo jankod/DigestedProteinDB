@@ -81,6 +81,7 @@ public class UniprotXMLParser {
         ProteinInfo proteinInfo = null;
         boolean inLineage = false;
         boolean isOrganism = false;
+        boolean inRecommendedName = false;
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty(XMLInputFactory.IS_COALESCING, true);
@@ -111,10 +112,15 @@ public class UniprotXMLParser {
                                         proteinInfo.setAccession(elementText);
                                     }
                                     break;
+                                case "recommendedName":
+                                    inRecommendedName = true;
+                                    break;
                                 case "fullName":
-                                    String fullName = reader.getElementText();
-//                                    System.out.println("fullName " + fullName);
-                                    proteinInfo.setProteinName(fullName);
+                                    if (inRecommendedName) {
+                                        String fullName = reader.getElementText();
+//                                      System.out.println("recommended fullName " + fullName);
+                                        proteinInfo.setProteinName(fullName);
+                                    }
                                     break;
                                 case "organism":
                                     isOrganism = true;
@@ -176,6 +182,9 @@ public class UniprotXMLParser {
                             case "lineage":
                                 inLineage = false; // Ispravno resetiranje
                                 break;
+                            case "recommendedName":
+                                inRecommendedName = false;
+                                break;
                         }
                         break;
                 }
@@ -203,7 +212,6 @@ public class UniprotXMLParser {
     }
 
 }
-
 
 
 
