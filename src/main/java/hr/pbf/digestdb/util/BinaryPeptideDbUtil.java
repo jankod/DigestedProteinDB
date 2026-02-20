@@ -21,7 +21,7 @@ import java.util.*;
 @UtilityClass
 public class BinaryPeptideDbUtil {
 
-	private static ByteBuffer bufferCache = ByteBuffer.allocate(1024 * 1024 * 36); // 36MB
+	private static final ThreadLocal<ByteBuffer> bufferCache = ThreadLocal.withInitial(() -> ByteBuffer.allocate(1024 * 1024 * 36)); // 36MB
 
 	public void writeVarInt(ByteBuffer buffer, int value) {
 		// VarInt use unsigned int, so we need to make sure we are working with positive values
@@ -169,7 +169,8 @@ public class BinaryPeptideDbUtil {
 	 */
 	public static byte[] writeGroupedRow(String value) {
 		try {
-			bufferCache.clear();
+			ByteBuffer buffer = bufferCache.get();
+			buffer.clear();
 			int start = 0;
 			while(start < value.length()) {
 				int colonIndex = value.indexOf(':', start);
@@ -181,31 +182,33 @@ public class BinaryPeptideDbUtil {
 
 				byte[] seqBytes = AminoAcid5bitCoder.encodePeptide(seq);
 				// byte[] seqBytes = seq.getBytes(StandardCharsets.UTF_8);
-				ensureCapacity(bufferCache, seqBytes.length + 5); // 4 bytes for length + 1 byte for data
-				writeVarInt(bufferCache, seqBytes.length);
+				ensureCapacity(seqBytes.length + 5); // 4 bytes for length + 1 byte for data
+				buffer = bufferCache.get(); // get potentially new buffer
+				writeVarInt(buffer, seqBytes.length);
 
-				bufferCache.put(seqBytes);
+				buffer.put(seqBytes);
 
-				writeVarInt(bufferCache, accessions.length);
+				writeVarInt(buffer, accessions.length);
 				for(String acc : accessions) {
-					writeVarInt(bufferCache, Integer.parseInt(acc));
+					writeVarInt(buffer, Integer.parseInt(acc));
 				}
 				start = dashIndex + 1;
 			}
-			return Arrays.copyOf(bufferCache.array(), bufferCache.position());
+			return Arrays.copyOf(buffer.array(), buffer.position());
 		} catch(Exception e) {
 			log.error("Error on line: " + StringUtils.truncate(value, 20_000), e);
 			throw e;
 		}
 	}
 
-	private void ensureCapacity(ByteBuffer buff, int additionalCapacity) {
+	private void ensureCapacity(int additionalCapacity) {
+		ByteBuffer buff = bufferCache.get();
 		if(buff.remaining() < additionalCapacity) {
 			int newCapacity = Math.max((int) (buff.capacity() * 2), buff.capacity() + additionalCapacity);
 			ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
 			buff.flip();
 			newBuffer.put(buff);
-			bufferCache = newBuffer;
+			bufferCache.set(newBuffer);
 		}
 	}
 
