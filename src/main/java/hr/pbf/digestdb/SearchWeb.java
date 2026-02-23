@@ -40,7 +40,7 @@ public class SearchWeb {
     private MassRocksDbReader massDb;
     private AccessionDbReader accDb;
 
-    private AccTaxDB accTaxDb;
+    private volatile AccTaxDB accTaxDb;
 
     public SearchWeb(String dbDirPath, int port) {
         this.dbDirPath = dbDirPath;
@@ -141,8 +141,12 @@ public class SearchWeb {
 
     private PageResultTax toTaxonomy(PageResult pageResult) throws IOException {
         if (accTaxDb == null) {
-            accTaxDb = AccTaxDB.loadFromDiskCsv(dbAccTaxPath);
-            log.debug("Taxonomy read from disk: {}", accTaxDb);
+            synchronized (this) {
+                if (accTaxDb == null) {
+                    accTaxDb = AccTaxDB.loadFromDiskCsv(dbAccTaxPath);
+                    log.debug("Taxonomy read from disk: {}", accTaxDb);
+                }
+            }
         }
 
         PageResultTax pageResultTax = new PageResultTax();
@@ -214,7 +218,7 @@ public class SearchWeb {
         return params;
     }
 
-    private void handleDbInfo(HttpServerExchange exchange) throws IOException {
+    private void handleDbInfo(HttpServerExchange exchange) {
         if (exchange.isInIoThread()) {
             exchange.dispatch(this::handleDbInfo);
             return;
@@ -228,7 +232,7 @@ public class SearchWeb {
         }
     }
 
-    private void handleSearch(HttpServerExchange exchange) throws IOException {
+    private void handleSearch(HttpServerExchange exchange) {
         if (exchange.isInIoThread()) {
             exchange.dispatch(this::handleSearch);
             return;
@@ -261,7 +265,7 @@ public class SearchWeb {
         }
     }
 
-    synchronized private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
+    private void searchByMass(HttpServerExchange exchange, double mass1, double mass2, int page, int pageSize) {
         MyStopWatch watch = new MyStopWatch();
         MassRocksDbReader.MassPageResult result = massDb.searchByMass(mass1, mass2, page, pageSize);
         long l = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();

@@ -22,7 +22,7 @@ include_once 'lib.php';
         <li class="list-group-item"><a class=" link-info" href='dow/disk3_download/db_swisprot_chymotrypsin.zip' download>db_swisprot_chymotrypsin.zip</a> (208 MB)</li>
         <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_swisprot_trypsin.zip' download>db_swisprot_trypsin.zip</a>  (263 MB)</li>
         <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_trembl_bacteria_trypsin.zip' download>db_trembl_bacteria_trypsin.zip</a> (50 GB)</li>
-        <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_trembl_trypsin.zip' download>db_trembl_trypsin.zip</a> (84 GB)</li>
+        <li class="list-group-item"><a class="link-info" href='dow/disk3_download/db_trembl_trypsin.zip' download>db_trembl_trypsin.zip</a> (208 GB)</li>
     </ul>
     <div class="custom-database-note text-body mt-3">
         <p>Creating custom databases for different taxonomic groups or enzymes is straightforward.

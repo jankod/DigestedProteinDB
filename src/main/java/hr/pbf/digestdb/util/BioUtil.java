@@ -49,7 +49,7 @@ public class BioUtil {
         if (charset == null) {
             charset = "ASCII";
         }
-        return new BufferedReader(new InputStreamReader(new FileInputStream(new File(path)), charset),
+        return new BufferedReader(new InputStreamReader(new FileInputStream(path), charset),
               bufSize);
     }
 
@@ -67,18 +67,18 @@ public class BioUtil {
         int BUFFER = 1024 * 1024 * 12 * 4; // 12 * 4 MB
 
 
-        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(path)), charset),
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), charset),
               BUFFER);
     }
 
     public DataOutputStream newDataOutputStreamCompresed(String path) throws IOException {
 
         return new DataOutputStream(
-              new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(new File(path)))));
+              new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(path))));
     }
 
     public DataInputStream newDataInputStreamCompressed(String path) throws IOException {
-        GZIPInputStream in = new GZIPInputStream(new FileInputStream(new File(path)));
+        GZIPInputStream in = new GZIPInputStream(new FileInputStream(path));
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         IOUtils.copy(in, bytes);
         return new DataInputStream(new ByteArrayInputStream(bytes.toByteArray()));
@@ -86,7 +86,7 @@ public class BioUtil {
 
 
     public DataInputStream newDataInputStream(String path) throws FileNotFoundException {
-        return new DataInputStream(new BufferedInputStream(new FileInputStream(new File(path))));
+        return new DataInputStream(new BufferedInputStream(new FileInputStream(path)));
     }
 
     public double roundToDecimals(double num, int dec) {
@@ -363,10 +363,10 @@ public class BioUtil {
      * peptide mass other libs. New fast calculation of mass + water 18.01.
      */
     public double calculateMassWidthH2O(final String peptide) {
-        float h = 0;
+        double h = 0;
         try {
             for (int i = 0; i < peptide.length(); i++) {
-                h += (float) getMassFromAAfast(peptide.charAt(i));
+                h += getMassFromAAfast(peptide.charAt(i));
             }
         } catch (RuntimeException e) {
             throw new RuntimeException(e.getMessage() + " peptide: " + peptide, e);
