@@ -47,6 +47,11 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link <?php echo isActive('enterprise.php') ?>" href="enterprise.php"
+                       aria-current="page">Enterprise</a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link <?php echo isActive('about.php') ?>" href="about.php"
                        aria-current="page">About</a>
                 </li>
