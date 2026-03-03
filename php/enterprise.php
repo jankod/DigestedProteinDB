@@ -109,28 +109,58 @@
         <div class="card-body">
           <h5 class="card-title">Performance snapshot</h5>
 
-          <table class="table table-sm mb-0">
-            <tr>
-              <td><strong>Database</strong></td>
-              <td>UniProt TrEMBL digest</td>
-            </tr>
-            <tr>
-              <td><strong>Size</strong></td>
-              <td>~380 GB</td>
-            </tr>
-            <tr>
-              <td><strong>Typical query</strong></td>
-              <td>~2–3 ms</td>
-            </tr>
-            <tr>
-              <td><strong>Peak memory</strong></td>
-              <td>~316 MB</td>
-            </tr>
-            <tr>
-              <td><strong>Enzyme</strong></td>
-              <td>Trypsin (MC=2)</td>
-            </tr>
-          </table>
+<div class="card shadow-sm">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Enterprise Engine Specification (Rust)</h5>
+        <span class="badge bg-success">High Performance</span>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <tbody>
+                <tr>
+                    <td class="fw-bold" style="width: 35%;">Database Version</td>
+                    <td>UniProtKB/TrEMBL (Release 2026_01)</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Taxonomy & Scope</td>
+                    <td><span class="text-primary fw-bold">All Organisms (Proteome-wide)</span> - Full global protein index</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Scale</td>
+                    <td>~252 million proteins / ~5.9 billion peptides</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Digestion Parameters</td>
+                    <td>
+                        <strong>Enzyme:</strong> Trypsin<br>
+                        <strong>Missed Cleavages:</strong> Up to 2 allowed<br>
+                        <strong>Peptide Length:</strong> 6 to 50 amino acids
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Search Performance</td>
+                    <td><mark class="px-2">~2–3 ms</mark> average mass-range query time</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Disk Footprint</td>
+                    <td>~380 GB (Optimized with Snappy compression & 5-bit encoding)</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Memory Usage</td>
+                    <td>~316 MB peak RAM (Out-of-core indexing)</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold">Storage Engine</td>
+                    <td>RocksDB Key-Value (Optimized Rust Core)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer bg-light text-center">
+        <small class="text-muted">Designed for ultra-fast candidate retrieval in large-scale metaproteomics.</small>
+    </div>
+</div>
+
         </div>
       </div>
     </div>
@@ -219,7 +249,7 @@
   </div>
 
   <!-- COMMUNITY VS ENTERPRISE -->
-  <div class="row mb-4">
+  <div class="row mb-4 ">
     <div class="col-lg-6 mb-3">
       <div class="card h-100 border-success">
         <div class="card-body">
@@ -234,7 +264,7 @@
       </div>
     </div>
 
-    <div class="col-lg-6 mb-3">
+    <div class="col-lg-6 mb-3 ">
       <div class="card h-100 border-primary">
         <div class="card-body">
           <h5 class="card-title text-primary">Enterprise Engine (Rust)</h5>
