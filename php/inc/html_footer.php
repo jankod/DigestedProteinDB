@@ -33,3 +33,5 @@
         </div>
     </div>
 </div>
+
+<?php include_once "inc/google_analytics_body.php"; ?>

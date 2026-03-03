@@ -78,6 +78,6 @@ include_once 'lib.php';
 <script src="bio-lib.js" defer></script>
 <script src="//unpkg.com/alpinejs" defer></script>
 
-
+<?php include_once "inc/google_analytics_body.php"; ?>
 </body>
 </html>
