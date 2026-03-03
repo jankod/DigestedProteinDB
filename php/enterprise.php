@@ -8,6 +8,14 @@
     <head>
         <?php include_once "inc/html_head.php"; ?>
          <style>
+             body {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+  }
+  .card {
+    background-color: #fff;
+  }
+
         :root {
           --dpdb-bg: #0b1220;
           --dpdb-card: rgba(255,255,255,0.06);
