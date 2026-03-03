@@ -26,123 +26,170 @@ include_once 'lib.php';
         </div>
     </div>
 
-    <div class="my-4 p-4 border-start border-4 border-primary bg-light shadow-sm rounded-end">
-        <div class="d-flex align-items-center mb-2">
-            <i class="bi bi-info-square-fill text-primary me-2 fs-4"></i>
-            <h5 class="mb-0 fw-bold text-dark">Production Engine Overview</h5>
-        </div>
-        <p class="mb-0 text-muted" style="font-size: 1.05rem;">
-            The <strong>Enterprise Engine (Rust)</strong> is an ultra-optimized implementation of DigestedProteinDB.
-            While the <span class="text-primary fw-semibold">Java version</span> serves as the open-source research
-            reference,
-            this engine is specifically engineered for high-throughput production, sub-millisecond mass-range queries,
-            and seamless embedding into high-performance computing (HPC) pipelines.
-        </p>
-    </div>
-
     <!-- OVERVIEW -->
     <div class="row mb-4">
-        <div class="col-lg-7">
+        <div class="col">
             <h3>Overview</h3>
-            <p>
-                The <strong>DigestedProteinDB Engine (Rust)</strong> is a high-performance command-line
-                peptide indexing and search tool designed for large-scale proteomics and metaproteomics.
-                It enables millisecond-level peptide mass-range queries even on very large databases.
+            <p class="mb-2">
+                The <strong>Enterprise Engine (Rust)</strong> is an ultra-optimized implementation of DigestedProteinDB
+                designed for large-scale proteomics and metaproteomics.
             </p>
-
-
-            <div class="row g-4 mt-5">
-                <div class="col-md-6">
-                    <h5 class="fw-bold"><i class="bi bi-gear-wide-connected text-primary"></i> Production-Ready</h5>
-                    <p class="text-muted small">Optimized for stability and consistent 2-3 ms latency using RocksDB's
-                        Log-Structured Merge (LSM) tree architecture.</p>
-                </div>
-                <div class="col-md-6">
-                    <h5 class="fw-bold"><i class="bi bi-memory text-primary"></i> Minimal Resource Usage</h5>
-                    <p class="text-muted small">Search billions of entries with peak RAM under 500 MB, thanks to 5-bit
-                        sequence encoding and varint serialization.</p>
-                </div>
-                <div class="col-md-6">
-                    <h5 class="fw-bold"><i class="bi bi-diagram-3 text-primary"></i> Custom Taxonomy & Enzymes</h5>
-                    <p class="text-muted small">We build tailored indices for specific TaxIDs, enzymes (Trypsin, Pepsin,
-                        etc.), and custom digestion rules (missed cleavages, length).</p>
-                </div>
-                <div class="col-md-6">
-                    <h5 class="fw-bold"><i class="bi bi-box-seam text-primary"></i> Seamless Embedding</h5>
-                    <p class="text-muted small">Zero-dependency Rust core. Perfect for integration into HPC pipelines or
-                        as a backend engine for third-party proteomics software.</p>
-                </div>
-            </div>
+            <p class="mb-0">
+                The <span class="text-primary fw-semibold">Java version</span> serves as the open-source research
+                reference, while this engine delivers sub-millisecond mass-range queries and seamless embedding into
+                high-performance computing (HPC) pipelines.
+            </p>
         </div>
+    </div>
 
-        <div class="col-lg-5">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Performance Snapshot</h5>
+    <!-- KEY FEATURES -->
+    <div class="row mb-4">
+        <div class="col">
+            <h3>Key capabilities</h3>
+            <div class="row">
 
-                    <div class="card shadow-sm">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Enterprise Engine Specifications (Rust)</h5>
-                            <span class="badge bg-success">High-performance</span>
-                        </div>
-                        <div class="card-body p-0">
-                            <table class="table table-hover table-striped mb-0">
-                                <tbody>
-                                <tr>
-                                    <td class="fw-bold" style="width: 35%;">Database Version</td>
-                                    <td>UniProtKB/TrEMBL (Release 2026_01)</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Taxonomy & Scope</td>
-                                    <td><span class="text-primary fw-bold">All Organisms (proteome-wide)</span> - full
-                                        global protein index.
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Scale</td>
-                                    <td>202.55 million proteins / 17.20 billion peptides</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Digestion Parameters</td>
-                                    <td>
-                                        <strong>Enzyme:</strong> Trypsin<br>
-                                        <strong>Missed Cleavages:</strong> Up to 2 allowed<br>
-                                        <strong>Peptide Length:</strong> 6 to 50 amino acids
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Search Performance</td>
-                                    <td>
-                                        <mark class="px-2">~150 ms</mark>
-                                        average mass-range query time.
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Disk Footprint</td>
-                                    <td>~255 GB (Optimized with Snappy/Zstd compression & 5-bit encoding)</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Memory Usage</td>
-                                    <td>~316 MB peak RAM (Out-of-core indexing)</td>
-                                </tr>
-                                <tr>
-                                    <td class="fw-bold">Storage Engine</td>
-                                    <td>RocksDB key-value store (optimized Rust core)</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="card-footer bg-light text-center">
-                            <small class="text-muted">Designed for ultra-fast candidate retrieval in large-scale
-                                metaproteomics.</small>
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Ultra-fast mass search</h6>
+                            <p class="card-text small">
+                                Retrieve candidate peptides within narrow precursor mass windows
+                                in milliseconds, even for very large databases.
+                            </p>
                         </div>
                     </div>
-
                 </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Custom database generation</h6>
+                            <p class="card-text small">
+                                Build tailored peptide indexes for specific organisms,
+                                taxonomies, enzymes, and digestion parameters.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Out-of-core design</h6>
+                            <p class="card-text small">
+                                No need to load the full digest into memory. Works efficiently
+                                with very large UniProt-scale datasets.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">CLI-first architecture</h6>
+                            <p class="card-text small">
+                                Scriptable and pipeline-friendly command-line interface suitable
+                                for HPC and automated workflows.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Embeddable engine</h6>
+                            <p class="card-text small">
+                                Designed to be integrated into external software, services,
+                                or internal proteomics pipelines.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">Enterprise customization</h6>
+                            <p class="card-text small">
+                                Supports custom builds, organism-specific databases,
+                                and performance tuning for production environments.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
+    <!-- PERFORMANCE SNAPSHOT -->
+    <div class="row mb-4">
+        <div class="col">
+            <h3>Performance snapshot</h3>
+            <p class="text-muted mb-2">These results correspond to the <strong>largest database build</strong> we have
+                benchmarked so far, which best reflects peak-scale performance. Additional snapshots for other database
+                sizes will be added as they become available.</p>
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Enterprise Engine Specifications (Rust)</h5>
+                    <span class="badge bg-success">High-performance</span>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover table-striped mb-0">
+                        <tbody>
+                        <tr>
+                            <td class="fw-bold" style="width: 35%;">Database Version</td>
+                            <td>UniProtKB/TrEMBL (Release 2026_01)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Taxonomy & Scope</td>
+                            <td><span class="text-primary fw-bold">All Organisms (proteome-wide)</span> - full
+                                global protein index.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Scale</td>
+                            <td>202.55 million proteins / 17.20 billion peptides</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Digestion Parameters</td>
+                            <td>
+                                <strong>Enzyme:</strong> Trypsin<br>
+                                <strong>Missed Cleavages:</strong> Up to 2 allowed<br>
+                                <strong>Peptide Length:</strong> 6 to 50 amino acids
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Search Performance</td>
+                            <td>
+                                <mark class="px-2">~150 ms</mark>
+                                average mass-range query time.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Disk Footprint</td>
+                            <td>~255 GB (Optimized with Snappy/Zstd compression & 5-bit encoding)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Memory Usage</td>
+                            <td>~316 MB peak RAM (Out-of-core indexing)</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Storage Engine</td>
+                            <td>RocksDB key-value store (optimized Rust core)</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer bg-light text-center">
+                    <small class="text-muted">Designed for ultra-fast candidate retrieval in large-scale
+                        metaproteomics.</small>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="my-5">
         <div class="row justify-content-center">
@@ -192,8 +239,19 @@ include_once 'lib.php';
 
         <br>
 
-
         <div class="my-4">
+            <div class="row mb-3">
+                <div class="col">
+                    <h3>Architecture and workflow</h3>
+                    <p class="text-muted mb-2">
+                        The diagram is split into two parts: <strong>database construction</strong> (left) and
+                        <strong>mass-based search</strong> (right). The first shows the build pipeline from UniProtKB input
+                        through digestion and encoding into a RocksDB index. The second shows how experimental mass
+                        queries are matched against the indexed data to return candidate peptides.
+                    </p>
+                    <p class="text-muted mb-0">High-level build and query flow for the enterprise engine.</p>
+                </div>
+            </div>
 
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                  contentStyleType="text/css" data-diagram-type="DESCRIPTION" height="708.3333px"
@@ -493,31 +551,31 @@ include_once 'lib.php';
 
 
         <div class="my-5">
-            <div class="row justify-content-center text-center mb-4">
+            <div class="row justify-content-start text-center mb-4">
                 <div class="col-lg-8">
-                    <h2 class="fw-bold text-dark">Accessing the Engine</h2>
-                    <p class="text-muted">The DigestedProteinDB Enterprise Engine (Rust) is optimized for
-                        high-throughput production environments and large-scale metaproteomics.</p>
+                    <h2 class="fw-bold text-dark">Downloads</h2>
+                    <p class="text-muted">Downloadable builds and pre-built databases will be published as releases become
+                        available.</p>
                 </div>
             </div>
 
-            <div class="row g-4 justify-content-center">
+            <div class="row g-4">
                 <div class="col-md-5">
                     <div class="card h-100 shadow-sm border-0 bg-light">
                         <div class="card-body p-4 d-flex flex-column align-items-center justify-content-center text-center">
                             <div class="mb-3 text-primary">
                                 <i class="bi bi-cpu fs-1"></i>
                             </div>
-                            <h4 class="fw-bold">High-performance CLI</h4>
+                            <h4 class="fw-bold">CLI Binary (Rust)</h4>
                             <p class="small text-muted mb-4">Optimized Rust binary for Linux, macOS, and Windows.
                                 Features sub-millisecond query resolution and ultra-low memory footprint.</p>
 
                             <div class="d-grid w-100">
-                                <button class="btn btn-secondary btn-lg disabled shadow-sm">
-                                    <i class="bi bi-clock-history me-2"></i> Available Soon
+                                <button class="btn btn-outline-info btn-lg disabled shadow-sm">
+                                    <i class="bi bi-clock-history me-2"></i> Coming Soon
                                 </button>
                             </div>
-                            <small class="mt-3 text-primary fw-bold">Pre-release testing in progress.</small>
+                            <small class="mt-3 text-muted">Pre-release testing in progress.</small>
                         </div>
                     </div>
                 </div>
@@ -528,13 +586,13 @@ include_once 'lib.php';
                             <div class="mb-3 text-success">
                                 <i class="bi bi-database-down fs-1"></i>
                             </div>
-                            <h4 class="fw-bold">Pre-built Indices</h4>
+                            <h4 class="fw-bold">Pre-built Databases</h4>
                             <p class="small text-muted mb-4">Download the complete UniProtKB/TrEMBL 2026 digest
-                                (Trypsin, MC=2). Approximately 380 GB of optimized RocksDB data.</p>
+                                (Trypsin, MC=2). Approximately 255 GB of optimized RocksDB data.</p>
 
                             <div class="d-grid w-100">
-                                <button class="btn btn-outline-success btn-lg disabled">
-                                    <i class="bi bi-cloud-download me-2"></i> Coming in Q1 2026
+                                <button class="btn btn-outline-info btn-lg disabled">
+                                    <i class="bi bi-cloud-download me-2"></i> Coming soon
                                 </button>
                             </div>
                             <small class="mt-3 text-muted">Direct high-speed mirror links will be provided.</small>
@@ -543,98 +601,6 @@ include_once 'lib.php';
                 </div>
             </div>
 
-            <div class="row mt-5 justify-content-center">
-                <div class="col-lg-8 text-center p-4 bg-white border rounded shadow-sm">
-                    <h5 class="fw-bold">Need Early Access?</h5>
-                    <p class="mb-0">For custom database builds, pipeline integration support, or early access to the
-                        Rust CLI engine, please contact the development team at <a href="mailto:jdiminic@pbf.hr"
-                                                                                   class="text-decoration-none fw-bold">jdiminic@pbf.hr</a>.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- KEY FEATURES -->
-        <div class="row mb-4">
-            <div class="col">
-                <h3>Key capabilities</h3>
-                <div class="row">
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">Ultra-fast mass search</h6>
-                                <p class="card-text small">
-                                    Retrieve candidate peptides within narrow precursor mass windows
-                                    in milliseconds, even for very large databases.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">Custom database generation</h6>
-                                <p class="card-text small">
-                                    Build tailored peptide indexes for specific organisms,
-                                    taxonomies, enzymes, and digestion parameters.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">Out-of-core design</h6>
-                                <p class="card-text small">
-                                    No need to load the full digest into memory. Works efficiently
-                                    with very large UniProt-scale datasets.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">CLI-first architecture</h6>
-                                <p class="card-text small">
-                                    Scriptable and pipeline-friendly command-line interface suitable
-                                    for HPC and automated workflows.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">Embeddable engine</h6>
-                                <p class="card-text small">
-                                    Designed to be integrated into external software, services,
-                                    or internal proteomics pipelines.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h6 class="card-title">Enterprise customization</h6>
-                                <p class="card-text small">
-                                    Supports custom builds, organism-specific databases,
-                                    and performance tuning for production environments.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
         </div>
 
         <!-- COMMUNITY VS ENTERPRISE -->
