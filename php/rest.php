@@ -35,17 +35,17 @@ include_once 'lib.php';
                 <tbody>
                 <tr>
                     <td><span class="badge bg-success">GET</span></td>
-                    <td><code>/search</code></td>
+                    <td><code>search.php</code></td>
                     <td>Search peptides by mass range. Returns accession numbers.</td>
                 </tr>
                 <tr>
                     <td><span class="badge bg-success">GET</span></td>
-                    <td><code>/search-peptide</code></td>
+                    <td><code>search-peptide.php</code></td>
                     <td>Search by peptide amino acid sequence (exact monoisotopic mass match).</td>
                 </tr>
                 <tr>
                     <td><span class="badge bg-success">GET</span></td>
-                    <td><code>/search-taxonomy</code></td>
+                    <td><code>search-taxonomy.php</code></td>
                     <td>Search peptides by mass range. Returns accession numbers enriched with NCBI taxonomy IDs.</td>
                 </tr>
                 </tbody>
@@ -56,12 +56,12 @@ include_once 'lib.php';
     <!-- ============================================================ -->
     <!--  ENDPOINT 1: /search                                         -->
     <!-- ============================================================ -->
-    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">1. Search by Mass Range &mdash; <code>GET /search</code></h2>
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">1. Search by Mass Range &mdash; <code>GET search.php</code></h2>
 
     <div class="card mb-4">
         <div class="card-header"><strong>Endpoint</strong></div>
         <div class="card-body">
-            <code>GET https://digestedproteindb.pbf.hr/search</code>
+            <code>GET https://digestedproteindb.pbf.hr/search.php</code>
             <p class="mt-3 mb-0">
                 Retrieves peptides whose monoisotopic mass falls within the specified range.
                 Returns UniProt accession numbers for each matching peptide.
@@ -114,9 +114,9 @@ include_once 'lib.php';
     <div class="card mb-4">
         <div class="card-header"><strong>Request Example</strong></div>
         <div class="card-body">
-            <pre><code>GET https://digestedproteindb.pbf.hr/search?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10</code></pre>
+            <pre><code>GET https://digestedproteindb.pbf.hr/search.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10</code></pre>
             <p class="mt-2 mb-0">cURL:</p>
-            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10"</code></pre>
+            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10"</code></pre>
         </div>
     </div>
 
@@ -164,16 +164,16 @@ include_once 'lib.php';
     <!-- ============================================================ -->
     <!--  ENDPOINT 2: /search-peptide                                 -->
     <!-- ============================================================ -->
-    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">2. Search by Peptide Sequence &mdash; <code>GET /search-peptide</code></h2>
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">2. Search by Peptide Sequence &mdash; <code>GET search-peptide.php</code></h2>
 
     <div class="card mb-4">
         <div class="card-header"><strong>Endpoint</strong></div>
         <div class="card-body">
-            <code>GET https://digestedproteindb.pbf.hr/search-peptide</code>
+            <code>GET https://digestedproteindb.pbf.hr/search-peptide.php</code>
             <p class="mt-3 mb-0">
                 Accepts a peptide amino acid sequence, computes its exact monoisotopic mass server-side,
                 and returns all database entries matching that precise mass.
-                The response format is identical to <code>/search</code>.
+                The response format is identical to <code>search.php</code>.
             </p>
         </div>
     </div>
@@ -217,23 +217,23 @@ include_once 'lib.php';
     <div class="card mb-4">
         <div class="card-header"><strong>Request Example</strong></div>
         <div class="card-body">
-            <pre><code>GET https://digestedproteindb.pbf.hr/search-peptide?peptide=SYTFHFKYR</code></pre>
+            <pre><code>GET https://digestedproteindb.pbf.hr/search-peptide.php?peptide=SYTFHFKYR</code></pre>
             <p class="mt-2 mb-0">cURL:</p>
-            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search-peptide?peptide=SYTFHFKYR"</code></pre>
+            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search-peptide.php?peptide=SYTFHFKYR"</code></pre>
         </div>
     </div>
 
     <!-- ============================================================ -->
     <!--  ENDPOINT 3: /search-taxonomy                                -->
     <!-- ============================================================ -->
-    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">3. Search by Mass Range with Taxonomy &mdash; <code>GET /search-taxonomy</code></h2>
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">3. Search by Mass Range with Taxonomy &mdash; <code>GET search-taxonomy.php</code></h2>
 
     <div class="card mb-4">
         <div class="card-header"><strong>Endpoint</strong></div>
         <div class="card-body">
             <code>GET https://digestedproteindb.pbf.hr/search-taxonomy.php</code>
             <p class="mt-3 mb-0">
-                Identical to <code>/search</code> in its query parameters, but the response enriches each
+                Identical to <code>search.php</code> in its query parameters, but the response enriches each
                 accession number with the corresponding <b>NCBI Taxonomy ID</b> (<code>taxId</code>).
                 This allows downstream filtering of results by organism directly from the API response,
                 without requiring additional lookups.
@@ -297,7 +297,7 @@ include_once 'lib.php';
         <div class="card-body">
             <p><b>Content-Type:</b> <code>application/json</code></p>
             <p>
-                The structure is the same as <code>/search</code>, except each peptide entry uses
+                The structure is the same as <code>search.php</code>, except each peptide entry uses
                 <code>accsTax</code> instead of <code>acc</code>. Each element of <code>accsTax</code>
                 is an object containing the UniProt accession and its NCBI Taxonomy ID.
             </p>

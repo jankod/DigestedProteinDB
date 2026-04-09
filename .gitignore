@@ -13,3 +13,4 @@ war/node_modules
 /DigestedProteinDB.iml
 /python/misc/
 /src/test/java/hr/pbf/digestdb/experiments/
+.serena

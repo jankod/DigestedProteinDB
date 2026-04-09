@@ -15,7 +15,7 @@ import java.io.*;
 @Slf4j
 public class AccTaxDB {
 
-    // Acc => TaxId
+    //
     private Long2IntMap db;
 
     private AccTaxDB() {
