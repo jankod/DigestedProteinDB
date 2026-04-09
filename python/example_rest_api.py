@@ -5,7 +5,8 @@ https://digestedproteindb.pbf.hr/rest.php
 
 import requests
 
-BASE_URL = "https://digestedproteindb.pbf.hr/search.php"
+BASE_URL     = "https://digestedproteindb.pbf.hr/search.php"
+TAXONOMY_URL = "https://digestedproteindb.pbf.hr/search-taxonomy.php"
 
 # Monoisotopic masses of amino acid residues (Da)
 AA_MASS = {
@@ -24,13 +25,8 @@ def peptide_mass(sequence: str) -> float:
 
 
 def search_by_mass(mass1: float, mass2: float, page: int = 1, page_size: int = 10) -> dict:
-    """Search peptides by mass range."""
-    params = {
-        "mass1": mass1,
-        "mass2": mass2,
-        "page": page,
-        "pageSize": page_size,
-    }
+    """Search peptides by mass range. Returns plain accession numbers."""
+    params = {"mass1": mass1, "mass2": mass2, "page": page, "pageSize": page_size}
     response = requests.get(BASE_URL, params=params)
     response.raise_for_status()
     return response.json()
@@ -43,8 +39,16 @@ def search_by_peptide(sequence: str, tolerance_da: float = 0.02, page_size: int 
     return search_by_mass(mass - tolerance_da, mass + tolerance_da, page_size=page_size)
 
 
+def search_by_mass_taxonomy(mass1: float, mass2: float, page: int = 1, page_size: int = 10) -> dict:
+    """Search peptides by mass range with NCBI taxonomy ID per accession."""
+    params = {"mass1": mass1, "mass2": mass2, "page": page, "pageSize": page_size}
+    response = requests.get(TAXONOMY_URL, params=params)
+    response.raise_for_status()
+    return response.json()
+
+
 def print_results(data: dict):
-    """Print a summary of search results."""
+    """Print search results (plain accession format)."""
     print(f"Total results : {data.get('totalResult', 0)}")
     print(f"Page          : {data.get('page')} / pageSize={data.get('pageSize')}")
     print(f"Duration      : {data.get('duration')}")
@@ -57,6 +61,26 @@ def print_results(data: dict):
                 seq = pep.get("seq", "?")
                 accs = ", ".join(pep.get("acc", []))
                 print(f"  Mass: {mass:<12}  Sequence: {seq:<20}  Acc: {accs}")
+
+
+def print_results_taxonomy(data: dict):
+    """Print search results including NCBI taxonomy IDs."""
+    print(f"Total results : {data.get('totalResult', 0)}")
+    print(f"Page          : {data.get('page')} / pageSize={data.get('pageSize')}")
+    print(f"Duration      : {data.get('duration')}")
+    print(f"Memory        : {data.get('memory')}")
+    print("-" * 75)
+
+    for item in data.get("result", []):
+        for mass, peptides in item.items():
+            for pep in peptides:
+                seq = pep.get("seq", "?")
+                # accsTax: list of {"acc": "...", "taxId": 12345}
+                accs_tax = pep.get("accsTax", [])
+                accs_str = ", ".join(
+                    f"{e['acc']} (taxId:{e['taxId']})" for e in accs_tax
+                )
+                print(f"  Mass: {mass:<12}  Sequence: {seq:<20}  {accs_str}")
 
 
 if __name__ == "__main__":
@@ -86,3 +110,15 @@ if __name__ == "__main__":
     print("=" * 65)
     data = search_by_mass(mass1=1800.00, mass2=1800.02, page=2, page_size=5)
     print_results(data)
+
+    print()
+
+    # --- Example 4: search with taxonomy (NCBI taxId per accession) ---
+    print("=" * 65)
+    print("Example 4: search with taxonomy (1247.60 – 1247.62)")
+    print("=" * 65)
+    try:
+        data = search_by_mass_taxonomy(mass1=1247.60, mass2=1247.62, page_size=5)
+        print_results_taxonomy(data)
+    except Exception as e:
+        print(f"  Taxonomy endpoint not available: {e}")

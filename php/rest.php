@@ -13,13 +13,58 @@ include_once 'lib.php';
 
 <div class="container">
     <h1 class="mb-4">Digested Protein DB REST API Documentation</h1>
+
+    <p class="lead mb-4">
+        The DigestedProteinDB REST API provides programmatic access to a large database of theoretically
+        digested proteins for use in mass spectrometry (MS) peptide identification workflows.
+        All endpoints return <code>application/json</code> and support pagination.
+    </p>
+
+    <!-- Endpoints overview -->
+    <div class="card mb-4">
+        <div class="card-header"><strong>Available Endpoints</strong></div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Method</th>
+                    <th>Endpoint</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><span class="badge bg-success">GET</span></td>
+                    <td><code>/search</code></td>
+                    <td>Search peptides by mass range. Returns accession numbers.</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-success">GET</span></td>
+                    <td><code>/search-peptide</code></td>
+                    <td>Search by peptide amino acid sequence (exact monoisotopic mass match).</td>
+                </tr>
+                <tr>
+                    <td><span class="badge bg-success">GET</span></td>
+                    <td><code>/search-taxonomy</code></td>
+                    <td>Search peptides by mass range. Returns accession numbers enriched with NCBI taxonomy IDs.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  ENDPOINT 1: /search                                         -->
+    <!-- ============================================================ -->
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">1. Search by Mass Range &mdash; <code>GET /search</code></h2>
+
     <div class="card mb-4">
         <div class="card-header"><strong>Endpoint</strong></div>
         <div class="card-body">
-            <code>GET https://digestedproteindb.pbf.hr/search.php</code>
-            <p class="mt-3">
-                Retrieves peptide/protein ptmSearchResults filtered by a specific mass range or peptide query.<br>
-                Returns ptmSearchResults in JSON format.
+            <code>GET https://digestedproteindb.pbf.hr/search</code>
+            <p class="mt-3 mb-0">
+                Retrieves peptides whose monoisotopic mass falls within the specified range.
+                Returns UniProt accession numbers for each matching peptide.
             </p>
         </div>
     </div>
@@ -40,37 +85,26 @@ include_once 'lib.php';
                 <tr>
                     <td><code>mass1</code></td>
                     <td>float</td>
-                    <td>Yes (or peptide)</td>
-                    <td>Lower bound of the mass range (inclusive). If <code>peptide</code> parameter is used, <code>mass1</code>
-                        and <code>mass2</code> will be calculated from its mass.
-                    </td>
+                    <td>Yes</td>
+                    <td>Lower bound of the mass range in Daltons (inclusive).</td>
                 </tr>
                 <tr>
                     <td><code>mass2</code></td>
                     <td>float</td>
-                    <td>Yes (or peptide)</td>
-                    <td>Upper bound of the mass range (inclusive).</td>
-                </tr>
-                <tr>
-                    <td><code>peptide</code></td>
-                    <td>string</td>
-                    <td>No</td>
-                    <td>Peptide sequence. If provided, calculates <code>mass1</code> and <code>mass2</code> for the
-                        sequence.
-                    </td>
+                    <td>Yes</td>
+                    <td>Upper bound of the mass range in Daltons (inclusive).</td>
                 </tr>
                 <tr>
                     <td><code>page</code></td>
                     <td>integer</td>
                     <td>No</td>
-                    <td>Page number for pagination. Default is <code>1</code>.</td>
+                    <td>Page number for pagination. Default: <code>1</code>.</td>
                 </tr>
                 <tr>
                     <td><code>pageSize</code></td>
                     <td>integer</td>
                     <td>No</td>
-                    <td>Number of ptmSearchResults per page. Default is <code>10</code>. Maximum allowed is <code>1000</code>.
-                    </td>
+                    <td>Results per page. Default: <code>10</code>. Maximum: <code>1000</code>.</td>
                 </tr>
                 </tbody>
             </table>
@@ -80,7 +114,9 @@ include_once 'lib.php';
     <div class="card mb-4">
         <div class="card-header"><strong>Request Example</strong></div>
         <div class="card-body">
-            <pre><code>GET https://digestedproteindb.pbf.hr/search.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10</code></pre>
+            <pre><code>GET https://digestedproteindb.pbf.hr/search?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10</code></pre>
+            <p class="mt-2 mb-0">cURL:</p>
+            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10"</code></pre>
         </div>
     </div>
 
@@ -88,11 +124,10 @@ include_once 'lib.php';
         <div class="card-header"><strong>Response</strong></div>
         <div class="card-body">
             <p><b>Content-Type:</b> <code>application/json</code></p>
-            <p><b>Response structure:</b></p>
             <pre><code>{
     "totalResult": 431,
     "memory": "2008 MB",
-    "duration": "00:00:54.966",
+    "duration": "00:00:00.024",
     "page": 1,
     "pageSize": 10,
     "result": [
@@ -100,118 +135,253 @@ include_once 'lib.php';
             "1247.6087": [
                 {
                     "seq": "SYTFHFKYR",
-                    "acc": [
-                        "A0A0C9U8Z7",
-                        "A0A0C9UZS6",
-                        "A0A0C9UMQ1"
-                    ]
+                    "acc": ["A0A0C9U8Z7", "A0A0C9UZS6", "A0A0C9UMQ1"]
                 },
                 {
                     "seq": "AIGFDGWHAFK",
-                    "acc": [
-                        "A0A8J3B0H4",
-                        "A4G425",
-                        "A0A4R6G671"
-                    ]
+                    "acc": ["A0A8J3B0H4", "A4G425"]
                 }
-                // ... more peptide objects for this mass
             ]
         }
-        // ... more mass keys and peptide arrays
     ]
 }</code></pre>
-            <p class="mt-3 mb-1"><b>Top-level fields:</b></p>
-            <ul>
-                <li><code>totalResult</code> – Total number of matching entries.</li>
-                <li><code>memory</code> – Memory usage for the request.</li>
-                <li><code>duration</code> – Query execution time.</li>
-                <li><code>page</code> – Current page number.</li>
-                <li><code>pageSize</code> – Number of ptmSearchResults per page.</li>
-                <li>
-                    <code>result</code> – Array of objects, each key is the peptide mass (as a string/number), value is
-                    an array of peptide objects:
+            <p class="mt-3 mb-1"><b>Fields:</b></p>
+            <ul class="mb-0">
+                <li><code>totalResult</code> – Total number of matching peptides across all pages.</li>
+                <li><code>memory</code> – Server memory usage at the time of the request.</li>
+                <li><code>duration</code> – Server-side query execution time.</li>
+                <li><code>page</code> / <code>pageSize</code> – Pagination info.</li>
+                <li><code>result</code> – Array of objects keyed by peptide mass (Da):
                     <ul>
-                        <li><code>seq</code> – Peptide sequence</li>
-                        <li><code>acc</code> – List of protein accession numbers for this peptide</li>
+                        <li><code>seq</code> – Peptide amino acid sequence (single-letter code).</li>
+                        <li><code>acc</code> – List of UniProt accession numbers of proteins containing this peptide.</li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
 
+    <!-- ============================================================ -->
+    <!--  ENDPOINT 2: /search-peptide                                 -->
+    <!-- ============================================================ -->
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">2. Search by Peptide Sequence &mdash; <code>GET /search-peptide</code></h2>
+
     <div class="card mb-4">
-        <div class="card-header"><strong>Error Responses</strong></div>
+        <div class="card-header"><strong>Endpoint</strong></div>
         <div class="card-body">
-            <ul>
-                <li><code>400 Bad Request</code> – Returned if required parameters are missing or invalid.<br>
-                    <code>{"error": "Peptide is required"}</code>
+            <code>GET https://digestedproteindb.pbf.hr/search-peptide</code>
+            <p class="mt-3 mb-0">
+                Accepts a peptide amino acid sequence, computes its exact monoisotopic mass server-side,
+                and returns all database entries matching that precise mass.
+                The response format is identical to <code>/search</code>.
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Query Parameters</strong></div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>peptide</code></td>
+                    <td>string</td>
+                    <td>Yes</td>
+                    <td>Amino acid sequence in single-letter code (e.g. <code>SYTFHFKYR</code>). Mass is computed server-side.</td>
+                </tr>
+                <tr>
+                    <td><code>page</code></td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Page number. Default: <code>1</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>pageSize</code></td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Results per page. Default: <code>1000</code>. Maximum: <code>1000</code>.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Request Example</strong></div>
+        <div class="card-body">
+            <pre><code>GET https://digestedproteindb.pbf.hr/search-peptide?peptide=SYTFHFKYR</code></pre>
+            <p class="mt-2 mb-0">cURL:</p>
+            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search-peptide?peptide=SYTFHFKYR"</code></pre>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  ENDPOINT 3: /search-taxonomy                                -->
+    <!-- ============================================================ -->
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">3. Search by Mass Range with Taxonomy &mdash; <code>GET /search-taxonomy</code></h2>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Endpoint</strong></div>
+        <div class="card-body">
+            <code>GET https://digestedproteindb.pbf.hr/search-taxonomy.php</code>
+            <p class="mt-3 mb-0">
+                Identical to <code>/search</code> in its query parameters, but the response enriches each
+                accession number with the corresponding <b>NCBI Taxonomy ID</b> (<code>taxId</code>).
+                This allows downstream filtering of results by organism directly from the API response,
+                without requiring additional lookups.
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Query Parameters</strong></div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><code>mass1</code></td>
+                    <td>float</td>
+                    <td>Yes</td>
+                    <td>Lower bound of the mass range in Daltons (inclusive).</td>
+                </tr>
+                <tr>
+                    <td><code>mass2</code></td>
+                    <td>float</td>
+                    <td>Yes</td>
+                    <td>Upper bound of the mass range in Daltons (inclusive).</td>
+                </tr>
+                <tr>
+                    <td><code>page</code></td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Page number. Default: <code>1</code>.</td>
+                </tr>
+                <tr>
+                    <td><code>pageSize</code></td>
+                    <td>integer</td>
+                    <td>No</td>
+                    <td>Results per page. Default: <code>1000</code>. Maximum: <code>1000</code>.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Request Example</strong></div>
+        <div class="card-body">
+            <pre><code>GET https://digestedproteindb.pbf.hr/search-taxonomy.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10</code></pre>
+            <p class="mt-2 mb-0">cURL:</p>
+            <pre class="mb-0"><code>curl "https://digestedproteindb.pbf.hr/search-taxonomy.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10"</code></pre>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Response</strong></div>
+        <div class="card-body">
+            <p><b>Content-Type:</b> <code>application/json</code></p>
+            <p>
+                The structure is the same as <code>/search</code>, except each peptide entry uses
+                <code>accsTax</code> instead of <code>acc</code>. Each element of <code>accsTax</code>
+                is an object containing the UniProt accession and its NCBI Taxonomy ID.
+            </p>
+            <pre><code>{
+    "totalResult": 431,
+    "memory": "2014 MB",
+    "duration": "00:00:00.047",
+    "page": 1,
+    "pageSize": 10,
+    "result": [
+        {
+            "1247.6087": [
+                {
+                    "seq": "SYTFHFKYR",
+                    "accsTax": [
+                        {"acc": "A0A0C9U8Z7", "taxId": 9606},
+                        {"acc": "A0A0C9UZS6", "taxId": 10090},
+                        {"acc": "A0A0C9UMQ1", "taxId": 10116}
+                    ]
+                },
+                {
+                    "seq": "AIGFDGWHAFK",
+                    "accsTax": [
+                        {"acc": "A0A8J3B0H4", "taxId": 3702},
+                        {"acc": "A4G425",     "taxId": 4577}
+                    ]
+                }
+            ]
+        }
+    ]
+}</code></pre>
+            <p class="mt-3 mb-1"><b>Fields specific to this endpoint:</b></p>
+            <ul class="mb-0">
+                <li>
+                    <code>accsTax</code> – List of accession/taxonomy objects per peptide (replaces <code>acc</code>):
+                    <ul>
+                        <li><code>acc</code> – UniProt accession number.</li>
+                        <li><code>taxId</code> – NCBI Taxonomy ID of the source organism
+                            (e.g. <code>9606</code> = <em>Homo sapiens</em>,
+                            <code>10090</code> = <em>Mus musculus</em>,
+                            <code>3702</code> = <em>Arabidopsis thaliana</em>).
+                            Use <a href="https://www.ncbi.nlm.nih.gov/taxonomy" target="_blank">NCBI Taxonomy</a>
+                            to resolve IDs to organism names.
+                        </li>
+                    </ul>
                 </li>
-                <li><code>500 Internal Server Error</code> – Returned if the server encounters an error.<br>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!--  Error responses & general notes                             -->
+    <!-- ============================================================ -->
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">Error Responses</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <ul class="mb-0">
+                <li>
+                    <code>400 Bad Request</code> – Missing or invalid parameters.<br>
+                    <code>{"error": "Mass1 and Mass2 are required as doubles."}</code>
+                </li>
+                <li class="mt-2">
+                    <code>500 Internal Server Error</code> – Unexpected server-side error.<br>
                     <code>{"error": "Error details"}</code>
                 </li>
             </ul>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header"><strong>Example cURL Request</strong></div>
-        <div class="card-body">
-            <pre><code>curl "https://digestedproteindb.pbf.hr/search.php?mass1=1247.5&amp;mass2=1247.7&amp;page=1&amp;pageSize=10"</code></pre>
-        </div>
-    </div>
+    <h2 class="mt-5 mb-3 fs-4 border-bottom pb-2">General Notes</h2>
 
     <div class="card mb-4">
-        <div class="card-header"><strong>Usage Notes</strong></div>
         <div class="card-body">
-            <ul>
+            <ul class="mb-0">
+                <li>All masses are <b>monoisotopic</b> masses in Daltons (Da).</li>
+                <li>All endpoints are read-only and optimized for high-performance querying.</li>
+                <li>Maximum <code>pageSize</code> is <code>1000</code> for all endpoints.</li>
                 <li>
-                    Use either <code>mass1</code>/<code>mass2</code> for direct mass range filtering or
-                    <code>peptide</code> for sequence-based mass search.
-                </li>
-                <li>
-                    Each entry in <code>result</code> is an object with the mass as the key, mapping to an array of
-                    peptide/protein hitPeptides.
-                </li>
-                <li>
-                    The endpoint is optimized for read-only, high-performance querying.
-                </li>
-                <li>
-                    Maximum <code>pageSize</code> is <code>1000</code>.
+                    For programmatic access examples in Python, see the
+                    <a href="https://github.com/tag/DigestedProteinDB/tree/master/python" target="_blank">
+                        Python example scripts</a> included with the database distribution.
                 </li>
             </ul>
-        </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header"><strong>Implementation Note (Java server method)</strong></div>
-        <div class="card-body">
-<pre><code>private void handleBySearch(HttpServerExchange http) {
-    if (http.isInIoThread()) {
-        http.dispatch(this::handleBySearch);
-        return;
-    }
-    Map&lt;String, String&gt; params = createParam(http);
-
-    try {
-        String peptide = params.getOrDefault("peptide", "");
-        if (peptide.isEmpty()) {
-            sendJsonResponse(http, StatusCodes.BAD_REQUEST,
-                    "{\"error\": \"Peptide is required\"}");
-            return;
-        }
-        double mass1 = BioUtil.calculateMassWidthH2O(peptide);
-        double mass2 = mass1;
-        int page = Integer.parseInt(params.getOrDefault("page", "1"));
-        int pageSize = Integer.parseInt(params.getOrDefault("pageSize", "1000"));
-
-        searchByMass(http, mass1, mass2, page, pageSize);
-    } catch (Exception e) {
-        sendJsonResponse(http, StatusCodes.INTERNAL_SERVER_ERROR,
-                "{\"error\": \"" + e.getMessage() + "\"}");
-    }
-}</code></pre>
-            <p class="mt-2">For <code>peptide</code> queries, mass is computed server-side and search is performed for
-                that precise mass.</p>
         </div>
     </div>
 </div>
