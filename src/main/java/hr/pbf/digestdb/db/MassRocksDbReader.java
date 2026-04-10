@@ -3,6 +3,7 @@ package hr.pbf.digestdb.db;
 import hr.pbf.digestdb.util.BinaryPeptideDbUtil;
 import hr.pbf.digestdb.util.MyUtil;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksDB;
@@ -13,6 +14,7 @@ import java.util.*;
 
 public class MassRocksDbReader implements AutoCloseable {
     private final String dbPath;
+    @Getter
     private RocksDB db;
 
     public MassRocksDbReader(String dbPath) throws RocksDBException {
