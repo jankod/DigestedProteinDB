@@ -88,6 +88,8 @@ public class MyUtil {
         Options options = new Options();
         BlockBasedTableConfig tableConfig = new BlockBasedTableConfig();
         Cache cache = new LRUCache(64L * 1024L * 1024L * 1024L); // 64GB cache
+//        Cache cache = new LRUCache(8L * 1024L * 1024L * 1024L); // 8 GB
+
         tableConfig.setBlockCache(cache);
         tableConfig.setCacheIndexAndFilterBlocks(true);
         tableConfig.setPinL0FilterAndIndexBlocksInCache(true);

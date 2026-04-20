@@ -8,7 +8,9 @@ import org.apache.commons.lang3.RandomUtils;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksIterator;
 
+import java.io.PrintWriter;
 import java.util.*;
+import java.util.Locale;
 
 import static org.apache.commons.math3.stat.StatUtils.mean;
 
@@ -26,6 +28,8 @@ public class BenchmarkRunner {
             dbDirPath = args[0];
             accDbPath = args[1];
         }
+        dbDirPath = "/disk-2tb/digested-db/db_trembl_trypsin/rocksdb_mass.db";
+        accDbPath = "/disk-2tb/digested-db/db_trembl_trypsin/custom_accession.db";
         MassRocksDbReader massDb = new MassRocksDbReader(dbDirPath);
         AccessionDbReader accDb = new AccessionDbReader(accDbPath);
 
@@ -49,6 +53,9 @@ public class BenchmarkRunner {
         long totalSink = 0; // accumulated value consumed at the end to prevent JIT dead-code elimination
         long totalStart = System.nanoTime();
 
+        PrintWriter pw = new PrintWriter("benchmark_distribution.csv");
+        pw.println("mass,hit_count,latency_ms");
+
         for (int i = 0; i < BATCH_SIZE; i++) {
             double mass = queryMasses.get(i);
             double lo = mass - TOLERANCE_DA;
@@ -61,10 +68,12 @@ public class BenchmarkRunner {
             // Step 3: mapping of internal integer IDs to UniProt accession strings
             MassRocksDbReader.MassPageResult results = massDb.searchByMass(lo, hi, 1, Integer.MAX_VALUE);
 
+            int hitCount = 0;
             for (int i1 = 0; i1 < results.getResults().size(); i1++) {
                 Map.Entry<Double, Set<BinaryPeptideDbUtil.PeptideAccids>> entry = results.getResults().get(i1);
                 Set<BinaryPeptideDbUtil.PeptideAccids> peptideAccids = entry.getValue();
                 for (BinaryPeptideDbUtil.PeptideAccids peptideAccid : peptideAccids) {
+                    hitCount++;
                     // Resolve ALL accession IDs for this peptide (not just the first one)
                     for (int iAcc = 0; iAcc < peptideAccid.getAccids().length; iAcc++) {
                         String accession = accDb.getAccession(peptideAccid.getAccids()[iAcc]);
@@ -74,7 +83,11 @@ public class BenchmarkRunner {
             }
 
             perQueryNanos[i] = System.nanoTime() - t0;
+            pw.printf(Locale.US, "%.4f,%d,%.4f%n", mass, hitCount, perQueryNanos[i] / 1_000_000.0);
         }
+
+        pw.close();
+        System.out.println("Distribution data saved to benchmark_distribution.csv");
 
         long totalNanos = System.nanoTime() - totalStart;
 

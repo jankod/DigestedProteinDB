@@ -1,0 +1,10 @@
+Min mass: 360.1393, max mass: 8532.7586
+Warmup done. Starting benchmark...
+Distribution data saved to benchmark_distribution.csv
+(sink=48873771340, ignore this value)
+Total (10k queries): 2004.27 s
+Mean per query:      200.42 ms
+Median (P50):        6.68 ms
+P95:                 1184.34 ms
+P99:                 2045.30 ms
+Max:                 2995.89 ms
